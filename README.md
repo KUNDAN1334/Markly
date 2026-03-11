@@ -57,3 +57,5 @@ npm run dev
 ## Keyboard Shortcuts
 S=Select, R=Rectangle, C=Circle, A=Arrow, L=Line, H=Highlight, F=Freehand, T=Text  
 Delete=Remove selected, Ctrl+Z=Undo, Ctrl+Y=Redo, Ctrl+S=Save
+
+

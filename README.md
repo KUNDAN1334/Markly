@@ -2,6 +2,9 @@
 
 A production-quality MVP for web-based PDF annotation and review.
 
+<img width="1699" height="907" alt="image" src="https://github.com/user-attachments/assets/3447e996-faed-4031-8eb7-2fc38615d9fb" />
+
+
 ## Features
 - PDF Viewer (pdf.js, multi-page, zoom, thumbnails)
 - Excalidraw-style annotation canvas (Rectangle, Circle, Arrow, Line, Highlight, Freehand, Text)

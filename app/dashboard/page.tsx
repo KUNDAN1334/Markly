@@ -286,11 +286,14 @@ export default function HomePage() {
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', height: 56, gap: 16 }}>
           {/* Logo */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
-            <div style={{ width: 28, height: 28, background: 'var(--accent)', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M2 11 L5 5 L8 9 L10 6 L13 11 Z" stroke="var(--accent-fg)" strokeWidth="1.5" strokeLinejoin="round" />
-              </svg>
-            </div>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'center',width:32,height:32}}>
+  <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+    <path d="M20 6 L8 6 L8 20" stroke="var(--text)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M20 34 L32 34 L32 20" stroke="var(--text)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+    <circle cx="20" cy="20" r="3" fill="var(--text)"/>
+    <path d="M13 20 Q17 18 20 20 Q23 22 27 20" stroke="var(--text)" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+  </svg>
+</div>
             <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, color: 'var(--text)', letterSpacing: '-.01em' }}>Markly</span>
           </div>
 

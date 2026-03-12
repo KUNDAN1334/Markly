@@ -56,15 +56,14 @@ export default function LandingPage() {
         }
         .lp-nav-inner {
           max-width:1100px;margin:0 auto;padding:0 24px;
-          display:flex;align-items:center;height:56px;gap:20px;
+          display:flex;align-items:center;height:72px;gap:20px;
         }
         .lp-logo { display:flex;align-items:center;gap:8px;text-decoration:none;flex:1; }
         .lp-logo-mark {
           width:28px;height:28px;background:var(--accent);border-radius:6px;
           display:flex;align-items:center;justify-content:center;
         }
-        .lp-logo-text { font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);letter-spacing:-.01em; }
-        .lp-nav-links { display:flex;gap:4px;list-style:none;padding:0;margin:0; }
+        .lp-logo-text { font-family:'DM Serif Display',serif;font-size:22px;font-weight:700;color:var(--text);letter-spacing:-.01em; }        .lp-nav-links { display:flex;gap:4px;list-style:none;padding:0;margin:0; }
         .lp-nav-links a {
           padding:6px 12px;border-radius:8px;font-size:14px;color:var(--text-2);
           text-decoration:none;transition:all .15s;
@@ -272,11 +271,14 @@ export default function LandingPage() {
         <nav className="lp-nav">
           <div className="lp-nav-inner">
             <a href="/" className="lp-logo">
-              <div className="lp-logo-mark">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d="M2 11 L5 5 L8 9 L10 6 L13 11 Z" stroke="var(--accent-fg)" strokeWidth="1.5" strokeLinejoin="round"/>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'center',width:32,height:32}}>
+                <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+                  <path d="M20 6 L8 6 L8 20" stroke="var(--text)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M20 34 L32 34 L32 20" stroke="var(--text)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <circle cx="20" cy="20" r="3" fill="var(--text)"/>
+                  <path d="M13 20 Q17 18 20 20 Q23 22 27 20" stroke="var(--text)" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
                 </svg>
-              </div>
+            </div>
               <span className="lp-logo-text">Markly</span>
             </a>
             <ul className="lp-nav-links">
@@ -590,7 +592,14 @@ export default function LandingPage() {
             <div className="lp-footer-inner">
               <div>
                 <a href="/" className="lp-logo" style={{marginBottom:12,display:'inline-flex'}}>
-                  <div className="lp-logo-mark"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 11 L5 5 L8 9 L10 6 L13 11 Z" stroke="var(--accent-fg)" strokeWidth="1.5" strokeLinejoin="round"/></svg></div>
+                  <div className="lp-logo-mark" style={{background:'transparent',border:'none'}}>
+                      <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+                         <path d="M20 6 L8 6 L8 20" stroke="var(--accent)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                         <path d="M20 34 L32 34 L32 20" stroke="var(--accent)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                         <circle cx="20" cy="20" r="3" fill="var(--accent)"/>
+                        <path d="M13 20 Q17 18 20 20 Q23 22 27 20" stroke="var(--accent)" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+                       </svg>
+</div>
                   <span className="lp-logo-text">Markly</span>
                 </a>
                 <div className="lp-footer-tagline">Excalidraw for Documents. Visual feedback for any PDF — draw, annotate, share.</div>

@@ -234,13 +234,7 @@ export function Toolbar({ onSave, onExport, onShare, isSaving, isDirty }: Toolba
 
       {/* ACTIONS */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <button onClick={toggleTheme}
-          style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-2)', cursor: 'pointer', color: 'var(--text-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .15s' }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border-strong)'; e.currentTarget.style.color = 'var(--text)'; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-3)'; }}
-        >
-          {theme === 'light' ? <Moon size={13} /> : <Sun size={13} />}
-        </button>
+        
 
         <button
           onClick={onSave} disabled={isSaving || !isDirty}
@@ -275,11 +269,11 @@ export function Toolbar({ onSave, onExport, onShare, isSaving, isDirty }: Toolba
         <button
           onClick={onExport}
           style={{
-            display: 'flex', alignItems: 'center', gap: 5,
+            display: 'flex', alignItems: 'center',justifyContent: 'center', gap: 5,
             padding: '0 14px', height: 32, borderRadius: 8,
             border: 'none', background: 'var(--accent)',
             fontSize: 12, fontWeight: 500, cursor: 'pointer', color: 'var(--accent-fg)',
-            fontFamily: "'Instrument Sans', sans-serif", transition: 'opacity .15s',
+            fontFamily: "'Instrument Sans', sans-serif", transition: 'opacity .15s', lineHeight: 1
           }}
           onMouseEnter={e => (e.currentTarget.style.opacity = '.8')}
           onMouseLeave={e => (e.currentTarget.style.opacity = '1')}

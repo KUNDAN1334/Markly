@@ -184,7 +184,12 @@ export default function EditorPage() {
       body: JSON.stringify({ documentId, access }),
     });
     const link = await res.json();
-    setShareLinks((prev) => [...prev, link]);
+    if (link.documentId === documentId) {
+      setShareLinks((prev) => {
+        const exists = prev.some((item) => item.id === link.id);
+        return exists ? prev : [...prev, link];
+      });
+    }
     return link;
   }
 

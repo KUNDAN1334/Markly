@@ -144,7 +144,12 @@ export default function ReviewPage() {
       body: JSON.stringify({ documentId: document.id, access: accessType }),
     });
     const link = await res.json();
-    setShareLinks((prev) => [...prev, link]);
+    if (link.documentId === document.id) {
+      setShareLinks((prev) => {
+        const exists = prev.some((item) => item.id === link.id);
+        return exists ? prev : [...prev, link];
+      });
+    }
     return link;
   }
 
@@ -346,6 +351,7 @@ export default function ReviewPage() {
           onClose={() => setShowShare(false)}
           onCreateLink={handleCreateShareLink}
           onDeleteLink={handleDeleteShareLink}
+          hiddenToken={token}
         />
       )}
     </div>

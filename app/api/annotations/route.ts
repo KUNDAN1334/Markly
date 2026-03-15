@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { validateShareLinkAccess } from '@/lib/share-link-auth';
 import { z } from 'zod';
 
 const bulkSaveSchema = z.object({
@@ -11,7 +12,7 @@ const bulkSaveSchema = z.object({
       type: z.string(),
       geometry: z.record(z.string(), z.unknown()),
       style: z.record(z.string(), z.unknown()),
-      content: z.string().optional(),
+      content: z.string().nullish(),
     })
   ),
 });
@@ -36,6 +37,19 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { documentId, annotations } = bulkSaveSchema.parse(body);
+    const shareToken = req.headers.get('x-share-token');
+
+    if (shareToken) {
+      const accessResult = await validateShareLinkAccess({
+        token: shareToken,
+        documentId,
+        minimumAccess: 'EDIT',
+      });
+
+      if (!accessResult.ok) {
+        return NextResponse.json({ error: accessResult.error }, { status: accessResult.status });
+      }
+    }
 
     await prisma.annotation.deleteMany({ where: { documentId } });
 
@@ -48,7 +62,7 @@ export async function POST(req: NextRequest) {
           type: a.type,
           geometry: a.geometry,
           style: a.style,
-          content: a.content,
+          content: a.content ?? null,
         })),
       });
     }

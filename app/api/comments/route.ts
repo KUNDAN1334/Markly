@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { validateShareLinkAccess } from '@/lib/share-link-auth';
 import { z } from 'zod';
 
 const commentSchema = z.object({
@@ -25,6 +26,20 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const data = commentSchema.parse(body);
+    const shareToken = req.headers.get('x-share-token');
+
+    if (shareToken) {
+      const accessResult = await validateShareLinkAccess({
+        token: shareToken,
+        documentId: data.documentId,
+        minimumAccess: 'COMMENT',
+      });
+
+      if (!accessResult.ok) {
+        return NextResponse.json({ error: accessResult.error }, { status: accessResult.status });
+      }
+    }
+
     const comment = await prisma.comment.create({ data });
     return NextResponse.json(comment, { status: 201 });
   } catch (error) {

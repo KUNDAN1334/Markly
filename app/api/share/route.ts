@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createDocumentBranch } from '@/lib/document-branch';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { generateToken } from '@/lib/utils';
 
 const shareLinkSchema = z.object({
-  projectId: z.string(),
+  documentId: z.string(),
   access: z.enum(['VIEW', 'COMMENT', 'EDIT']).default('VIEW'),
   expiresAt: z.string().optional(),
 });
@@ -17,6 +18,15 @@ export async function GET(req: NextRequest) {
     const shareLink = await prisma.shareLink.findUnique({
       where: { token },
       include: {
+        document: {
+          include: {
+            annotations: { orderBy: { createdAt: 'asc' } },
+            comments: { orderBy: { createdAt: 'desc' } },
+            shareLinks: {
+              orderBy: { createdAt: 'desc' },
+            },
+          },
+        },
         project: {
           include: {
             documents: {
@@ -25,7 +35,9 @@ export async function GET(req: NextRequest) {
                 comments: { orderBy: { createdAt: 'desc' } },
               },
             },
-            shareLinks: true,
+            shareLinks: {
+              orderBy: { createdAt: 'desc' },
+            },
           },
         },
       },
@@ -40,22 +52,49 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(shareLink);
   }
 
+  const documentId = searchParams.get('documentId');
+  if (documentId) {
+    const links = await prisma.shareLink.findMany({
+      where: { documentId },
+      orderBy: { createdAt: 'desc' },
+    });
+    return NextResponse.json(links);
+  }
+
   const projectId = searchParams.get('projectId');
   if (!projectId) return NextResponse.json({ error: 'projectId required' }, { status: 400 });
 
-  const links = await prisma.shareLink.findMany({ where: { projectId } });
+  const links = await prisma.shareLink.findMany({
+    where: { projectId },
+    orderBy: { createdAt: 'desc' },
+  });
   return NextResponse.json(links);
 }
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { projectId, access, expiresAt } = shareLinkSchema.parse(body);
+    const { documentId, access, expiresAt } = shareLinkSchema.parse(body);
+
+    const sourceDocument = await prisma.document.findUnique({
+      where: { id: documentId },
+      select: { id: true, projectId: true },
+    });
+
+    if (!sourceDocument) {
+      return NextResponse.json({ error: 'Document not found' }, { status: 404 });
+    }
+
+    const targetDocument =
+      access === 'EDIT'
+        ? await createDocumentBranch(sourceDocument.id)
+        : sourceDocument;
 
     const shareLink = await prisma.shareLink.create({
       data: {
         token: generateToken(),
-        projectId,
+        projectId: targetDocument.projectId,
+        documentId: targetDocument.id,
         access,
         expiresAt: expiresAt ? new Date(expiresAt) : null,
       },

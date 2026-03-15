@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ShareLink, AccessType } from '@/types';
 import { X, Copy, Check, Link, Trash2, Plus, Eye, MessageSquare, Edit3 } from 'lucide-react';
 
@@ -9,6 +9,7 @@ interface Props {
   onClose: () => void;
   onCreateLink: (access: AccessType) => Promise<ShareLink>;
   onDeleteLink: (id: string) => Promise<void>;
+  hiddenToken?: string;
 }
 
 const ACCESS_OPTIONS: { id: AccessType; label: string; desc: string; icon: React.ReactNode }[] = [
@@ -17,22 +18,19 @@ const ACCESS_OPTIONS: { id: AccessType; label: string; desc: string; icon: React
   { id: 'EDIT',    label: 'Can edit',    desc: 'Full annotation access', icon: <Edit3 size={12} /> },
 ];
 
-export function ShareModal({ shareLinks, onClose, onCreateLink, onDeleteLink }: Props) {
+export function ShareModal({ shareLinks, onClose, onCreateLink, onDeleteLink, hiddenToken }: Props) {
   const [selectedAccess, setSelectedAccess] = useState<AccessType>('COMMENT');
   const [creating, setCreating] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [links, setLinks] = useState<ShareLink[]>(shareLinks);
+  const [createdLink, setCreatedLink] = useState<ShareLink | null>(null);
 
   const appUrl = typeof window !== 'undefined' ? window.location.origin : '';
-
-  useEffect(() => {
-    setLinks(shareLinks);
-  }, [shareLinks]);
 
   const uniqueLinks = useMemo(() => {
     const seen = new Map<string, ShareLink>();
 
-    for (const link of links) {
+    for (const link of shareLinks) {
+      if (hiddenToken && link.token === hiddenToken) continue;
       const key = link.id || link.token;
       if (!seen.has(key)) {
         seen.set(key, link);
@@ -40,12 +38,14 @@ export function ShareModal({ shareLinks, onClose, onCreateLink, onDeleteLink }: 
     }
 
     return Array.from(seen.values());
-  }, [links]);
+  }, [hiddenToken, shareLinks]);
 
   async function handleCreate() {
     setCreating(true);
     try {
-      await onCreateLink(selectedAccess);
+      const link = await onCreateLink(selectedAccess);
+      setCreatedLink(link);
+      await copy(link.token, `created-${link.id}`);
     } finally {
       setCreating(false);
     }
@@ -123,6 +123,15 @@ export function ShareModal({ shareLinks, onClose, onCreateLink, onDeleteLink }: 
               <Plus size={13} />
               {creating ? 'Generating...' : 'Generate link'}
             </button>
+
+            {createdLink && (
+              <div style={{ marginTop: 12, padding: '10px 12px', borderRadius: 10, border: '1px solid #bfdbfe', background: '#eff6ff' }}>
+                <p style={{ fontSize: 11, fontWeight: 600, color: '#1d4ed8', marginBottom: 4 }}>New link ready</p>
+                <p style={{ fontSize: 10, color: '#1e3a8a', fontFamily: "'DM Mono', monospace", wordBreak: 'break-all' }}>
+                  {appUrl}/review/{createdLink.token}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Existing links */}

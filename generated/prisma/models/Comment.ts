@@ -513,10 +513,6 @@ export type CommentUncheckedUpdateManyWithoutAnnotationNestedInput = {
   deleteMany?: Prisma.CommentScalarWhereInput | Prisma.CommentScalarWhereInput[]
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type CommentCreateWithoutDocumentInput = {
   id?: string
   content: string

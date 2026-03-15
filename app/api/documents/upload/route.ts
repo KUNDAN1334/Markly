@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
         mimeType: file.type,
         size: file.size,
         path: filePath,
+        isVisible: true,
         projectId,
       },
       include: { annotations: true, comments: true },

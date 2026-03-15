@@ -91,6 +91,7 @@ export const DocumentScalarFieldEnum = {
   mimeType: 'mimeType',
   size: 'size',
   path: 'path',
+  isVisible: 'isVisible',
   projectId: 'projectId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -132,6 +133,7 @@ export const ShareLinkScalarFieldEnum = {
   id: 'id',
   token: 'token',
   projectId: 'projectId',
+  documentId: 'documentId',
   access: 'access',
   createdAt: 'createdAt',
   expiresAt: 'expiresAt'

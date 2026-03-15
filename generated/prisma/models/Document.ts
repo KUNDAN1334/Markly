@@ -41,6 +41,7 @@ export type DocumentMinAggregateOutputType = {
   mimeType: string | null
   size: number | null
   path: string | null
+  isVisible: boolean | null
   projectId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -53,6 +54,7 @@ export type DocumentMaxAggregateOutputType = {
   mimeType: string | null
   size: number | null
   path: string | null
+  isVisible: boolean | null
   projectId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -65,6 +67,7 @@ export type DocumentCountAggregateOutputType = {
   mimeType: number
   size: number
   path: number
+  isVisible: number
   projectId: number
   createdAt: number
   updatedAt: number
@@ -87,6 +90,7 @@ export type DocumentMinAggregateInputType = {
   mimeType?: true
   size?: true
   path?: true
+  isVisible?: true
   projectId?: true
   createdAt?: true
   updatedAt?: true
@@ -99,6 +103,7 @@ export type DocumentMaxAggregateInputType = {
   mimeType?: true
   size?: true
   path?: true
+  isVisible?: true
   projectId?: true
   createdAt?: true
   updatedAt?: true
@@ -111,6 +116,7 @@ export type DocumentCountAggregateInputType = {
   mimeType?: true
   size?: true
   path?: true
+  isVisible?: true
   projectId?: true
   createdAt?: true
   updatedAt?: true
@@ -210,6 +216,7 @@ export type DocumentGroupByOutputType = {
   mimeType: string
   size: number
   path: string
+  isVisible: boolean
   projectId: string
   createdAt: Date
   updatedAt: Date
@@ -245,12 +252,14 @@ export type DocumentWhereInput = {
   mimeType?: Prisma.StringFilter<"Document"> | string
   size?: Prisma.IntFilter<"Document"> | number
   path?: Prisma.StringFilter<"Document"> | string
+  isVisible?: Prisma.BoolFilter<"Document"> | boolean
   projectId?: Prisma.StringFilter<"Document"> | string
   createdAt?: Prisma.DateTimeFilter<"Document"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Document"> | Date | string
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
   annotations?: Prisma.AnnotationListRelationFilter
   comments?: Prisma.CommentListRelationFilter
+  shareLinks?: Prisma.ShareLinkListRelationFilter
 }
 
 export type DocumentOrderByWithRelationInput = {
@@ -260,12 +269,14 @@ export type DocumentOrderByWithRelationInput = {
   mimeType?: Prisma.SortOrder
   size?: Prisma.SortOrder
   path?: Prisma.SortOrder
+  isVisible?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   project?: Prisma.ProjectOrderByWithRelationInput
   annotations?: Prisma.AnnotationOrderByRelationAggregateInput
   comments?: Prisma.CommentOrderByRelationAggregateInput
+  shareLinks?: Prisma.ShareLinkOrderByRelationAggregateInput
 }
 
 export type DocumentWhereUniqueInput = Prisma.AtLeast<{
@@ -278,12 +289,14 @@ export type DocumentWhereUniqueInput = Prisma.AtLeast<{
   mimeType?: Prisma.StringFilter<"Document"> | string
   size?: Prisma.IntFilter<"Document"> | number
   path?: Prisma.StringFilter<"Document"> | string
+  isVisible?: Prisma.BoolFilter<"Document"> | boolean
   projectId?: Prisma.StringFilter<"Document"> | string
   createdAt?: Prisma.DateTimeFilter<"Document"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Document"> | Date | string
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
   annotations?: Prisma.AnnotationListRelationFilter
   comments?: Prisma.CommentListRelationFilter
+  shareLinks?: Prisma.ShareLinkListRelationFilter
 }, "id">
 
 export type DocumentOrderByWithAggregationInput = {
@@ -293,6 +306,7 @@ export type DocumentOrderByWithAggregationInput = {
   mimeType?: Prisma.SortOrder
   size?: Prisma.SortOrder
   path?: Prisma.SortOrder
+  isVisible?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -313,6 +327,7 @@ export type DocumentScalarWhereWithAggregatesInput = {
   mimeType?: Prisma.StringWithAggregatesFilter<"Document"> | string
   size?: Prisma.IntWithAggregatesFilter<"Document"> | number
   path?: Prisma.StringWithAggregatesFilter<"Document"> | string
+  isVisible?: Prisma.BoolWithAggregatesFilter<"Document"> | boolean
   projectId?: Prisma.StringWithAggregatesFilter<"Document"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Document"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Document"> | Date | string
@@ -325,11 +340,13 @@ export type DocumentCreateInput = {
   mimeType: string
   size: number
   path: string
+  isVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   project: Prisma.ProjectCreateNestedOneWithoutDocumentsInput
   annotations?: Prisma.AnnotationCreateNestedManyWithoutDocumentInput
   comments?: Prisma.CommentCreateNestedManyWithoutDocumentInput
+  shareLinks?: Prisma.ShareLinkCreateNestedManyWithoutDocumentInput
 }
 
 export type DocumentUncheckedCreateInput = {
@@ -339,11 +356,13 @@ export type DocumentUncheckedCreateInput = {
   mimeType: string
   size: number
   path: string
+  isVisible?: boolean
   projectId: string
   createdAt?: Date | string
   updatedAt?: Date | string
   annotations?: Prisma.AnnotationUncheckedCreateNestedManyWithoutDocumentInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutDocumentInput
+  shareLinks?: Prisma.ShareLinkUncheckedCreateNestedManyWithoutDocumentInput
 }
 
 export type DocumentUpdateInput = {
@@ -353,11 +372,13 @@ export type DocumentUpdateInput = {
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   size?: Prisma.IntFieldUpdateOperationsInput | number
   path?: Prisma.StringFieldUpdateOperationsInput | string
+  isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.ProjectUpdateOneRequiredWithoutDocumentsNestedInput
   annotations?: Prisma.AnnotationUpdateManyWithoutDocumentNestedInput
   comments?: Prisma.CommentUpdateManyWithoutDocumentNestedInput
+  shareLinks?: Prisma.ShareLinkUpdateManyWithoutDocumentNestedInput
 }
 
 export type DocumentUncheckedUpdateInput = {
@@ -367,11 +388,13 @@ export type DocumentUncheckedUpdateInput = {
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   size?: Prisma.IntFieldUpdateOperationsInput | number
   path?: Prisma.StringFieldUpdateOperationsInput | string
+  isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   annotations?: Prisma.AnnotationUncheckedUpdateManyWithoutDocumentNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutDocumentNestedInput
+  shareLinks?: Prisma.ShareLinkUncheckedUpdateManyWithoutDocumentNestedInput
 }
 
 export type DocumentCreateManyInput = {
@@ -381,6 +404,7 @@ export type DocumentCreateManyInput = {
   mimeType: string
   size: number
   path: string
+  isVisible?: boolean
   projectId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -393,6 +417,7 @@ export type DocumentUpdateManyMutationInput = {
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   size?: Prisma.IntFieldUpdateOperationsInput | number
   path?: Prisma.StringFieldUpdateOperationsInput | string
+  isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -404,6 +429,7 @@ export type DocumentUncheckedUpdateManyInput = {
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   size?: Prisma.IntFieldUpdateOperationsInput | number
   path?: Prisma.StringFieldUpdateOperationsInput | string
+  isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -426,6 +452,7 @@ export type DocumentCountOrderByAggregateInput = {
   mimeType?: Prisma.SortOrder
   size?: Prisma.SortOrder
   path?: Prisma.SortOrder
+  isVisible?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -442,6 +469,7 @@ export type DocumentMaxOrderByAggregateInput = {
   mimeType?: Prisma.SortOrder
   size?: Prisma.SortOrder
   path?: Prisma.SortOrder
+  isVisible?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -454,6 +482,7 @@ export type DocumentMinOrderByAggregateInput = {
   mimeType?: Prisma.SortOrder
   size?: Prisma.SortOrder
   path?: Prisma.SortOrder
+  isVisible?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -466,6 +495,11 @@ export type DocumentSumOrderByAggregateInput = {
 export type DocumentScalarRelationFilter = {
   is?: Prisma.DocumentWhereInput
   isNot?: Prisma.DocumentWhereInput
+}
+
+export type DocumentNullableScalarRelationFilter = {
+  is?: Prisma.DocumentWhereInput | null
+  isNot?: Prisma.DocumentWhereInput | null
 }
 
 export type DocumentCreateNestedManyWithoutProjectInput = {
@@ -518,6 +552,10 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
+}
+
 export type DocumentCreateNestedOneWithoutAnnotationsInput = {
   create?: Prisma.XOR<Prisma.DocumentCreateWithoutAnnotationsInput, Prisma.DocumentUncheckedCreateWithoutAnnotationsInput>
   connectOrCreate?: Prisma.DocumentCreateOrConnectWithoutAnnotationsInput
@@ -546,6 +584,22 @@ export type DocumentUpdateOneRequiredWithoutCommentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.DocumentUpdateToOneWithWhereWithoutCommentsInput, Prisma.DocumentUpdateWithoutCommentsInput>, Prisma.DocumentUncheckedUpdateWithoutCommentsInput>
 }
 
+export type DocumentCreateNestedOneWithoutShareLinksInput = {
+  create?: Prisma.XOR<Prisma.DocumentCreateWithoutShareLinksInput, Prisma.DocumentUncheckedCreateWithoutShareLinksInput>
+  connectOrCreate?: Prisma.DocumentCreateOrConnectWithoutShareLinksInput
+  connect?: Prisma.DocumentWhereUniqueInput
+}
+
+export type DocumentUpdateOneWithoutShareLinksNestedInput = {
+  create?: Prisma.XOR<Prisma.DocumentCreateWithoutShareLinksInput, Prisma.DocumentUncheckedCreateWithoutShareLinksInput>
+  connectOrCreate?: Prisma.DocumentCreateOrConnectWithoutShareLinksInput
+  upsert?: Prisma.DocumentUpsertWithoutShareLinksInput
+  disconnect?: Prisma.DocumentWhereInput | boolean
+  delete?: Prisma.DocumentWhereInput | boolean
+  connect?: Prisma.DocumentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.DocumentUpdateToOneWithWhereWithoutShareLinksInput, Prisma.DocumentUpdateWithoutShareLinksInput>, Prisma.DocumentUncheckedUpdateWithoutShareLinksInput>
+}
+
 export type DocumentCreateWithoutProjectInput = {
   id?: string
   filename: string
@@ -553,10 +607,12 @@ export type DocumentCreateWithoutProjectInput = {
   mimeType: string
   size: number
   path: string
+  isVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   annotations?: Prisma.AnnotationCreateNestedManyWithoutDocumentInput
   comments?: Prisma.CommentCreateNestedManyWithoutDocumentInput
+  shareLinks?: Prisma.ShareLinkCreateNestedManyWithoutDocumentInput
 }
 
 export type DocumentUncheckedCreateWithoutProjectInput = {
@@ -566,10 +622,12 @@ export type DocumentUncheckedCreateWithoutProjectInput = {
   mimeType: string
   size: number
   path: string
+  isVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   annotations?: Prisma.AnnotationUncheckedCreateNestedManyWithoutDocumentInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutDocumentInput
+  shareLinks?: Prisma.ShareLinkUncheckedCreateNestedManyWithoutDocumentInput
 }
 
 export type DocumentCreateOrConnectWithoutProjectInput = {
@@ -608,6 +666,7 @@ export type DocumentScalarWhereInput = {
   mimeType?: Prisma.StringFilter<"Document"> | string
   size?: Prisma.IntFilter<"Document"> | number
   path?: Prisma.StringFilter<"Document"> | string
+  isVisible?: Prisma.BoolFilter<"Document"> | boolean
   projectId?: Prisma.StringFilter<"Document"> | string
   createdAt?: Prisma.DateTimeFilter<"Document"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Document"> | Date | string
@@ -620,10 +679,12 @@ export type DocumentCreateWithoutAnnotationsInput = {
   mimeType: string
   size: number
   path: string
+  isVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   project: Prisma.ProjectCreateNestedOneWithoutDocumentsInput
   comments?: Prisma.CommentCreateNestedManyWithoutDocumentInput
+  shareLinks?: Prisma.ShareLinkCreateNestedManyWithoutDocumentInput
 }
 
 export type DocumentUncheckedCreateWithoutAnnotationsInput = {
@@ -633,10 +694,12 @@ export type DocumentUncheckedCreateWithoutAnnotationsInput = {
   mimeType: string
   size: number
   path: string
+  isVisible?: boolean
   projectId: string
   createdAt?: Date | string
   updatedAt?: Date | string
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutDocumentInput
+  shareLinks?: Prisma.ShareLinkUncheckedCreateNestedManyWithoutDocumentInput
 }
 
 export type DocumentCreateOrConnectWithoutAnnotationsInput = {
@@ -662,10 +725,12 @@ export type DocumentUpdateWithoutAnnotationsInput = {
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   size?: Prisma.IntFieldUpdateOperationsInput | number
   path?: Prisma.StringFieldUpdateOperationsInput | string
+  isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.ProjectUpdateOneRequiredWithoutDocumentsNestedInput
   comments?: Prisma.CommentUpdateManyWithoutDocumentNestedInput
+  shareLinks?: Prisma.ShareLinkUpdateManyWithoutDocumentNestedInput
 }
 
 export type DocumentUncheckedUpdateWithoutAnnotationsInput = {
@@ -675,10 +740,12 @@ export type DocumentUncheckedUpdateWithoutAnnotationsInput = {
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   size?: Prisma.IntFieldUpdateOperationsInput | number
   path?: Prisma.StringFieldUpdateOperationsInput | string
+  isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   comments?: Prisma.CommentUncheckedUpdateManyWithoutDocumentNestedInput
+  shareLinks?: Prisma.ShareLinkUncheckedUpdateManyWithoutDocumentNestedInput
 }
 
 export type DocumentCreateWithoutCommentsInput = {
@@ -688,10 +755,12 @@ export type DocumentCreateWithoutCommentsInput = {
   mimeType: string
   size: number
   path: string
+  isVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   project: Prisma.ProjectCreateNestedOneWithoutDocumentsInput
   annotations?: Prisma.AnnotationCreateNestedManyWithoutDocumentInput
+  shareLinks?: Prisma.ShareLinkCreateNestedManyWithoutDocumentInput
 }
 
 export type DocumentUncheckedCreateWithoutCommentsInput = {
@@ -701,10 +770,12 @@ export type DocumentUncheckedCreateWithoutCommentsInput = {
   mimeType: string
   size: number
   path: string
+  isVisible?: boolean
   projectId: string
   createdAt?: Date | string
   updatedAt?: Date | string
   annotations?: Prisma.AnnotationUncheckedCreateNestedManyWithoutDocumentInput
+  shareLinks?: Prisma.ShareLinkUncheckedCreateNestedManyWithoutDocumentInput
 }
 
 export type DocumentCreateOrConnectWithoutCommentsInput = {
@@ -730,10 +801,12 @@ export type DocumentUpdateWithoutCommentsInput = {
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   size?: Prisma.IntFieldUpdateOperationsInput | number
   path?: Prisma.StringFieldUpdateOperationsInput | string
+  isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.ProjectUpdateOneRequiredWithoutDocumentsNestedInput
   annotations?: Prisma.AnnotationUpdateManyWithoutDocumentNestedInput
+  shareLinks?: Prisma.ShareLinkUpdateManyWithoutDocumentNestedInput
 }
 
 export type DocumentUncheckedUpdateWithoutCommentsInput = {
@@ -743,10 +816,88 @@ export type DocumentUncheckedUpdateWithoutCommentsInput = {
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   size?: Prisma.IntFieldUpdateOperationsInput | number
   path?: Prisma.StringFieldUpdateOperationsInput | string
+  isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   annotations?: Prisma.AnnotationUncheckedUpdateManyWithoutDocumentNestedInput
+  shareLinks?: Prisma.ShareLinkUncheckedUpdateManyWithoutDocumentNestedInput
+}
+
+export type DocumentCreateWithoutShareLinksInput = {
+  id?: string
+  filename: string
+  originalName: string
+  mimeType: string
+  size: number
+  path: string
+  isVisible?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  project: Prisma.ProjectCreateNestedOneWithoutDocumentsInput
+  annotations?: Prisma.AnnotationCreateNestedManyWithoutDocumentInput
+  comments?: Prisma.CommentCreateNestedManyWithoutDocumentInput
+}
+
+export type DocumentUncheckedCreateWithoutShareLinksInput = {
+  id?: string
+  filename: string
+  originalName: string
+  mimeType: string
+  size: number
+  path: string
+  isVisible?: boolean
+  projectId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  annotations?: Prisma.AnnotationUncheckedCreateNestedManyWithoutDocumentInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutDocumentInput
+}
+
+export type DocumentCreateOrConnectWithoutShareLinksInput = {
+  where: Prisma.DocumentWhereUniqueInput
+  create: Prisma.XOR<Prisma.DocumentCreateWithoutShareLinksInput, Prisma.DocumentUncheckedCreateWithoutShareLinksInput>
+}
+
+export type DocumentUpsertWithoutShareLinksInput = {
+  update: Prisma.XOR<Prisma.DocumentUpdateWithoutShareLinksInput, Prisma.DocumentUncheckedUpdateWithoutShareLinksInput>
+  create: Prisma.XOR<Prisma.DocumentCreateWithoutShareLinksInput, Prisma.DocumentUncheckedCreateWithoutShareLinksInput>
+  where?: Prisma.DocumentWhereInput
+}
+
+export type DocumentUpdateToOneWithWhereWithoutShareLinksInput = {
+  where?: Prisma.DocumentWhereInput
+  data: Prisma.XOR<Prisma.DocumentUpdateWithoutShareLinksInput, Prisma.DocumentUncheckedUpdateWithoutShareLinksInput>
+}
+
+export type DocumentUpdateWithoutShareLinksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  filename?: Prisma.StringFieldUpdateOperationsInput | string
+  originalName?: Prisma.StringFieldUpdateOperationsInput | string
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.IntFieldUpdateOperationsInput | number
+  path?: Prisma.StringFieldUpdateOperationsInput | string
+  isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  project?: Prisma.ProjectUpdateOneRequiredWithoutDocumentsNestedInput
+  annotations?: Prisma.AnnotationUpdateManyWithoutDocumentNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutDocumentNestedInput
+}
+
+export type DocumentUncheckedUpdateWithoutShareLinksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  filename?: Prisma.StringFieldUpdateOperationsInput | string
+  originalName?: Prisma.StringFieldUpdateOperationsInput | string
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.IntFieldUpdateOperationsInput | number
+  path?: Prisma.StringFieldUpdateOperationsInput | string
+  isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  annotations?: Prisma.AnnotationUncheckedUpdateManyWithoutDocumentNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutDocumentNestedInput
 }
 
 export type DocumentCreateManyProjectInput = {
@@ -756,6 +907,7 @@ export type DocumentCreateManyProjectInput = {
   mimeType: string
   size: number
   path: string
+  isVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -767,10 +919,12 @@ export type DocumentUpdateWithoutProjectInput = {
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   size?: Prisma.IntFieldUpdateOperationsInput | number
   path?: Prisma.StringFieldUpdateOperationsInput | string
+  isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   annotations?: Prisma.AnnotationUpdateManyWithoutDocumentNestedInput
   comments?: Prisma.CommentUpdateManyWithoutDocumentNestedInput
+  shareLinks?: Prisma.ShareLinkUpdateManyWithoutDocumentNestedInput
 }
 
 export type DocumentUncheckedUpdateWithoutProjectInput = {
@@ -780,10 +934,12 @@ export type DocumentUncheckedUpdateWithoutProjectInput = {
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   size?: Prisma.IntFieldUpdateOperationsInput | number
   path?: Prisma.StringFieldUpdateOperationsInput | string
+  isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   annotations?: Prisma.AnnotationUncheckedUpdateManyWithoutDocumentNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutDocumentNestedInput
+  shareLinks?: Prisma.ShareLinkUncheckedUpdateManyWithoutDocumentNestedInput
 }
 
 export type DocumentUncheckedUpdateManyWithoutProjectInput = {
@@ -793,6 +949,7 @@ export type DocumentUncheckedUpdateManyWithoutProjectInput = {
   mimeType?: Prisma.StringFieldUpdateOperationsInput | string
   size?: Prisma.IntFieldUpdateOperationsInput | number
   path?: Prisma.StringFieldUpdateOperationsInput | string
+  isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -805,11 +962,13 @@ export type DocumentUncheckedUpdateManyWithoutProjectInput = {
 export type DocumentCountOutputType = {
   annotations: number
   comments: number
+  shareLinks: number
 }
 
 export type DocumentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   annotations?: boolean | DocumentCountOutputTypeCountAnnotationsArgs
   comments?: boolean | DocumentCountOutputTypeCountCommentsArgs
+  shareLinks?: boolean | DocumentCountOutputTypeCountShareLinksArgs
 }
 
 /**
@@ -836,6 +995,13 @@ export type DocumentCountOutputTypeCountCommentsArgs<ExtArgs extends runtime.Typ
   where?: Prisma.CommentWhereInput
 }
 
+/**
+ * DocumentCountOutputType without action
+ */
+export type DocumentCountOutputTypeCountShareLinksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ShareLinkWhereInput
+}
+
 
 export type DocumentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -844,12 +1010,14 @@ export type DocumentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   mimeType?: boolean
   size?: boolean
   path?: boolean
+  isVisible?: boolean
   projectId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   annotations?: boolean | Prisma.Document$annotationsArgs<ExtArgs>
   comments?: boolean | Prisma.Document$commentsArgs<ExtArgs>
+  shareLinks?: boolean | Prisma.Document$shareLinksArgs<ExtArgs>
   _count?: boolean | Prisma.DocumentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["document"]>
 
@@ -860,6 +1028,7 @@ export type DocumentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   mimeType?: boolean
   size?: boolean
   path?: boolean
+  isVisible?: boolean
   projectId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -873,6 +1042,7 @@ export type DocumentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   mimeType?: boolean
   size?: boolean
   path?: boolean
+  isVisible?: boolean
   projectId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -886,16 +1056,18 @@ export type DocumentSelectScalar = {
   mimeType?: boolean
   size?: boolean
   path?: boolean
+  isVisible?: boolean
   projectId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type DocumentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "filename" | "originalName" | "mimeType" | "size" | "path" | "projectId" | "createdAt" | "updatedAt", ExtArgs["result"]["document"]>
+export type DocumentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "filename" | "originalName" | "mimeType" | "size" | "path" | "isVisible" | "projectId" | "createdAt" | "updatedAt", ExtArgs["result"]["document"]>
 export type DocumentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   annotations?: boolean | Prisma.Document$annotationsArgs<ExtArgs>
   comments?: boolean | Prisma.Document$commentsArgs<ExtArgs>
+  shareLinks?: boolean | Prisma.Document$shareLinksArgs<ExtArgs>
   _count?: boolean | Prisma.DocumentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type DocumentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -911,6 +1083,7 @@ export type $DocumentPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     project: Prisma.$ProjectPayload<ExtArgs>
     annotations: Prisma.$AnnotationPayload<ExtArgs>[]
     comments: Prisma.$CommentPayload<ExtArgs>[]
+    shareLinks: Prisma.$ShareLinkPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -919,6 +1092,7 @@ export type $DocumentPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     mimeType: string
     size: number
     path: string
+    isVisible: boolean
     projectId: string
     createdAt: Date
     updatedAt: Date
@@ -1319,6 +1493,7 @@ export interface Prisma__DocumentClient<T, Null = never, ExtArgs extends runtime
   project<T extends Prisma.ProjectDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProjectDefaultArgs<ExtArgs>>): Prisma.Prisma__ProjectClient<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   annotations<T extends Prisma.Document$annotationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Document$annotationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AnnotationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   comments<T extends Prisma.Document$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Document$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  shareLinks<T extends Prisma.Document$shareLinksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Document$shareLinksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShareLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1354,6 +1529,7 @@ export interface DocumentFieldRefs {
   readonly mimeType: Prisma.FieldRef<"Document", 'String'>
   readonly size: Prisma.FieldRef<"Document", 'Int'>
   readonly path: Prisma.FieldRef<"Document", 'String'>
+  readonly isVisible: Prisma.FieldRef<"Document", 'Boolean'>
   readonly projectId: Prisma.FieldRef<"Document", 'String'>
   readonly createdAt: Prisma.FieldRef<"Document", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Document", 'DateTime'>
@@ -1798,6 +1974,30 @@ export type Document$commentsArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.CommentScalarFieldEnum | Prisma.CommentScalarFieldEnum[]
+}
+
+/**
+ * Document.shareLinks
+ */
+export type Document$shareLinksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ShareLink
+   */
+  select?: Prisma.ShareLinkSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ShareLink
+   */
+  omit?: Prisma.ShareLinkOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ShareLinkInclude<ExtArgs> | null
+  where?: Prisma.ShareLinkWhereInput
+  orderBy?: Prisma.ShareLinkOrderByWithRelationInput | Prisma.ShareLinkOrderByWithRelationInput[]
+  cursor?: Prisma.ShareLinkWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ShareLinkScalarFieldEnum | Prisma.ShareLinkScalarFieldEnum[]
 }
 
 /**

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { PDFViewer } from '@/components/editor/PDFViewer';
 import { AnnotationCanvas } from '@/components/editor/AnnotationCanvas';
@@ -33,20 +33,26 @@ export default function EditorPage() {
 
   const { currentPage, totalPages, setTotalPages, zoom, isDirty, setIsDirty, pushHistory, undo, redo } = useEditorStore();
 
+  const syncDocument = useCallback(async () => {
+    const res = await fetch(`/api/documents/${documentId}`);
+    if (!res.ok) throw new Error('Document not found');
+
+    const doc: MarklyDoc = await res.json();
+    setDocument(doc);
+    setAnnotations(doc.annotations || []);
+    setComments(doc.comments || []);
+
+    const slRes = await fetch(`/api/share?documentId=${doc.id}`);
+    if (slRes.ok) setShareLinks(await slRes.json());
+  }, [documentId]);
+
   useEffect(() => {
     const saved = localStorage.getItem('markly-theme');
     if (saved) window.document.documentElement.setAttribute('data-theme', saved);
 
     async function load() {
       try {
-        const res = await fetch(`/api/documents/${documentId}`);
-        if (!res.ok) throw new Error('Document not found');
-        const doc: MarklyDoc = await res.json();
-        setDocument(doc);
-        setAnnotations(doc.annotations || []);
-        setComments(doc.comments || []);
-        const slRes = await fetch(`/api/share?projectId=${doc.projectId}`);
-        if (slRes.ok) setShareLinks(await slRes.json());
+        await syncDocument();
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Failed to load');
       } finally {
@@ -55,7 +61,29 @@ export default function EditorPage() {
     }
     load();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [documentId]);
+  }, [syncDocument]);
+
+  useEffect(() => {
+    if (!documentId) return;
+
+    async function refreshIfIdle() {
+      if (document?.id !== documentId || isDirty || window.document.hidden) return;
+
+      try {
+        await syncDocument();
+      } catch {
+        // Keep the current editor state if a background refresh fails.
+      }
+    }
+
+    const intervalId = window.setInterval(refreshIfIdle, 5000);
+    window.addEventListener('focus', refreshIfIdle);
+
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener('focus', refreshIfIdle);
+    };
+  }, [document?.id, documentId, isDirty, syncDocument]);
 
   const saveAnnotations = useCallback(
     debounce(async (anns: Annotation[]) => {
@@ -153,11 +181,20 @@ export default function EditorPage() {
   async function handleCreateShareLink(access: AccessType): Promise<ShareLink> {
     const res = await fetch('/api/share', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ projectId: document?.projectId, access }),
+      body: JSON.stringify({ documentId, access }),
     });
     const link = await res.json();
     setShareLinks((prev) => [...prev, link]);
     return link;
+  }
+
+  async function handleDeleteShareLink(id: string) {
+    const res = await fetch(`/api/share/${id}`, { method: 'DELETE' });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Failed to delete share link' }));
+      throw new Error(err.error || 'Failed to delete share link');
+    }
+    setShareLinks((prev) => prev.filter((l) => l.id !== id));
   }
 
   if (loading) {
@@ -285,11 +322,10 @@ export default function EditorPage() {
 
       {showShare && (
         <ShareModal
-          projectId={document.projectId}
           shareLinks={shareLinks}
           onClose={() => setShowShare(false)}
           onCreateLink={handleCreateShareLink}
-          onDeleteLink={async (id) => setShareLinks((prev) => prev.filter((l) => l.id !== id))}
+          onDeleteLink={handleDeleteShareLink}
         />
       )}
     </div>

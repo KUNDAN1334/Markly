@@ -60,9 +60,11 @@ export interface Document {
   mimeType: string;
   size: number;
   path: string;
+  isVisible?: boolean;
   projectId: string;
   annotations: Annotation[];
   comments: Comment[];
+  shareLinks?: ShareLink[];
   createdAt: string;
   updatedAt: string;
 }
@@ -80,6 +82,7 @@ export interface ShareLink {
   id: string;
   token: string;
   projectId: string;
+  documentId?: string;
   access: AccessType;
   createdAt: string;
   expiresAt?: string;

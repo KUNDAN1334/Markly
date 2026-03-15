@@ -8,6 +8,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       where: { id },
       include: {
         documents: {
+          where: { isVisible: true },
           include: {
             annotations: { orderBy: { createdAt: 'asc' } },
             comments: { orderBy: { createdAt: 'asc' } },

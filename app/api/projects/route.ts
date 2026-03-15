@@ -11,6 +11,7 @@ export async function GET() {
     const projects = await prisma.project.findMany({
       include: {
         documents: {
+          where: { isVisible: true },
           select: { id: true, originalName: true, createdAt: true },
           orderBy: { createdAt: 'desc' },
         },

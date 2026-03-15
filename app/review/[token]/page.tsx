@@ -17,7 +17,6 @@ export default function ReviewPage() {
   const token = params.token as string;
 
   const [document, setDocument] = useState<MarklyDoc | null>(null);
-  const [projectId, setProjectId] = useState<string>('');
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const [shareLinks, setShareLinks] = useState<ShareLink[]>([]);
@@ -32,7 +31,7 @@ export default function ReviewPage() {
   const [saved, setSaved] = useState(true);
   const [copied, setCopied] = useState(false);
 
-  const { currentPage, totalPages, setTotalPages, zoom, zoomIn, zoomOut, setCurrentPage, isDirty, setIsDirty, pushHistory, undo, redo } = useEditorStore();
+  const { currentPage, totalPages, setTotalPages, zoom, zoomIn, zoomOut, setCurrentPage, isDirty, setIsDirty, pushHistory } = useEditorStore();
 
   useEffect(() => {
     const saved = localStorage.getItem('markly-theme') as 'light' | 'dark' | null;
@@ -46,11 +45,9 @@ export default function ReviewPage() {
         if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Invalid link'); }
         const shareLink = await res.json();
         setAccess(shareLink.access);
-        setProjectId(shareLink.project.id);
-        setShareLinks(shareLink.project.shareLinks || []);
-        const docs = shareLink.project.documents;
-        if (docs.length > 0) {
-          const doc = docs[0];
+        setShareLinks(shareLink.document?.shareLinks || shareLink.project?.shareLinks || []);
+        const doc = shareLink.document ?? shareLink.project?.documents?.[0] ?? null;
+        if (doc) {
           setDocument(doc);
           setAnnotations(doc.annotations || []);
           setComments(doc.comments || []);
@@ -70,13 +67,23 @@ export default function ReviewPage() {
     debounce(async (anns: Annotation[], docId: string) => {
       setIsSaving(true);
       try {
-        await fetch('/api/annotations', {
+        const res = await fetch('/api/annotations', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'x-share-token': token },
           body: JSON.stringify({ documentId: docId, annotations: anns }),
         });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: 'Failed to save annotations' }));
+          throw new Error(err.error || 'Failed to save annotations');
+        }
+
         setIsDirty(false);
         setSaved(true);
+        setError(null);
+      } catch (e) {
+        setSaved(false);
+        setError(e instanceof Error ? e.message : 'Failed to save annotations');
       } finally {
         setIsSaving(false);
       }
@@ -103,7 +110,7 @@ export default function ReviewPage() {
   async function handleAddComment(content: string, pageNumber: number, annotationId?: string) {
     if (!document || access === 'VIEW') return;
     const res = await fetch('/api/comments', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-share-token': token },
       body: JSON.stringify({ content, documentId: document.id, annotationId, pageNumber }),
     });
     const comment = await res.json();
@@ -111,23 +118,43 @@ export default function ReviewPage() {
   }
 
   async function handleResolveComment(id: string, resolved: boolean) {
-    await fetch(`/api/comments/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ resolved }) });
+    await fetch(`/api/comments/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-share-token': token },
+      body: JSON.stringify({ resolved }),
+    });
     setComments((prev) => prev.map((c) => c.id === id ? { ...c, resolved } : c));
   }
 
   async function handleDeleteComment(id: string) {
-    await fetch(`/api/comments/${id}`, { method: 'DELETE' });
+    await fetch(`/api/comments/${id}`, {
+      method: 'DELETE',
+      headers: { 'x-share-token': token },
+    });
     setComments((prev) => prev.filter((c) => c.id !== id));
   }
 
   async function handleCreateShareLink(accessType: AccessType): Promise<ShareLink> {
+    if (!document) {
+      throw new Error('Document not loaded');
+    }
+
     const res = await fetch('/api/share', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ projectId, access: accessType }),
+      body: JSON.stringify({ documentId: document.id, access: accessType }),
     });
     const link = await res.json();
     setShareLinks((prev) => [...prev, link]);
     return link;
+  }
+
+  async function handleDeleteShareLink(id: string) {
+    const res = await fetch(`/api/share/${id}`, { method: 'DELETE' });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Failed to delete share link' }));
+      throw new Error(err.error || 'Failed to delete share link');
+    }
+    setShareLinks((prev) => prev.filter((l) => l.id !== id));
   }
 
   async function copyCurrentLink() {
@@ -139,13 +166,27 @@ export default function ReviewPage() {
   async function handleManualSave() {
     if (!document) return;
     setIsSaving(true);
-    await fetch('/api/annotations', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ documentId: document.id, annotations }),
-    });
-    setIsDirty(false);
-    setSaved(true);
-    setIsSaving(false);
+    try {
+      const res = await fetch('/api/annotations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-share-token': token },
+        body: JSON.stringify({ documentId: document.id, annotations }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Failed to save annotations' }));
+        throw new Error(err.error || 'Failed to save annotations');
+      }
+
+      setIsDirty(false);
+      setSaved(true);
+      setError(null);
+    } catch (e) {
+      setSaved(false);
+      setError(e instanceof Error ? e.message : 'Failed to save annotations');
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   if (loading) {
@@ -301,11 +342,10 @@ export default function ReviewPage() {
 
       {showShare && (
         <ShareModal
-          projectId={projectId}
           shareLinks={shareLinks}
           onClose={() => setShowShare(false)}
           onCreateLink={handleCreateShareLink}
-          onDeleteLink={async (id) => setShareLinks((prev) => prev.filter((l) => l.id !== id))}
+          onDeleteLink={handleDeleteShareLink}
         />
       )}
     </div>

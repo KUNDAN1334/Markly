@@ -834,6 +834,7 @@ export const DocumentScalarFieldEnum = {
   mimeType: 'mimeType',
   size: 'size',
   path: 'path',
+  isVisible: 'isVisible',
   projectId: 'projectId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -875,6 +876,7 @@ export const ShareLinkScalarFieldEnum = {
   id: 'id',
   token: 'token',
   projectId: 'projectId',
+  documentId: 'documentId',
   access: 'access',
   createdAt: 'createdAt',
   expiresAt: 'expiresAt'
@@ -972,6 +974,13 @@ export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
  * Reference to a field of type 'Json'
  */
 export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -982,13 +991,6 @@ export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'J
  * Reference to a field of type 'QueryMode'
  */
 export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
-    
-
-
-/**
- * Reference to a field of type 'Boolean'
- */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 

@@ -23,10 +23,12 @@ model Document {
   mimeType     String
   size         Int
   path         String
+  isVisible    Boolean      @default(true)
   projectId    String
   project      Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
   annotations  Annotation[]
   comments     Comment[]
+  shareLinks   ShareLink[]
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 }
@@ -63,6 +65,8 @@ model ShareLink {
   token     String    @unique @default(cuid())
   projectId String
   project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  documentId String?
+  document   Document? @relation(fields: [documentId], references: [id], onDelete: Cascade)
   access    String    @default("VIEW")
   createdAt DateTime  @default(now())
   expiresAt DateTime?

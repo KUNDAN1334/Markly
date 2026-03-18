@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { UploadZone } from '@/components/documents/UploadZone';
 import { Project } from '@/types';
 import { Plus, X, FolderOpen, Clock, Trash2, FileText, Sun, Moon } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 /* ── THEME TOGGLE ── */
 function ThemeToggle() {
@@ -246,16 +245,43 @@ export default function HomePage() {
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userName, setUserName] = useState<string>('');
   const [showNewProject, setShowNewProject] = useState(false);
   const [uploadingProject, setUploadingProject] = useState<Project | null>(null);
 
   useEffect(() => {
-    // Restore theme
     const saved = localStorage.getItem('markly-theme');
     if (saved) document.documentElement.setAttribute('data-theme', saved);
 
-    fetch('/api/projects').then((r) => r.json()).then(setProjects).finally(() => setLoading(false));
-  }, []);
+    async function load() {
+      const sessionRes = await fetch('/api/auth/session');
+      if (!sessionRes.ok) {
+        router.replace('/login');
+        return;
+      }
+
+      const session = await sessionRes.json();
+      setUserName(session.name || session.email || 'Workspace');
+
+      const projectsRes = await fetch('/api/projects');
+      if (!projectsRes.ok) {
+        setLoading(false);
+        return;
+      }
+
+      const data = await projectsRes.json();
+      setProjects(data);
+      setLoading(false);
+    }
+
+    load();
+  }, [router]);
+
+  async function handleLogout() {
+    await fetch('/api/auth/session', { method: 'DELETE' });
+    router.push('/');
+    router.refresh();
+  }
 
   function handleProjectCreated(p: Project) {
     setProjects((prev) => [p, ...prev]);
@@ -297,7 +323,29 @@ export default function HomePage() {
             <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, color: 'var(--text)', letterSpacing: '-.01em' }}>Markly</span>
           </div>
 
-          <ThemeToggle />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {userName && (
+              <span style={{ fontSize: 12, color: 'var(--text-2)', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {userName}
+              </span>
+            )}
+            <ThemeToggle />
+            <button
+              onClick={handleLogout}
+              style={{
+                background: 'transparent',
+                color: 'var(--text-2)',
+                border: '1px solid var(--border)',
+                borderRadius: 10,
+                padding: '8px 12px',
+                fontSize: 12,
+                cursor: 'pointer',
+                fontFamily: "'Instrument Sans', sans-serif",
+              }}
+            >
+              Log out
+            </button>
+          </div>
 
           <button
             onClick={() => setShowNewProject(true)}

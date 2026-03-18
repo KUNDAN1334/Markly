@@ -39,6 +39,19 @@ function MarklyLogo({ size = 36, forDark = false }: { size?: number; forDark?: b
 export default function LandingPage() {
   const router = useRouter();
   const { theme, toggle } = useTheme();
+  const [isAuthed, setIsAuthed] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/auth/session')
+      .then((res) => setIsAuthed(res.ok))
+      .catch(() => setIsAuthed(false));
+  }, []);
+
+  async function handleLogout() {
+    await fetch('/api/auth/session', { method: 'DELETE' });
+    setIsAuthed(false);
+    router.refresh();
+  }
 
   return (
     <>
@@ -454,8 +467,17 @@ export default function LandingPage() {
                 : <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32 1.41-1.41"/></svg>
               }
             </button>
-            <button onClick={() => router.push('/dashboard')} className="btn btn-outline" style={{padding:'8px 16px',fontSize:13}}>Dashboard</button>
-            <button onClick={() => router.push('/dashboard')} className="btn btn-primary" style={{padding:'8px 16px',fontSize:13}}>Get started free</button>
+            {isAuthed ? (
+              <>
+                <button onClick={() => router.push('/dashboard')} className="btn btn-outline" style={{padding:'8px 16px',fontSize:13}}>Dashboard</button>
+                <button onClick={handleLogout} className="btn btn-primary" style={{padding:'8px 16px',fontSize:13}}>Log out</button>
+              </>
+            ) : (
+              <>
+                <button onClick={() => router.push('/login')} className="btn btn-outline" style={{padding:'8px 16px',fontSize:13}}>Log in</button>
+                <button onClick={() => router.push('/signup')} className="btn btn-primary" style={{padding:'8px 16px',fontSize:13}}>Get started free</button>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -480,9 +502,9 @@ export default function LandingPage() {
           </p>
 
           <div className="hero-actions anim d3">
-            <button onClick={() => router.push('/dashboard')} className="btn btn-primary btn-lg">
+            <button onClick={() => router.push(isAuthed ? '/dashboard' : '/signup')} className="btn btn-primary btn-lg">
               <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              Upload a PDF — it&apos;s free
+              {isAuthed ? 'Open your dashboard' : 'Start free with Google/GitHub'}
             </button>
             <button className="btn btn-outline btn-lg">
               Watch demo
@@ -492,7 +514,7 @@ export default function LandingPage() {
 
           {/* PROOF */}
           <div className="hero-proof anim d4">
-            {['No sign-up required','Share via link','Export as PDF','Works on any PDF'].map(t => (
+            {['Google & GitHub login','Share via link','Export as PDF','Works on any PDF'].map(t => (
               <div key={t} className="hero-proof-item">
                 <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
                 {t}
@@ -718,7 +740,7 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <button
-                  onClick={() => router.push('/dashboard')}
+                  onClick={() => router.push(isAuthed ? '/dashboard' : '/signup')}
                   className="btn btn-primary"
                   style={{
                     justifyContent:'center', width:'100%', borderRadius:10,
@@ -727,7 +749,7 @@ export default function LandingPage() {
                     padding:'11px 0',
                   }}
                 >
-                  {p.featured ? 'Start Pro free' : 'Get started'}
+                  {isAuthed ? 'Open dashboard' : (p.featured ? 'Start Pro free' : 'Get started')}
                 </button>
               </div>
             ))}
@@ -741,10 +763,10 @@ export default function LandingPage() {
           <div className="cta-block">
             <div className="cta-inner">
               <h2 className="cta-title">Start reviewing smarter.</h2>
-              <p className="cta-sub">Upload your first document in under 30 seconds. No account needed.</p>
+              <p className="cta-sub">Create your workspace, upload PDFs, and share public review links in under 30 seconds.</p>
               <div className="cta-actions">
-                <button onClick={() => router.push('/dashboard')} className="btn btn-lg" style={{background:'var(--accent-fg)',color:'var(--text)',border:'none'}}>
-                  Upload a PDF — it&apos;s free
+                <button onClick={() => router.push(isAuthed ? '/dashboard' : '/signup')} className="btn btn-lg" style={{background:'var(--accent-fg)',color:'var(--text)',border:'none'}}>
+                  {isAuthed ? 'Open your workspace' : 'Create free account'}
                 </button>
                 <button className="btn btn-lg" style={{background:'transparent',color:'var(--accent-fg)',border:'1px solid color-mix(in srgb,var(--accent-fg) 25%,transparent)'}}>
                   View example review →

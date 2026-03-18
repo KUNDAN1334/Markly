@@ -35,6 +35,7 @@ export default function EditorPage() {
 
   const syncDocument = useCallback(async () => {
     const res = await fetch(`/api/documents/${documentId}`);
+    if (res.status === 401) throw new Error('AUTH_REQUIRED');
     if (!res.ok) throw new Error('Document not found');
 
     const doc: MarklyDoc = await res.json();
@@ -54,6 +55,10 @@ export default function EditorPage() {
       try {
         await syncDocument();
       } catch (e) {
+        if (e instanceof Error && e.message === 'AUTH_REQUIRED') {
+          router.replace('/login');
+          return;
+        }
         setError(e instanceof Error ? e.message : 'Failed to load');
       } finally {
         setLoading(false);
@@ -61,7 +66,7 @@ export default function EditorPage() {
     }
     load();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [syncDocument]);
+  }, [router, syncDocument]);
 
   useEffect(() => {
     if (!documentId) return;
@@ -224,7 +229,7 @@ export default function EditorPage() {
     );
   }
 
-  const fileUrl = `/api/documents/file/${document.filename}`;
+  const fileUrl = `/api/documents/file/${document.filename}?documentId=${document.id}`;
   const unresolvedComments = comments.filter((c) => !c.resolved).length;
 
   return (

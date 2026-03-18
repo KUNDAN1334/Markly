@@ -10,6 +10,7 @@ interface Props {
   onCreateLink: (access: AccessType) => Promise<ShareLink>;
   onDeleteLink: (id: string) => Promise<void>;
   hiddenToken?: string;
+  allowDelete?: boolean;
 }
 
 const ACCESS_OPTIONS: { id: AccessType; label: string; desc: string; icon: React.ReactNode }[] = [
@@ -18,7 +19,14 @@ const ACCESS_OPTIONS: { id: AccessType; label: string; desc: string; icon: React
   { id: 'EDIT',    label: 'Can edit',    desc: 'Full annotation access', icon: <Edit3 size={12} /> },
 ];
 
-export function ShareModal({ shareLinks, onClose, onCreateLink, onDeleteLink, hiddenToken }: Props) {
+export function ShareModal({
+  shareLinks,
+  onClose,
+  onCreateLink,
+  onDeleteLink,
+  hiddenToken,
+  allowDelete = true,
+}: Props) {
   const [selectedAccess, setSelectedAccess] = useState<AccessType>('COMMENT');
   const [creating, setCreating] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -165,13 +173,15 @@ export function ShareModal({ shareLinks, onClose, onCreateLink, onDeleteLink, hi
                         style={{ width: 30, height: 30, borderRadius: 7, border: '1px solid var(--border)', background: 'transparent', cursor: 'pointer', color: copiedId === link.id ? '#16a34a' : 'var(--text-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .15s' }}>
                         {copiedId === link.id ? <Check size={12} /> : <Copy size={12} />}
                       </button>
-                      <button onClick={() => handleDelete(link.id)}
-                        style={{ width: 30, height: 30, borderRadius: 7, border: '1px solid var(--border)', background: 'transparent', cursor: 'pointer', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .15s' }}
-                        onMouseEnter={e => (e.currentTarget.style.background = '#fef2f2')}
-                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                      >
-                        <Trash2 size={11} />
-                      </button>
+                      {allowDelete && (
+                        <button onClick={() => handleDelete(link.id)}
+                          style={{ width: 30, height: 30, borderRadius: 7, border: '1px solid var(--border)', background: 'transparent', cursor: 'pointer', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .15s' }}
+                          onMouseEnter={e => (e.currentTarget.style.background = '#fef2f2')}
+                          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                        >
+                          <Trash2 size={11} />
+                        </button>
+                      )}
                     </div>
                   );
                 })}

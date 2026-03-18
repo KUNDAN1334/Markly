@@ -140,7 +140,7 @@ export default function ReviewPage() {
     }
 
     const res = await fetch('/api/share', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-share-token': token },
       body: JSON.stringify({ documentId: document.id, access: accessType }),
     });
     const link = await res.json();
@@ -216,7 +216,7 @@ export default function ReviewPage() {
     );
   }
 
-  const fileUrl = `/api/documents/file/${document.filename}`;
+  const fileUrl = `/api/documents/file/${document.filename}?documentId=${document.id}&token=${token}`;
   const canComment = access === 'COMMENT' || access === 'EDIT';
   const canEdit = access === 'EDIT';
   const unresolvedCount = comments.filter((c) => !c.resolved).length;
@@ -299,7 +299,7 @@ export default function ReviewPage() {
       {canEdit && (
         <Toolbar
           onSave={handleManualSave}
-          onExport={() => window.open(`/api/export?documentId=${document.id}`, '_blank')}
+          onExport={() => window.open(`/api/export?documentId=${document.id}&token=${token}`, '_blank')}
           onShare={() => setShowShare(true)}
           isSaving={isSaving}
           isDirty={isDirty}
@@ -352,6 +352,7 @@ export default function ReviewPage() {
           onCreateLink={handleCreateShareLink}
           onDeleteLink={handleDeleteShareLink}
           hiddenToken={token}
+          allowDelete={false}
         />
       )}
     </div>

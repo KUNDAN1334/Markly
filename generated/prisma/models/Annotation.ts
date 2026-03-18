@@ -491,10 +491,6 @@ export type AnnotationUncheckedUpdateManyWithoutDocumentNestedInput = {
   deleteMany?: Prisma.AnnotationScalarWhereInput | Prisma.AnnotationScalarWhereInput[]
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type AnnotationCreateNestedOneWithoutCommentsInput = {
   create?: Prisma.XOR<Prisma.AnnotationCreateWithoutCommentsInput, Prisma.AnnotationUncheckedCreateWithoutCommentsInput>
   connectOrCreate?: Prisma.AnnotationCreateOrConnectWithoutCommentsInput

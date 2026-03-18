@@ -51,6 +51,7 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
+  User: 'User',
   Project: 'Project',
   Document: 'Document',
   Annotation: 'Annotation',
@@ -74,9 +75,23 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+export const UserScalarFieldEnum = {
+  id: 'id',
+  firebaseUid: 'firebaseUid',
+  email: 'email',
+  name: 'name',
+  imageUrl: 'imageUrl',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
 export const ProjectScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  ownerId: 'ownerId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -120,6 +135,8 @@ export const CommentScalarFieldEnum = {
   content: 'content',
   documentId: 'documentId',
   annotationId: 'annotationId',
+  authorUserId: 'authorUserId',
+  authorName: 'authorName',
   pageNumber: 'pageNumber',
   resolved: 'resolved',
   createdAt: 'createdAt',
@@ -134,6 +151,7 @@ export const ShareLinkScalarFieldEnum = {
   token: 'token',
   projectId: 'projectId',
   documentId: 'documentId',
+  createdByUserId: 'createdByUserId',
   access: 'access',
   createdAt: 'createdAt',
   expiresAt: 'expiresAt'
@@ -165,6 +183,14 @@ export const QueryMode = {
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
 export const JsonNullValueFilter = {
   DbNull: DbNull,
   JsonNull: JsonNull,
@@ -172,12 +198,4 @@ export const JsonNullValueFilter = {
 } as const
 
 export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
-
-
-export const NullsOrder = {
-  first: 'first',
-  last: 'last'
-} as const
-
-export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 

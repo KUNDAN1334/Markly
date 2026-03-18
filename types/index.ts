@@ -47,6 +47,8 @@ export interface Comment {
   content: string;
   documentId: string;
   annotationId?: string;
+  authorUserId?: string;
+  authorName?: string;
   pageNumber: number;
   resolved: boolean;
   createdAt: string;

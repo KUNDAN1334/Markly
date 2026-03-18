@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createDocumentBranch } from '@/lib/document-branch';
+import {
+  authorizeDocumentAccess,
+  requireAuthenticatedUser,
+  unauthorizedResponse,
+} from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { generateToken } from '@/lib/utils';
@@ -22,9 +27,6 @@ export async function GET(req: NextRequest) {
           include: {
             annotations: { orderBy: { createdAt: 'asc' } },
             comments: { orderBy: { createdAt: 'desc' } },
-            shareLinks: {
-              orderBy: { createdAt: 'desc' },
-            },
           },
         },
         project: {
@@ -34,9 +36,6 @@ export async function GET(req: NextRequest) {
                 annotations: { orderBy: { createdAt: 'asc' } },
                 comments: { orderBy: { createdAt: 'desc' } },
               },
-            },
-            shareLinks: {
-              orderBy: { createdAt: 'desc' },
             },
           },
         },
@@ -54,8 +53,11 @@ export async function GET(req: NextRequest) {
 
   const documentId = searchParams.get('documentId');
   if (documentId) {
+    const user = await requireAuthenticatedUser(req);
+    if (!user) return unauthorizedResponse();
+
     const links = await prisma.shareLink.findMany({
-      where: { documentId },
+      where: { documentId, project: { ownerId: user.id } },
       orderBy: { createdAt: 'desc' },
     });
     return NextResponse.json(links);
@@ -64,8 +66,11 @@ export async function GET(req: NextRequest) {
   const projectId = searchParams.get('projectId');
   if (!projectId) return NextResponse.json({ error: 'projectId required' }, { status: 400 });
 
+  const user = await requireAuthenticatedUser(req);
+  if (!user) return unauthorizedResponse();
+
   const links = await prisma.shareLink.findMany({
-    where: { projectId },
+    where: { projectId, project: { ownerId: user.id } },
     orderBy: { createdAt: 'desc' },
   });
   return NextResponse.json(links);
@@ -75,6 +80,8 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { documentId, access, expiresAt } = shareLinkSchema.parse(body);
+    const docAccess = await authorizeDocumentAccess(req, documentId, 'VIEW');
+    if (!docAccess.ok) return docAccess.response;
 
     const sourceDocument = await prisma.document.findUnique({
       where: { id: documentId },
@@ -95,6 +102,7 @@ export async function POST(req: NextRequest) {
         token: generateToken(),
         projectId: targetDocument.projectId,
         documentId: targetDocument.id,
+        createdByUserId: docAccess.actor === 'owner' ? docAccess.userId ?? null : null,
         access,
         expiresAt: expiresAt ? new Date(expiresAt) : null,
       },

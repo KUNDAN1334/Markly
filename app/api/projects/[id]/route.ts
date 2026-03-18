@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  forbiddenResponse,
+  requireAuthenticatedUser,
+  requireOwnedProject,
+  unauthorizedResponse,
+} from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const project = await prisma.project.findUnique({
-      where: { id },
+    const user = await requireAuthenticatedUser(req);
+    if (!user) return unauthorizedResponse();
+
+    const project = await prisma.project.findFirst({
+      where: { id, ownerId: user.id },
       include: {
         documents: {
           where: { isVisible: true },
@@ -26,9 +35,15 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
+    const user = await requireAuthenticatedUser(req);
+    if (!user) return unauthorizedResponse();
+
+    const project = await requireOwnedProject(req, id);
+    if (!project) return forbiddenResponse('Project not found');
+
     await prisma.project.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch {

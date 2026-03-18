@@ -1,21 +1,38 @@
 import { NextResponse } from 'next/server';
+import {
+  forbiddenResponse,
+  requireAuthenticatedUser,
+  unauthorizedResponse,
+} from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 type RouteContext = {
   params: Promise<{ id: string }>;
 };
 
-export async function DELETE(_req: Request, { params }: RouteContext) {
+export async function DELETE(req: Request, { params }: RouteContext) {
   try {
     const { id } = await params;
+    const user = await requireAuthenticatedUser(req);
+    if (!user) return unauthorizedResponse();
 
     const shareLink = await prisma.shareLink.findUnique({
       where: { id },
-      select: { id: true, documentId: true },
+      select: {
+        id: true,
+        documentId: true,
+        project: {
+          select: { ownerId: true },
+        },
+      },
     });
 
     if (!shareLink) {
       return NextResponse.json({ error: 'Share link not found' }, { status: 404 });
+    }
+
+    if (shareLink.project.ownerId !== user.id) {
+      return forbiddenResponse('Only the owner can delete share links');
     }
 
     await prisma.$transaction(async (tx) => {

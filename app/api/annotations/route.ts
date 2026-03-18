@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { authorizeDocumentAccess } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { validateShareLinkAccess } from '@/lib/share-link-auth';
 import { z } from 'zod';
 
 const bulkSaveSchema = z.object({
@@ -23,6 +23,9 @@ export async function GET(req: NextRequest) {
     const documentId = searchParams.get('documentId');
     if (!documentId) return NextResponse.json({ error: 'documentId required' }, { status: 400 });
 
+    const access = await authorizeDocumentAccess(req, documentId, 'VIEW');
+    if (!access.ok) return access.response;
+
     const annotations = await prisma.annotation.findMany({
       where: { documentId },
       orderBy: { createdAt: 'asc' },
@@ -37,19 +40,8 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { documentId, annotations } = bulkSaveSchema.parse(body);
-    const shareToken = req.headers.get('x-share-token');
-
-    if (shareToken) {
-      const accessResult = await validateShareLinkAccess({
-        token: shareToken,
-        documentId,
-        minimumAccess: 'EDIT',
-      });
-
-      if (!accessResult.ok) {
-        return NextResponse.json({ error: accessResult.error }, { status: accessResult.status });
-      }
-    }
+    const access = await authorizeDocumentAccess(req, documentId, 'EDIT');
+    if (!access.ok) return access.response;
 
     await prisma.annotation.deleteMany({ where: { documentId } });
 

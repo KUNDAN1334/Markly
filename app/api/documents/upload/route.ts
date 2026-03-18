@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuthenticatedUser, unauthorizedResponse } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { saveFile } from '@/lib/storage';
 import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(req: NextRequest) {
   try {
+    const user = await requireAuthenticatedUser(req);
+    if (!user) return unauthorizedResponse();
+
     const formData = await req.formData();
     const file = formData.get('file') as File;
     const projectId = formData.get('projectId') as string;
@@ -21,7 +25,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'File too large (max 50MB)' }, { status: 400 });
     }
 
-    const project = await prisma.project.findUnique({ where: { id: projectId } });
+    const project = await prisma.project.findFirst({ where: { id: projectId, ownerId: user.id } });
     if (!project) return NextResponse.json({ error: 'Project not found' }, { status: 404 });
 
     const bytes = await file.arrayBuffer();

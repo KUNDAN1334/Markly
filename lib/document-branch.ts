@@ -44,6 +44,8 @@ export async function createDocumentBranch(sourceDocumentId: string) {
         data: source.comments.map((comment) => ({
           content: comment.content,
           documentId: branchedDocument.id,
+          authorUserId: comment.authorUserId,
+          authorName: comment.authorName,
           pageNumber: comment.pageNumber,
           resolved: comment.resolved,
         })),

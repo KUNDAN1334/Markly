@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuthenticatedUser, unauthorizedResponse } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
@@ -6,9 +7,13 @@ const createProjectSchema = z.object({
   name: z.string().min(1).max(100),
 });
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const user = await requireAuthenticatedUser(req);
+    if (!user) return unauthorizedResponse();
+
     const projects = await prisma.project.findMany({
+      where: { ownerId: user.id },
       include: {
         documents: {
           where: { isVisible: true },
@@ -29,11 +34,14 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    const user = await requireAuthenticatedUser(req);
+    if (!user) return unauthorizedResponse();
+
     const body = await req.json();
     const { name } = createProjectSchema.parse(body);
 
     const project = await prisma.project.create({
-      data: { name },
+      data: { name, ownerId: user.id },
       include: { documents: true, shareLinks: true },
     });
 

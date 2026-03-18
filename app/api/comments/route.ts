@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { authorizeDocumentAccess, requireAuthenticatedUser, unauthorizedResponse } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { validateShareLinkAccess } from '@/lib/share-link-auth';
 import { z } from 'zod';
 
 const commentSchema = z.object({
@@ -15,6 +15,9 @@ export async function GET(req: NextRequest) {
   const documentId = searchParams.get('documentId');
   if (!documentId) return NextResponse.json({ error: 'documentId required' }, { status: 400 });
 
+  const access = await authorizeDocumentAccess(req, documentId, 'VIEW');
+  if (!access.ok) return access.response;
+
   const comments = await prisma.comment.findMany({
     where: { documentId },
     orderBy: { createdAt: 'desc' },
@@ -26,21 +29,28 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const data = commentSchema.parse(body);
-    const shareToken = req.headers.get('x-share-token');
+    const access = await authorizeDocumentAccess(req, data.documentId, 'COMMENT');
+    if (!access.ok) return access.response;
 
-    if (shareToken) {
-      const accessResult = await validateShareLinkAccess({
-        token: shareToken,
-        documentId: data.documentId,
-        minimumAccess: 'COMMENT',
-      });
+    let authorUserId: string | null = null;
+    let authorName: string | null = null;
 
-      if (!accessResult.ok) {
-        return NextResponse.json({ error: accessResult.error }, { status: accessResult.status });
-      }
+    if (access.actor === 'owner') {
+      const user = await requireAuthenticatedUser(req);
+      if (!user) return unauthorizedResponse();
+      authorUserId = user.id;
+      authorName = user.name || user.email || 'Owner';
+    } else {
+      authorName = 'Shared reviewer';
     }
 
-    const comment = await prisma.comment.create({ data });
+    const comment = await prisma.comment.create({
+      data: {
+        ...data,
+        authorUserId,
+        authorName,
+      },
+    });
     return NextResponse.json(comment, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {

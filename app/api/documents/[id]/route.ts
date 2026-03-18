@@ -1,3 +1,4 @@
+import { authorizeDocumentAccess } from '@/lib/auth';
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -7,6 +8,8 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    const access = await authorizeDocumentAccess(_req, id, 'VIEW');
+    if (!access.ok) return access.response;
 
     const document = await prisma.document.findUnique({
       where: { id },

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { authorizeDocumentAccess } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import path from 'path';
@@ -16,9 +17,22 @@ function hexToRgb(hex: string) {
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const documentId = searchParams.get('documentId');
+  const token = searchParams.get('token');
   if (!documentId) return NextResponse.json({ error: 'documentId required' }, { status: 400 });
 
   try {
+    const headers = new Headers(req.headers);
+    if (token) {
+      headers.set('x-share-token', token);
+    }
+
+    const access = await authorizeDocumentAccess(
+      new Request(req.url, { headers }),
+      documentId,
+      'VIEW'
+    );
+    if (!access.ok) return access.response;
+
     const doc = await prisma.document.findUnique({
       where: { id: documentId },
       include: { annotations: true },

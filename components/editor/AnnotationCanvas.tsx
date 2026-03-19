@@ -25,6 +25,13 @@ interface DrawingState {
   annotationId: string;
 }
 
+interface AnnotationBounds {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export function AnnotationCanvas({
   documentId,
   pageNumber,
@@ -54,6 +61,13 @@ export function AnnotationCanvas({
   const [textValue, setTextValue] = useState('');
   const [dragState, setDragState] = useState<{
     dragging: boolean; annotationId: string; offsetX: number; offsetY: number;
+  } | null>(null);
+  const [resizeState, setResizeState] = useState<{
+    annotationId: string;
+    startX: number;
+    startY: number;
+    initialGeometry: AnnotationGeometry;
+    initialBounds: AnnotationBounds;
   } | null>(null);
   const textInputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -93,6 +107,49 @@ export function AnnotationCanvas({
     [annotations, pageNumber]
   );
 
+  const getAnnotationBounds = useCallback((annotation: Annotation): AnnotationBounds => {
+    const geometry = annotation.geometry;
+
+    if (annotation.type === 'line' || annotation.type === 'arrow') {
+      const x1 = geometry.x || 0;
+      const y1 = geometry.y || 0;
+      const x2 = geometry.endX || x1;
+      const y2 = geometry.endY || y1;
+      return {
+        x: Math.min(x1, x2),
+        y: Math.min(y1, y2),
+        width: Math.max(Math.abs(x2 - x1), 1),
+        height: Math.max(Math.abs(y2 - y1), 1),
+      };
+    }
+
+    if (annotation.type === 'freehand') {
+      const xs = (geometry.points || []).filter((_, index) => index % 2 === 0);
+      const ys = (geometry.points || []).filter((_, index) => index % 2 !== 0);
+      if (xs.length === 0 || ys.length === 0) {
+        return { x: geometry.x || 0, y: geometry.y || 0, width: 1, height: 1 };
+      }
+
+      const minX = Math.min(...xs);
+      const maxX = Math.max(...xs);
+      const minY = Math.min(...ys);
+      const maxY = Math.max(...ys);
+      return {
+        x: minX,
+        y: minY,
+        width: Math.max(maxX - minX, 1),
+        height: Math.max(maxY - minY, 1),
+      };
+    }
+
+    return {
+      x: geometry.x || 0,
+      y: geometry.y || 0,
+      width: Math.max(geometry.width || 1, 1),
+      height: Math.max(geometry.height || 1, 1),
+    };
+  }, []);
+
   // Draw all annotations to canvas
   const render = useCallback(() => {
     const canvas = canvasRef.current;
@@ -114,10 +171,11 @@ export function AnnotationCanvas({
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
 
-      const x = (geo.x || 0) * zoom;
-      const y = (geo.y || 0) * zoom;
-      const w = (geo.width || 0) * zoom;
-      const h = (geo.height || 0) * zoom;
+      const bounds = getAnnotationBounds(ann);
+      const x = bounds.x * zoom;
+      const y = bounds.y * zoom;
+      const w = bounds.width * zoom;
+      const h = bounds.height * zoom;
 
       drawAnnotation(ctx, ann, x, y, w, h, zoom, style);
 
@@ -185,7 +243,7 @@ export function AnnotationCanvas({
       ctx.restore();
     }
   }, [
-    getPageAnnotations, width, height, zoom, drawing,
+    getAnnotationBounds, getPageAnnotations, width, height, zoom, drawing,
     activeTool, strokeColor, strokeWidth, opacity, selectedAnnotationIds,
   ]);
 
@@ -321,6 +379,103 @@ export function AnnotationCanvas({
     );
   }
 
+  function hitResizeHandle(ann: Annotation, x: number, y: number): boolean {
+    const bounds = getAnnotationBounds(ann);
+    const handleHalfSize = 8 / zoom;
+    const handleX = bounds.x + bounds.width + 4 / zoom;
+    const handleY = bounds.y + bounds.height + 4 / zoom;
+
+    return (
+      x >= handleX - handleHalfSize &&
+      x <= handleX + handleHalfSize &&
+      y >= handleY - handleHalfSize &&
+      y <= handleY + handleHalfSize
+    );
+  }
+
+  function resizeAnnotation(
+    annotation: Annotation,
+    initialGeometry: AnnotationGeometry,
+    initialBounds: AnnotationBounds,
+    deltaX: number,
+    deltaY: number
+  ): Annotation {
+    const minSize = 12;
+    const nextWidth = Math.max(minSize, initialBounds.width + deltaX);
+    const nextHeight = Math.max(minSize, initialBounds.height + deltaY);
+    const scaleX = initialBounds.width > 0 ? nextWidth / initialBounds.width : 1;
+    const scaleY = initialBounds.height > 0 ? nextHeight / initialBounds.height : 1;
+
+    if (annotation.type === 'line' || annotation.type === 'arrow') {
+      const startX = initialGeometry.x || 0;
+      const startY = initialGeometry.y || 0;
+      const endX = initialGeometry.endX || startX;
+      const endY = initialGeometry.endY || startY;
+      return {
+        ...annotation,
+        geometry: {
+          ...initialGeometry,
+          x: initialBounds.x + (startX - initialBounds.x) * scaleX,
+          y: initialBounds.y + (startY - initialBounds.y) * scaleY,
+          endX: initialBounds.x + (endX - initialBounds.x) * scaleX,
+          endY: initialBounds.y + (endY - initialBounds.y) * scaleY,
+          width: nextWidth,
+          height: nextHeight,
+        },
+      };
+    }
+
+    if (annotation.type === 'freehand') {
+      const points = initialGeometry.points || [];
+      const scaledPoints = points.map((point, index) =>
+        index % 2 === 0
+          ? initialBounds.x + (point - initialBounds.x) * scaleX
+          : initialBounds.y + (point - initialBounds.y) * scaleY
+      );
+
+      const xs = scaledPoints.filter((_, index) => index % 2 === 0);
+      const ys = scaledPoints.filter((_, index) => index % 2 !== 0);
+
+      return {
+        ...annotation,
+        geometry: {
+          ...initialGeometry,
+          points: scaledPoints,
+          x: Math.min(...xs),
+          y: Math.min(...ys),
+          width: Math.max(Math.max(...xs) - Math.min(...xs), 1),
+          height: Math.max(Math.max(...ys) - Math.min(...ys), 1),
+        },
+      };
+    }
+
+    if (annotation.type === 'text') {
+      const baseFontSize = annotation.style.fontSize || 18;
+      const nextFontSize = Math.max(10, Math.round(baseFontSize * Math.min(scaleX, scaleY)));
+      return {
+        ...annotation,
+        geometry: {
+          ...initialGeometry,
+          width: nextWidth,
+          height: nextHeight,
+        },
+        style: {
+          ...annotation.style,
+          fontSize: nextFontSize,
+        },
+      };
+    }
+
+    return {
+      ...annotation,
+      geometry: {
+        ...initialGeometry,
+        width: nextWidth,
+        height: nextHeight,
+      },
+    };
+  }
+
   function onMouseDown(e: React.MouseEvent<HTMLCanvasElement>) {
     if (readonly) return;
     const { x, y } = getCursorCoords(e);
@@ -329,6 +484,16 @@ export function AnnotationCanvas({
       const hit = [...getPageAnnotations()].reverse().find((a) => hitTest(a, x, y));
       if (hit) {
         setSelectedAnnotationIds([hit.id]);
+        if (hitResizeHandle(hit, x, y)) {
+          setResizeState({
+            annotationId: hit.id,
+            startX: x,
+            startY: y,
+            initialGeometry: { ...hit.geometry, points: hit.geometry.points ? [...hit.geometry.points] : undefined },
+            initialBounds: getAnnotationBounds(hit),
+          });
+          return;
+        }
         setDragState({ dragging: true, annotationId: hit.id, offsetX: x - (hit.geometry.x || 0), offsetY: y - (hit.geometry.y || 0) });
       } else {
         clearSelection();
@@ -376,6 +541,18 @@ export function AnnotationCanvas({
       return;
     }
 
+    if (resizeState) {
+      const deltaX = x - resizeState.startX;
+      const deltaY = y - resizeState.startY;
+      const updated = annotations.map((annotation) =>
+        annotation.id === resizeState.annotationId
+          ? resizeAnnotation(annotation, resizeState.initialGeometry, resizeState.initialBounds, deltaX, deltaY)
+          : annotation
+      );
+      onChange(updated);
+      return;
+    }
+
     if (!drawing?.isActive) return;
     setDrawing((d) =>
       d ? {
@@ -391,6 +568,11 @@ export function AnnotationCanvas({
 
     if (dragState) {
       setDragState(null);
+      return;
+    }
+
+    if (resizeState) {
+      setResizeState(null);
       return;
     }
 

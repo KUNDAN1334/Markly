@@ -31,7 +31,7 @@ export default function EditorPage() {
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>('pages');
   const [canvasDimensions, setCanvasDimensions] = useState({ width: 0, height: 0 });
 
-  const { currentPage, totalPages, setTotalPages, zoom, isDirty, setIsDirty, pushHistory, undo, redo } = useEditorStore();
+  const { currentPage, totalPages, setTotalPages, zoom, isDirty, setIsDirty, resetHistory, pushHistory, undo, redo } = useEditorStore();
 
   const syncDocument = useCallback(async () => {
     const res = await fetch(`/api/documents/${documentId}`);
@@ -41,11 +41,12 @@ export default function EditorPage() {
     const doc: MarklyDoc = await res.json();
     setDocument(doc);
     setAnnotations(doc.annotations || []);
+    resetHistory(doc.annotations || []);
     setComments(doc.comments || []);
 
     const slRes = await fetch(`/api/share?documentId=${doc.id}`);
     if (slRes.ok) setShareLinks(await slRes.json());
-  }, [documentId]);
+  }, [documentId, resetHistory]);
 
   useEffect(() => {
     const saved = localStorage.getItem('markly-theme');
@@ -134,9 +135,11 @@ export default function EditorPage() {
       if (e.key === 'Delete' || e.key === 'Backspace') {
         const { selectedAnnotationIds, clearSelection } = useEditorStore.getState();
         if (selectedAnnotationIds.length > 0) {
+          e.preventDefault();
           const updated = annotations.filter((a) => !selectedAnnotationIds.includes(a.id));
           handleAnnotationsChange(updated);
           clearSelection();
+          return;
         }
       }
       if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {

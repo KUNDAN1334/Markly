@@ -32,6 +32,12 @@ interface AnnotationBounds {
   height: number;
 }
 
+interface TextMetrics {
+  width: number;
+  height: number;
+  lines: string[];
+}
+
 export function AnnotationCanvas({
   documentId,
   pageNumber,
@@ -42,6 +48,7 @@ export function AnnotationCanvas({
   readonly = false,
 }: AnnotationCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const textMeasureCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const {
     activeTool, strokeColor, fillColor, strokeWidth,
     fontSize, opacity, zoom,
@@ -56,6 +63,8 @@ export function AnnotationCanvas({
     y: number;
     width: number;
     height: number;
+    fontSize: number;
+    stroke: string;
     isExisting: boolean;
   } | null>(null);
   const [textValue, setTextValue] = useState('');
@@ -68,8 +77,87 @@ export function AnnotationCanvas({
     startY: number;
     initialGeometry: AnnotationGeometry;
     initialBounds: AnnotationBounds;
+    initialStyle?: AnnotationStyle;
   } | null>(null);
   const textInputRef = useRef<HTMLTextAreaElement>(null);
+
+  function measureWrappedText(content: string, boxWidth: number, fontSizePx: number): TextMetrics {
+    const lines = content.split('\n');
+    const wrappedLines: string[] = [];
+    const safeBoxWidth = Math.max(boxWidth, fontSizePx * 2);
+    const measureCanvas =
+      textMeasureCanvasRef.current ||
+      (typeof document !== 'undefined' ? document.createElement('canvas') : null);
+
+    if (measureCanvas && !textMeasureCanvasRef.current) {
+      textMeasureCanvasRef.current = measureCanvas;
+    }
+
+    const measureContext = measureCanvas?.getContext('2d') || null;
+    if (measureContext) {
+      measureContext.font = `${fontSizePx}px "Virgil", "Comic Sans MS", cursive`;
+    }
+
+    const measureTextWidth = (value: string) =>
+      measureContext ? measureContext.measureText(value).width : value.length * fontSizePx * 0.62;
+
+    const splitLongToken = (token: string) => {
+      let chunk = '';
+      for (const char of token) {
+        const nextChunk = chunk + char;
+        if (chunk && measureTextWidth(nextChunk) > safeBoxWidth) {
+          wrappedLines.push(chunk);
+          chunk = char;
+        } else {
+          chunk = nextChunk;
+        }
+      }
+      if (chunk) {
+        wrappedLines.push(chunk);
+      }
+    };
+
+    for (const line of lines) {
+      if (!line) {
+        wrappedLines.push('');
+        continue;
+      }
+
+      let currentLine = '';
+      const tokens = line.split(/(\s+)/).filter((token) => token.length > 0);
+
+      for (const token of tokens) {
+        const candidate = currentLine + token;
+        if (!currentLine || measureTextWidth(candidate) <= safeBoxWidth) {
+          currentLine = candidate;
+          continue;
+        }
+
+        if (currentLine.trim()) {
+          wrappedLines.push(currentLine.trimEnd());
+          currentLine = token.trimStart();
+        } else {
+          currentLine = token;
+        }
+
+        if (measureTextWidth(currentLine) > safeBoxWidth) {
+          splitLongToken(currentLine);
+          currentLine = '';
+        }
+      }
+
+      if (currentLine || line.trim() === '') {
+        wrappedLines.push(currentLine.trimEnd());
+      }
+    }
+
+    const safeLines = wrappedLines.length > 0 ? wrappedLines : [''];
+    return {
+      width: safeBoxWidth,
+      height: Math.max(safeLines.length * fontSizePx * 1.3, fontSizePx * 1.3),
+      lines: safeLines,
+    };
+  }
 
   const beginTextEditing = useCallback((annotation?: Annotation, x?: number, y?: number) => {
     if (annotation) {
@@ -79,6 +167,8 @@ export function AnnotationCanvas({
         y: annotation.geometry.y || 0,
         width: annotation.geometry.width || 200,
         height: annotation.geometry.height || 50,
+        fontSize: annotation.style.fontSize || 18,
+        stroke: annotation.style.stroke || '#000000',
         isExisting: true,
       });
       setTextValue(annotation.content || '');
@@ -90,6 +180,8 @@ export function AnnotationCanvas({
         y,
         width: 200,
         height: 50,
+        fontSize,
+        stroke: strokeColor,
         isExisting: false,
       });
       setTextValue('');
@@ -142,6 +234,18 @@ export function AnnotationCanvas({
       };
     }
 
+    if (annotation.type === 'text') {
+      const fontSizePx = annotation.style.fontSize || 18;
+      const boxWidth = Math.max(geometry.width || 200, fontSizePx * 2);
+      const metrics = measureWrappedText(annotation.content || '', boxWidth, fontSizePx);
+      return {
+        x: geometry.x || 0,
+        y: geometry.y || 0,
+        width: boxWidth,
+        height: Math.max(geometry.height || 0, metrics.height),
+      };
+    }
+
     return {
       x: geometry.x || 0,
       y: geometry.y || 0,
@@ -158,8 +262,12 @@ export function AnnotationCanvas({
     ctx.clearRect(0, 0, width, height);
 
     const pageAnnotations = getPageAnnotations();
+    const orderedAnnotations = [
+      ...pageAnnotations.filter((annotation) => annotation.type !== 'text'),
+      ...pageAnnotations.filter((annotation) => annotation.type === 'text'),
+    ];
 
-    for (const ann of pageAnnotations) {
+    for (const ann of orderedAnnotations) {
       const style = ann.style;
       const geo = ann.geometry;
       const isSelected = selectedAnnotationIds.includes(ann.id);
@@ -249,6 +357,26 @@ export function AnnotationCanvas({
 
   useEffect(() => { render(); }, [render]);
 
+  useEffect(() => {
+    if (!editingText || !textInputRef.current || typeof ResizeObserver === 'undefined') return;
+
+    const element = textInputRef.current;
+    const observer = new ResizeObserver(() => {
+      setEditingText((current) =>
+        current
+          ? {
+              ...current,
+              width: element.offsetWidth / zoom,
+              height: element.offsetHeight / zoom,
+            }
+          : current
+      );
+    });
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [editingText, zoom]);
+
   function drawAnnotation(
     ctx: CanvasRenderingContext2D,
     ann: Annotation,
@@ -312,11 +440,12 @@ export function AnnotationCanvas({
       case 'text':
         if (ann.content) {
           const fs = (style.fontSize || 18) * zoom;
+          const textBoxWidth = Math.max((ann.geometry.width || 200) * zoom, fs * 2);
+          const textMetrics = measureWrappedText(ann.content, textBoxWidth, fs);
           ctx.font = `${fs}px "Virgil", "Comic Sans MS", cursive`;
           ctx.fillStyle = style.stroke || '#000';
           ctx.globalAlpha = style.opacity ?? 1;
-          const lines = ann.content.split('\n');
-          lines.forEach((line, i) => {
+          textMetrics.lines.forEach((line, i) => {
             ctx.fillText(line, x, y + fs + i * (fs * 1.3));
           });
         }
@@ -373,6 +502,13 @@ export function AnnotationCanvas({
       }
       return false;
     }
+    if (ann.type === 'text') {
+      const bounds = getAnnotationBounds(ann);
+      return (
+        x >= bounds.x - pad && x <= bounds.x + bounds.width + pad &&
+        y >= bounds.y - pad && y <= bounds.y + bounds.height + pad
+      );
+    }
     return (
       x >= (g.x || 0) - pad && x <= (g.x || 0) + (g.width || 0) + pad &&
       y >= (g.y || 0) - pad && y <= (g.y || 0) + (g.height || 0) + pad
@@ -397,6 +533,7 @@ export function AnnotationCanvas({
     annotation: Annotation,
     initialGeometry: AnnotationGeometry,
     initialBounds: AnnotationBounds,
+    initialStyle: AnnotationStyle | undefined,
     deltaX: number,
     deltaY: number
   ): Annotation {
@@ -450,14 +587,19 @@ export function AnnotationCanvas({
     }
 
     if (annotation.type === 'text') {
-      const baseFontSize = annotation.style.fontSize || 18;
-      const nextFontSize = Math.max(10, Math.round(baseFontSize * Math.min(scaleX, scaleY)));
+      const baseFontSize = initialStyle?.fontSize || annotation.style.fontSize || 18;
+      const widthRatio = initialBounds.width > 0 ? (initialBounds.width + deltaX) / initialBounds.width : 1;
+      const heightRatio = initialBounds.height > 0 ? (initialBounds.height + deltaY) / initialBounds.height : 1;
+      const scale = Math.max(0.5, Math.min(4, Math.max(widthRatio, heightRatio)));
+      const nextFontSize = Math.max(10, Math.round(baseFontSize * scale));
+      const nextWidth = Math.max(nextFontSize * 2, (initialGeometry.width || initialBounds.width) * scale);
+      const metrics = measureWrappedText(annotation.content || '', nextWidth, nextFontSize);
       return {
         ...annotation,
         geometry: {
           ...initialGeometry,
           width: nextWidth,
-          height: nextHeight,
+          height: Math.max(metrics.height, nextFontSize * 1.3),
         },
         style: {
           ...annotation.style,
@@ -478,10 +620,23 @@ export function AnnotationCanvas({
 
   function onMouseDown(e: React.MouseEvent<HTMLCanvasElement>) {
     if (readonly) return;
+
+    if (editingText) {
+      commitText();
+      return;
+    }
+
     const { x, y } = getCursorCoords(e);
 
     if (activeTool === 'select') {
-      const hit = [...getPageAnnotations()].reverse().find((a) => hitTest(a, x, y));
+      const pageAnnotations = getPageAnnotations();
+      const selectedHit = [...pageAnnotations]
+        .reverse()
+        .find((annotation) => selectedAnnotationIds.includes(annotation.id) && hitTest(annotation, x, y));
+      const textHit = [...pageAnnotations]
+        .reverse()
+        .find((annotation) => annotation.type === 'text' && hitTest(annotation, x, y));
+      const hit = selectedHit || textHit || [...pageAnnotations].reverse().find((a) => hitTest(a, x, y));
       if (hit) {
         setSelectedAnnotationIds([hit.id]);
         if (hitResizeHandle(hit, x, y)) {
@@ -491,6 +646,7 @@ export function AnnotationCanvas({
             startY: y,
             initialGeometry: { ...hit.geometry, points: hit.geometry.points ? [...hit.geometry.points] : undefined },
             initialBounds: getAnnotationBounds(hit),
+            initialStyle: { ...hit.style },
           });
           return;
         }
@@ -546,7 +702,7 @@ export function AnnotationCanvas({
       const deltaY = y - resizeState.startY;
       const updated = annotations.map((annotation) =>
         annotation.id === resizeState.annotationId
-          ? resizeAnnotation(annotation, resizeState.initialGeometry, resizeState.initialBounds, deltaX, deltaY)
+          ? resizeAnnotation(annotation, resizeState.initialGeometry, resizeState.initialBounds, resizeState.initialStyle, deltaX, deltaY)
           : annotation
       );
       onChange(updated);
@@ -618,7 +774,10 @@ export function AnnotationCanvas({
     if (readonly) return;
 
     const { x, y } = getCursorCoords(e);
-    const hit = [...getPageAnnotations()].reverse().find((a) => hitTest(a, x, y));
+    const pageAnnotations = getPageAnnotations();
+    const hit = [...pageAnnotations]
+      .reverse()
+      .find((annotation) => annotation.type === 'text' && hitTest(annotation, x, y));
     if (!hit || hit.type !== 'text') return;
 
     beginTextEditing(hit);
@@ -639,14 +798,28 @@ export function AnnotationCanvas({
       return;
     }
 
-    const style: AnnotationStyle = { stroke: strokeColor, strokeWidth, opacity, fontSize };
+    const currentAnnotation = editingText.isExisting
+      ? annotations.find((annotation) => annotation.id === editingText.id)
+      : undefined;
+    const style: AnnotationStyle = {
+      stroke: currentAnnotation?.style.stroke || strokeColor,
+      strokeWidth: currentAnnotation?.style.strokeWidth || strokeWidth,
+      opacity: currentAnnotation?.style.opacity ?? opacity,
+      fontSize: currentAnnotation?.style.fontSize || fontSize,
+    };
     const nextTimestamp = new Date().toISOString();
     const lineCount = trimmedValue.split('\n').length;
+    const nextWidth = textInputRef.current
+      ? textInputRef.current.offsetWidth / zoom
+      : editingText.width;
+    const nextHeight = textInputRef.current
+      ? textInputRef.current.offsetHeight / zoom
+      : editingText.height;
     const nextGeometry = {
       x: editingText.x,
       y: editingText.y,
-      width: editingText.width,
-      height: Math.max(editingText.height, Math.ceil((style.fontSize || 18) * lineCount * 1.5)),
+      width: nextWidth,
+      height: Math.max(nextHeight, Math.ceil((style.fontSize || 18) * lineCount * 1.5)),
     };
 
     if (editingText.isExisting) {
@@ -716,7 +889,10 @@ export function AnnotationCanvas({
           onBlur={commitText}
           onKeyDown={(e) => {
             if (e.key === 'Escape') { setEditingText(null); return; }
-            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commitText(); }
+            if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+              e.preventDefault();
+              commitText();
+            }
           }}
           style={{
             position: 'absolute',
@@ -729,15 +905,15 @@ export function AnnotationCanvas({
             border: '1.5px dashed #0ea5e9',
             borderRadius: 4,
             padding: '2px 6px',
-            fontSize: fontSize * zoom,
+            fontSize: editingText.fontSize * zoom,
             fontFamily: "'Virgil', 'Comic Sans MS', cursive",
-            color: strokeColor,
+            color: editingText.stroke,
             resize: 'both',
             outline: 'none',
             zIndex: 10,
             lineHeight: 1.4,
           }}
-          placeholder="Type here..."
+          placeholder="Type here... (Ctrl/Cmd+Enter to save)"
           className="pointer-events-auto"
         />
       )}

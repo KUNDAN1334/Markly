@@ -29,6 +29,7 @@ interface EditorStore extends EditorState {
   // Annotation history (undo/redo)
   history: Annotation[][];
   historyIndex: number;
+  resetHistory: (annotations: Annotation[]) => void;
   pushHistory: (annotations: Annotation[]) => void;
   undo: () => Annotation[] | null;
   redo: () => Annotation[] | null;
@@ -81,6 +82,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   setIsDirty: (dirty) => set({ isDirty: dirty }),
 
   // History
+  resetHistory: (annotations) => set({ history: [[...annotations]], historyIndex: 0 }),
   pushHistory: (annotations) => {
     const { history, historyIndex } = get();
     const newHistory = history.slice(0, historyIndex + 1);

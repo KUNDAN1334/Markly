@@ -43,12 +43,50 @@ export function AnnotationCanvas({
   } = useEditorStore();
 
   const [drawing, setDrawing] = useState<DrawingState | null>(null);
-  const [editingText, setEditingText] = useState<{ id: string; x: number; y: number } | null>(null);
+  const [editingText, setEditingText] = useState<{
+    id: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    isExisting: boolean;
+  } | null>(null);
   const [textValue, setTextValue] = useState('');
   const [dragState, setDragState] = useState<{
     dragging: boolean; annotationId: string; offsetX: number; offsetY: number;
   } | null>(null);
   const textInputRef = useRef<HTMLTextAreaElement>(null);
+
+  const beginTextEditing = useCallback((annotation?: Annotation, x?: number, y?: number) => {
+    if (annotation) {
+      setEditingText({
+        id: annotation.id,
+        x: annotation.geometry.x || 0,
+        y: annotation.geometry.y || 0,
+        width: annotation.geometry.width || 200,
+        height: annotation.geometry.height || 50,
+        isExisting: true,
+      });
+      setTextValue(annotation.content || '');
+      setSelectedAnnotationIds([annotation.id]);
+    } else if (typeof x === 'number' && typeof y === 'number') {
+      setEditingText({
+        id: uuidv4(),
+        x,
+        y,
+        width: 200,
+        height: 50,
+        isExisting: false,
+      });
+      setTextValue('');
+      clearSelection();
+    }
+
+    window.setTimeout(() => {
+      textInputRef.current?.focus();
+      textInputRef.current?.select();
+    }, 50);
+  }, [clearSelection, setSelectedAnnotationIds]);
 
   const getPageAnnotations = useCallback(
     () => annotations.filter((a) => a.pageNumber === pageNumber),
@@ -299,10 +337,7 @@ export function AnnotationCanvas({
     }
 
     if (activeTool === 'text') {
-      const newId = uuidv4();
-      setEditingText({ id: newId, x, y });
-      setTextValue('');
-      setTimeout(() => textInputRef.current?.focus(), 50);
+      beginTextEditing(undefined, x, y);
       return;
     }
 
@@ -397,26 +432,73 @@ export function AnnotationCanvas({
     onChange([...annotations, newAnnotation]);
   }
 
+  function onDoubleClick(e: React.MouseEvent<HTMLCanvasElement>) {
+    if (readonly) return;
+
+    const { x, y } = getCursorCoords(e);
+    const hit = [...getPageAnnotations()].reverse().find((a) => hitTest(a, x, y));
+    if (!hit || hit.type !== 'text') return;
+
+    beginTextEditing(hit);
+  }
+
   function commitText() {
-    if (!editingText || !textValue.trim()) {
+    if (!editingText) {
+      return;
+    }
+
+    const trimmedValue = textValue.trim();
+    if (!trimmedValue) {
+      if (editingText.isExisting) {
+        onChange(annotations.filter((annotation) => annotation.id !== editingText.id));
+      }
       setEditingText(null);
+      setTextValue('');
       return;
     }
 
     const style: AnnotationStyle = { stroke: strokeColor, strokeWidth, opacity, fontSize };
-    const newAnnotation: Annotation = {
-      id: editingText.id,
-      documentId,
-      pageNumber,
-      type: 'text',
-      geometry: { x: editingText.x, y: editingText.y, width: 200, height: 50 },
-      style,
-      content: textValue,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+    const nextTimestamp = new Date().toISOString();
+    const lineCount = trimmedValue.split('\n').length;
+    const nextGeometry = {
+      x: editingText.x,
+      y: editingText.y,
+      width: editingText.width,
+      height: Math.max(editingText.height, Math.ceil((style.fontSize || 18) * lineCount * 1.5)),
     };
 
-    onChange([...annotations, newAnnotation]);
+    if (editingText.isExisting) {
+      const updated = annotations.map((annotation) =>
+        annotation.id === editingText.id
+          ? {
+              ...annotation,
+              geometry: nextGeometry,
+              style: {
+                ...annotation.style,
+                ...style,
+              },
+              content: trimmedValue,
+              updatedAt: nextTimestamp,
+            }
+          : annotation
+      );
+      onChange(updated);
+    } else {
+      const newAnnotation: Annotation = {
+        id: editingText.id,
+        documentId,
+        pageNumber,
+        type: 'text',
+        geometry: nextGeometry,
+        style,
+        content: trimmedValue,
+        createdAt: nextTimestamp,
+        updatedAt: nextTimestamp,
+      };
+
+      onChange([...annotations, newAnnotation]);
+    }
+
     setEditingText(null);
     setTextValue('');
     setActiveTool('select');
@@ -440,6 +522,7 @@ export function AnnotationCanvas({
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
+        onDoubleClick={onDoubleClick}
       />
 
       {/* Inline text editor */}
@@ -458,6 +541,8 @@ export function AnnotationCanvas({
             left: editingText.x * zoom,
             top: editingText.y * zoom,
             minWidth: 120,
+            width: editingText.width * zoom,
+            height: editingText.height * zoom,
             background: 'rgba(255,255,255,0.9)',
             border: '1.5px dashed #0ea5e9',
             borderRadius: 4,

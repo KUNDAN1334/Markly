@@ -143,13 +143,15 @@ export default function ReviewPage() {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'x-share-token': token },
       body: JSON.stringify({ documentId: document.id, access: accessType }),
     });
-    const link = await res.json();
-    if (link.documentId === document.id) {
-      setShareLinks((prev) => {
-        const exists = prev.some((item) => item.id === link.id);
-        return exists ? prev : [...prev, link];
-      });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Failed to create share link' }));
+      throw new Error(err.error || 'Failed to create share link');
     }
+    const link = await res.json();
+    setShareLinks((prev) => {
+      const exists = prev.some((item) => item.id === link.id);
+      return exists ? prev : [link, ...prev];
+    });
     return link;
   }
 

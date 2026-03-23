@@ -41,7 +41,16 @@ export function PDFViewer({ fileUrl, pageNumber, zoom, onPageRendered, onTotalPa
     }
 
     loadPDF();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      if (renderTaskRef.current) {
+        try { renderTaskRef.current.cancel(); } catch { /* ignore */ }
+        renderTaskRef.current = null;
+      }
+      const currentPdf = pdfRef.current as { destroy?: () => void } | null;
+      try { currentPdf?.destroy?.(); } catch { /* ignore */ }
+      pdfRef.current = null;
+    };
   }, [fileUrl]);
 
   useEffect(() => {
@@ -63,12 +72,14 @@ export function PDFViewer({ fileUrl, pageNumber, zoom, onPageRendered, onTotalPa
         const viewport = page.getViewport({ scale: zoom });
         const canvas = canvasRef.current;
         if (!canvas) return;
+        const outputScale = window.devicePixelRatio || 1;
         const ctx = canvas.getContext('2d')!;
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
+        canvas.width = Math.floor(viewport.width * outputScale);
+        canvas.height = Math.floor(viewport.height * outputScale);
         canvas.style.width = `${viewport.width}px`;
         canvas.style.height = `${viewport.height}px`;
-        const renderTask = page.render({ canvasContext: ctx, viewport });
+        const transform = outputScale === 1 ? undefined : [outputScale, 0, 0, outputScale, 0, 0];
+        const renderTask = page.render({ canvasContext: ctx, viewport, transform });
         renderTaskRef.current = renderTask;
         await renderTask.promise;
         if (!cancelled) {

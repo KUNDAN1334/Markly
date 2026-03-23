@@ -13,27 +13,46 @@ export function PageThumbnails({ fileUrl, totalPages }: Props) {
   useEffect(() => {
     if (!fileUrl || !totalPages) return;
     let cancelled = false;
+    let currentPdf: { destroy?: () => void } | null = null;
+
     async function render() {
+      setLoading(true);
+      setThumbnails([]);
       try {
         const pdfjsLib = await import('pdfjs-dist');
         pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
         const pdf = await pdfjsLib.getDocument(fileUrl).promise;
+        currentPdf = pdf as { destroy?: () => void };
         const thumbs: string[] = [];
-        for (let i = 1; i <= Math.min(pdf.numPages, 30); i++) {
+        const outputScale = Math.min(window.devicePixelRatio || 1, 2);
+
+        for (let i = 1; i <= pdf.numPages; i++) {
           if (cancelled) return;
           const page = await pdf.getPage(i);
           const viewport = page.getViewport({ scale: 0.22 });
           const canvas = document.createElement('canvas');
-          canvas.width = viewport.width;
-          canvas.height = viewport.height;
-          await page.render({ canvasContext: canvas.getContext('2d')!, viewport } as Parameters<typeof page.render>[0]).promise;
+          canvas.width = Math.floor(viewport.width * outputScale);
+          canvas.height = Math.floor(viewport.height * outputScale);
+          canvas.style.width = `${viewport.width}px`;
+          canvas.style.height = `${viewport.height}px`;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) continue;
+
+          await page.render({
+            canvasContext: ctx,
+            viewport,
+            transform: outputScale === 1 ? undefined : [outputScale, 0, 0, outputScale, 0, 0],
+          } as Parameters<typeof page.render>[0]).promise;
           thumbs.push(canvas.toDataURL());
         }
         if (!cancelled) { setThumbnails(thumbs); setLoading(false); }
       } catch { setLoading(false); }
     }
     render();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      try { currentPdf?.destroy?.(); } catch { /* ignore */ }
+    };
   }, [fileUrl, totalPages]);
 
   return (

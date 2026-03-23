@@ -56,8 +56,42 @@ export async function GET(req: NextRequest) {
     const user = await requireAuthenticatedUser(req);
     if (!user) return unauthorizedResponse();
 
+    const sourceDocument = await prisma.document.findUnique({
+      where: { id: documentId },
+      select: {
+        id: true,
+        path: true,
+        originalName: true,
+        projectId: true,
+        project: {
+          select: { ownerId: true },
+        },
+      },
+    });
+
+    if (!sourceDocument || sourceDocument.project.ownerId !== user.id) {
+      return NextResponse.json({ error: 'Document not found' }, { status: 404 });
+    }
+
     const links = await prisma.shareLink.findMany({
-      where: { documentId, project: { ownerId: user.id } },
+      where: {
+        projectId: sourceDocument.projectId,
+        project: { ownerId: user.id },
+        OR: [
+          { documentId: sourceDocument.id },
+          {
+            access: 'EDIT',
+            document: {
+              is: {
+                isVisible: false,
+                path: sourceDocument.path,
+                originalName: sourceDocument.originalName,
+                projectId: sourceDocument.projectId,
+              },
+            },
+          },
+        ],
+      },
       orderBy: { createdAt: 'desc' },
     });
     return NextResponse.json(links);

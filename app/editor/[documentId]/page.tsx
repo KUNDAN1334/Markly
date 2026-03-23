@@ -191,13 +191,15 @@ export default function EditorPage() {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ documentId, access }),
     });
-    const link = await res.json();
-    if (link.documentId === documentId) {
-      setShareLinks((prev) => {
-        const exists = prev.some((item) => item.id === link.id);
-        return exists ? prev : [...prev, link];
-      });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Failed to create share link' }));
+      throw new Error(err.error || 'Failed to create share link');
     }
+    const link = await res.json();
+    setShareLinks((prev) => {
+      const exists = prev.some((item) => item.id === link.id);
+      return exists ? prev : [link, ...prev];
+    });
     return link;
   }
 

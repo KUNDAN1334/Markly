@@ -30,7 +30,6 @@ export function ShareModal({
   const [selectedAccess, setSelectedAccess] = useState<AccessType>('COMMENT');
   const [creating, setCreating] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [createdLink, setCreatedLink] = useState<ShareLink | null>(null);
 
   const appUrl = typeof window !== 'undefined' ? window.location.origin : '';
 
@@ -51,9 +50,7 @@ export function ShareModal({
   async function handleCreate() {
     setCreating(true);
     try {
-      const link = await onCreateLink(selectedAccess);
-      setCreatedLink(link);
-      await copy(link.token, `created-${link.id}`);
+      await onCreateLink(selectedAccess);
     } finally {
       setCreating(false);
     }
@@ -67,6 +64,92 @@ export function ShareModal({
     await navigator.clipboard.writeText(`${appUrl}/review/${token}`);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
+  }
+
+  function renderLinkCard(link: ShareLink) {
+    const opt = ACCESS_OPTIONS.find((o) => o.id === link.access);
+
+    return (
+      <div
+        key={link.id}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          padding: '10px 12px',
+          border: '1px solid var(--border)',
+          borderRadius: 10,
+          background: 'var(--bg-card)',
+          transition: 'border-color .15s',
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)' }}>{opt?.label}</span>
+            <span style={{
+              fontSize: 9, fontWeight: 700, letterSpacing: '.05em', padding: '1px 6px', borderRadius: 99,
+              background: link.access === 'EDIT' ? '#fff7ed' : link.access === 'COMMENT' ? '#eff6ff' : 'var(--bg-2)',
+              color: link.access === 'EDIT' ? '#c2410c' : link.access === 'COMMENT' ? '#1d4ed8' : 'var(--text-3)',
+              border: `1px solid ${link.access === 'EDIT' ? '#fed7aa' : link.access === 'COMMENT' ? '#bfdbfe' : 'var(--border)'}`,
+            }}>
+              {link.access}
+            </span>
+          </div>
+          <p
+            style={{
+              fontSize: 9,
+              color: 'var(--text-3)',
+              fontFamily: "'DM Mono', monospace",
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            /review/{link.token}
+          </p>
+        </div>
+        <button
+          onClick={() => copy(link.token, link.id)}
+          style={{
+            width: 30,
+            height: 30,
+            borderRadius: 7,
+            border: '1px solid var(--border)',
+            background: 'transparent',
+            cursor: 'pointer',
+            color: copiedId === link.id ? '#16a34a' : 'var(--text-3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all .15s',
+          }}
+        >
+          {copiedId === link.id ? <Check size={12} /> : <Copy size={12} />}
+        </button>
+        {allowDelete && (
+          <button
+            onClick={() => handleDelete(link.id)}
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: 7,
+              border: '1px solid var(--border)',
+              background: 'transparent',
+              cursor: 'pointer',
+              color: '#ef4444',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all .15s',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.background = '#fef2f2')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+          >
+            <Trash2 size={11} />
+          </button>
+        )}
+      </div>
+    );
   }
 
   return (
@@ -131,15 +214,6 @@ export function ShareModal({
               <Plus size={13} />
               {creating ? 'Generating...' : 'Generate link'}
             </button>
-
-            {createdLink && (
-              <div style={{ marginTop: 12, padding: '10px 12px', borderRadius: 10, border: '1px solid #bfdbfe', background: '#eff6ff' }}>
-                <p style={{ fontSize: 11, fontWeight: 600, color: '#1d4ed8', marginBottom: 4 }}>New link ready</p>
-                <p style={{ fontSize: 10, color: '#1e3a8a', fontFamily: "'DM Mono', monospace", wordBreak: 'break-all' }}>
-                  {appUrl}/review/{createdLink.token}
-                </p>
-              </div>
-            )}
           </div>
 
           {/* Existing links */}
@@ -149,42 +223,7 @@ export function ShareModal({
                 Active links ({uniqueLinks.length})
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {uniqueLinks.map((link) => {
-                  const opt = ACCESS_OPTIONS.find((o) => o.id === link.access);
-                  return (
-                    <div key={link.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', border: '1px solid var(--border)', borderRadius: 10, background: 'var(--bg-card)', transition: 'border-color .15s' }}>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)' }}>{opt?.label}</span>
-                          <span style={{
-                            fontSize: 9, fontWeight: 700, letterSpacing: '.05em', padding: '1px 6px', borderRadius: 99,
-                            background: link.access === 'EDIT' ? '#fff7ed' : link.access === 'COMMENT' ? '#eff6ff' : 'var(--bg-2)',
-                            color: link.access === 'EDIT' ? '#c2410c' : link.access === 'COMMENT' ? '#1d4ed8' : 'var(--text-3)',
-                            border: `1px solid ${link.access === 'EDIT' ? '#fed7aa' : link.access === 'COMMENT' ? '#bfdbfe' : 'var(--border)'}`,
-                          }}>
-                            {link.access}
-                          </span>
-                        </div>
-                        <p style={{ fontSize: 9, color: 'var(--text-3)', fontFamily: "'DM Mono', monospace", overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          /review/{link.token}
-                        </p>
-                      </div>
-                      <button onClick={() => copy(link.token, link.id)}
-                        style={{ width: 30, height: 30, borderRadius: 7, border: '1px solid var(--border)', background: 'transparent', cursor: 'pointer', color: copiedId === link.id ? '#16a34a' : 'var(--text-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .15s' }}>
-                        {copiedId === link.id ? <Check size={12} /> : <Copy size={12} />}
-                      </button>
-                      {allowDelete && (
-                        <button onClick={() => handleDelete(link.id)}
-                          style={{ width: 30, height: 30, borderRadius: 7, border: '1px solid var(--border)', background: 'transparent', cursor: 'pointer', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .15s' }}
-                          onMouseEnter={e => (e.currentTarget.style.background = '#fef2f2')}
-                          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                        >
-                          <Trash2 size={11} />
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
+                {uniqueLinks.map((link) => renderLinkCard(link))}
               </div>
             </div>
           )}

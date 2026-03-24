@@ -114,7 +114,7 @@ function UploadModal({ project, onClose, onUploaded }: { project: Project; onClo
       <div className="w-full max-w-md rounded-2xl overflow-hidden animate-fade-up" style={{ background: 'var(--bg-card)', boxShadow: 'var(--shadow-lg)', border: '1px solid var(--border)' }}>
         <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid var(--border)' }}>
           <div>
-            <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, letterSpacing: '-.01em', color: 'var(--text)' }}>Upload PDF</h2>
+            <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, letterSpacing: '-.01em', color: 'var(--text)' }}>Upload Document</h2>
             <p style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>{project.name}</p>
           </div>
           <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg transition-all" style={{ color: 'var(--text-3)' }}
@@ -233,7 +233,7 @@ function ProjectCard({ project, onUpload, onDelete, onOpenDoc }: {
           onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border-strong)'; e.currentTarget.style.color = 'var(--text)'; }}
           onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-3)'; }}
         >
-          <Plus size={12} /> Upload PDF
+          <Plus size={12} /> Upload PDF/DOCX
         </button>
       </div>
     </div>
@@ -380,7 +380,7 @@ export default function HomePage() {
               Welcome to Markly
             </h1>
             <p style={{ fontSize: 15, color: 'var(--text-2)', maxWidth: 380, margin: '0 auto 32px', lineHeight: 1.6 }}>
-              Annotate PDFs with Excalidraw-style tools. Share with a link — no login required.
+              Annotate PDFs and DOCX files with Excalidraw-style tools. Share with a link — no login required.
             </p>
             <button
               onClick={() => setShowNewProject(true)}

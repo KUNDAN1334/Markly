@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuthenticatedUser, unauthorizedResponse } from '@/lib/auth';
+import { convertDocxToPdfBuffer } from '@/lib/document-conversion';
+import { DOCX_MIME_TYPE, getUploadSupportMessage, isDocxFile, isSupportedUpload } from '@/lib/document-formats';
 import { prisma } from '@/lib/prisma';
 import { saveFile } from '@/lib/storage';
 import { v4 as uuidv4 } from 'uuid';
@@ -16,8 +18,8 @@ export async function POST(req: NextRequest) {
     if (!file) return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     if (!projectId) return NextResponse.json({ error: 'No projectId provided' }, { status: 400 });
 
-    if (file.type !== 'application/pdf') {
-      return NextResponse.json({ error: 'Only PDF files are allowed' }, { status: 400 });
+    if (!isSupportedUpload(file)) {
+      return NextResponse.json({ error: getUploadSupportMessage() }, { status: 400 });
     }
 
     const MAX_SIZE = 50 * 1024 * 1024; // 50MB
@@ -29,16 +31,19 @@ export async function POST(req: NextRequest) {
     if (!project) return NextResponse.json({ error: 'Project not found' }, { status: 404 });
 
     const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    const uploadBuffer = Buffer.from(bytes);
     const filename = `${uuidv4()}.pdf`;
-    const filePath = await saveFile(buffer, filename);
+    const pdfBuffer = isDocxFile(file)
+      ? await convertDocxToPdfBuffer(uploadBuffer, file.name)
+      : uploadBuffer;
+    const filePath = await saveFile(pdfBuffer, filename);
 
     const document = await prisma.document.create({
       data: {
         filename,
         originalName: file.name,
-        mimeType: file.type,
-        size: file.size,
+        mimeType: isDocxFile(file) ? DOCX_MIME_TYPE : file.type,
+        size: pdfBuffer.length,
         path: filePath,
         isVisible: true,
         projectId,
@@ -49,6 +54,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(document, { status: 201 });
   } catch (error) {
     console.error('POST /api/documents/upload error:', error);
-    return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Upload failed' },
+      { status: 500 }
+    );
   }
 }

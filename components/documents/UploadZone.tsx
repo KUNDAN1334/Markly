@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { Upload, FileText, X, AlertCircle } from 'lucide-react';
+import { getUploadSupportMessage, isSupportedUpload } from '@/lib/document-formats';
 import { formatBytes } from '@/lib/utils';
 
 interface Props { projectId: string; onUploaded: (documentId: string) => void; }
@@ -15,7 +16,7 @@ export function UploadZone({ projectId, onUploaded }: Props) {
 
   const handleFile = useCallback((f: File) => {
     setError(null);
-    if (f.type !== 'application/pdf') { setError('Only PDF files are supported'); return; }
+    if (!isSupportedUpload(f)) { setError(getUploadSupportMessage()); return; }
     if (f.size > 50 * 1024 * 1024) { setError('File too large (max 50MB)'); return; }
     setFile(f);
   }, []);
@@ -56,7 +57,7 @@ export function UploadZone({ projectId, onUploaded }: Props) {
         onMouseEnter={e => { if (!file) { (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-2)'; (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--border-strong)'; } }}
         onMouseLeave={e => { if (!file) { (e.currentTarget as HTMLDivElement).style.background = 'transparent'; (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--border)'; } }}
       >
-        <input ref={inputRef} type="file" accept="application/pdf" className="hidden" style={{ display: 'none' }} onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
+        <input ref={inputRef} type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" style={{ display: 'none' }} onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
 
         {file ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -79,7 +80,7 @@ export function UploadZone({ projectId, onUploaded }: Props) {
             <div style={{ width: 48, height: 48, background: 'var(--bg-2)', border: '1px solid var(--border)', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
               <Upload size={20} style={{ color: 'var(--text-3)' }} />
             </div>
-            <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)', marginBottom: 4 }}>Drop PDF here or click to browse</p>
+            <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)', marginBottom: 4 }}>Drop PDF or DOCX here or click to browse</p>
             <p style={{ fontSize: 11, color: 'var(--text-3)' }}>Up to 50MB</p>
           </>
         )}

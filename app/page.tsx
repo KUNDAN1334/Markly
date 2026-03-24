@@ -1,5 +1,6 @@
 'use client';
 
+import type { MouseEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -33,6 +34,71 @@ function MarklyLogo({ size = 36, forDark = false }: { size?: number; forDark?: b
       <path d="M7 18 L20 18" stroke={c} strokeWidth="1" strokeLinecap="round" opacity="0.35"/>
       <path d="M6 25 L10 29 L18 21" stroke="#e74c3c" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
     </svg>
+  );
+}
+
+type Testimonial = {
+  q: string;
+  name: string;
+  role: string;
+};
+
+function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
+  const initials = testimonial.name
+    .split(' ')
+    .map((part) => part[0])
+    .join('');
+
+  function handlePointerMove(event: MouseEvent<HTMLDivElement>) {
+    const card = event.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const px = (event.clientX - rect.left) / rect.width;
+    const py = (event.clientY - rect.top) / rect.height;
+    const rotateY = (px - 0.5) * 16;
+    const rotateX = (0.5 - py) * 14;
+
+    card.dataset.active = 'true';
+    card.style.setProperty('--rx', `${rotateX.toFixed(2)}deg`);
+    card.style.setProperty('--ry', `${rotateY.toFixed(2)}deg`);
+    card.style.setProperty('--mx', `${(px * 100).toFixed(2)}%`);
+    card.style.setProperty('--my', `${(py * 100).toFixed(2)}%`);
+  }
+
+  function resetTilt(event: MouseEvent<HTMLDivElement>) {
+    const card = event.currentTarget;
+    card.dataset.active = 'false';
+    card.style.setProperty('--rx', '0deg');
+    card.style.setProperty('--ry', '0deg');
+    card.style.setProperty('--mx', '50%');
+    card.style.setProperty('--my', '50%');
+  }
+
+  return (
+    <div className="testi-card-wrap">
+      <div
+        className="testi-card"
+        data-active="false"
+        onMouseMove={handlePointerMove}
+        onMouseLeave={resetTilt}
+        onMouseEnter={handlePointerMove}
+      >
+        <div className="testi-card-inner">
+          <div className="testi-stars testi-layer-sm">
+            {[...Array(5)].map((_, index) => (
+              <span key={index} className="testi-star">★</span>
+            ))}
+          </div>
+          <div className="testi-quote testi-layer-lg">{testimonial.q}</div>
+          <div className="testi-author testi-layer-md">
+            <div className="testi-avatar">{initials}</div>
+            <div>
+              <div className="testi-name">{testimonial.name}</div>
+              <div className="testi-role">{testimonial.role}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -323,13 +389,47 @@ export default function LandingPage() {
 
         /* ── TESTIMONIALS ── */
         .testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .testi-card-frag > .testi-stars { display: none; }
+        .testi-card-wrap { perspective: 1400px; }
         .testi-card {
+          --rx: 0deg;
+          --ry: 0deg;
+          --mx: 50%;
+          --my: 50%;
           background: var(--bg-card); border: 1px solid var(--border);
           border-radius: var(--radius-lg); padding: 28px 26px;
           display: flex; flex-direction: column; gap: 22px;
-          box-shadow: var(--shadow-sm); transition: box-shadow .2s, transform .2s;
+          box-shadow: var(--shadow-sm); transition: box-shadow .22s, transform .22s, border-color .22s;
+          position: relative; overflow: hidden; transform-style: preserve-3d;
+          transform: rotateX(var(--rx)) rotateY(var(--ry)) translateY(0);
+          min-height: 258px; will-change: transform;
         }
-        .testi-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+        .testi-card::before {
+          content: ''; position: absolute; inset: 0; pointer-events: none;
+          background:
+            radial-gradient(circle at var(--mx) var(--my), color-mix(in srgb, white 72%, transparent) 0%, transparent 36%),
+            linear-gradient(135deg, color-mix(in srgb, var(--accent) 5%, transparent), transparent 55%);
+          opacity: .72; transition: opacity .22s;
+        }
+        .testi-card::after {
+          content: ''; position: absolute; inset: 1px; pointer-events: none;
+          border-radius: calc(var(--radius-lg) - 1px);
+          border: 1px solid color-mix(in srgb, white 48%, transparent);
+          opacity: .5;
+        }
+        .testi-card[data-active="true"] {
+          box-shadow: var(--shadow-xl);
+          border-color: color-mix(in srgb, var(--border-strong) 82%, white 18%);
+          transform: rotateX(var(--rx)) rotateY(var(--ry)) translateY(-10px);
+        }
+        .testi-card-inner {
+          position: relative; z-index: 1; height: 100%;
+          display: flex; flex-direction: column; gap: 22px;
+          transform-style: preserve-3d;
+        }
+        .testi-layer-sm { transform: translateZ(28px); }
+        .testi-layer-md { transform: translateZ(42px); }
+        .testi-layer-lg { transform: translateZ(64px); }
         .testi-stars { display: flex; gap: 3px; }
         .testi-star { color: var(--yellow); font-size: 13px; }
         .testi-quote { font-size: 14px; color: var(--text-2); line-height: 1.75; font-style: italic; }
@@ -436,6 +536,18 @@ export default function LandingPage() {
           .cta-block { padding: 52px 28px; }
           .hero { padding: 72px 0 56px; }
           .section { padding: 72px 0; }
+          .testi-card { min-height: unset; }
+        }
+        @media (hover: none) {
+          .testi-card {
+            transform: none !important;
+            transition: box-shadow .22s, border-color .22s;
+          }
+          .testi-card[data-active="true"] { transform: none !important; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .testi-card, .testi-card::before { transition: none; }
+          .testi-card { transform: none !important; }
         }
       `}</style>
 
@@ -686,16 +798,9 @@ export default function LandingPage() {
               { q:'"We replaced three tools with Markly. The hand-drawn annotations with Virgil font feel personal and readable."', name:'Rohan K.', role:'Founder, legal-tech' },
               { q:'"Our architecture team reviews drawings daily. Free-form annotation is perfect — like sketching on paper but shareable."', name:'Jenna L.', role:'Senior Architect' },
             ].map((t,i) => (
-              <div key={i} className="testi-card">
+              <div className="testi-card-frag" key={i}>
+                <TestimonialCard testimonial={t} />
                 <div className="testi-stars">{[...Array(5)].map((_,j) => <span key={j} className="testi-star">★</span>)}</div>
-                <div className="testi-quote">{t.q}</div>
-                <div className="testi-author">
-                  <div className="testi-avatar">{t.name.split(' ').map(n=>n[0]).join('')}</div>
-                  <div>
-                    <div className="testi-name">{t.name}</div>
-                    <div className="testi-role">{t.role}</div>
-                  </div>
-                </div>
               </div>
             ))}
           </div>

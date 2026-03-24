@@ -95,7 +95,7 @@ export async function GET(req: NextRequest) {
     }
 
     const exportedBytes = await pdfDoc.save();
-    const exportName = doc.originalName.replace('.pdf', '') + '_reviewed.pdf';
+    const exportName = `${path.parse(doc.originalName).name}_reviewed.pdf`;
 
     return new NextResponse(exportedBytes as unknown as BodyInit, {
       headers: {

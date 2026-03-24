@@ -53,6 +53,7 @@ Built for designers, lawyers, architects, product teams, and anyone who reviews 
 - **Original file preserved** — source PDF always untouched
 
 ### Developer Experience
+- DOCX uploads supported through server-side conversion to PDF
 - Type-safe end-to-end with TypeScript
 - REST API with documented endpoints
 - Prisma schema for easy DB migrations
@@ -213,6 +214,7 @@ Render review page with access badge:
 - Node.js 18+
 - PostgreSQL 14+ running locally or via Docker
 - Git
+- LibreOffice on the server if you want DOCX uploads
 
 ### 1. Clone
 
@@ -240,7 +242,10 @@ NEXT_PUBLIC_APP_URL="http://localhost:3000"
 
 # Storage — path to store uploaded PDFs
 STORAGE_PATH="./storage/documents"
+LIBREOFFICE_PATH="C:\\Program Files\\LibreOffice\\program\\soffice.exe"
 ```
+
+> DOCX uploads are converted to PDF on the server for review. End users do not need LibreOffice installed.
 
 > **Using Docker for Postgres?**
 > ```bash
@@ -353,8 +358,8 @@ All endpoints return JSON. Errors follow `{ error: string }`.
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/documents/upload` | Upload PDF (multipart, 50MB max) |
-| `GET` | `/api/documents/file/:filename` | Serve PDF file bytes |
+| `POST` | `/api/documents/upload` | Upload PDF or DOCX (multipart, 50MB max) |
+| `GET` | `/api/documents/file/:filename` | Serve review PDF file bytes |
 | `GET` | `/api/documents/:id` | Get document metadata |
 | `DELETE` | `/api/documents/:id` | Delete document + annotations |
 
@@ -492,11 +497,14 @@ enum AccessType {
 DATABASE_URL=postgresql://...   # from Neon
 NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
 STORAGE_PATH=/tmp               # use object storage for production (see below)
+LIBREOFFICE_PATH=/usr/bin/soffice
 ```
 
 5. Deploy
 
 > **Note:** For production, replace local filesystem storage with S3 or R2. Update `lib/storage.ts` to use `@aws-sdk/client-s3` or Cloudflare R2.
+>
+> **DOCX note:** LibreOffice is only required on the server if you want DOCX uploads. PDF uploads do not depend on it.
 
 ### Docker (Self-hosted)
 

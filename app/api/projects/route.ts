@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuthenticatedUser, unauthorizedResponse } from '@/lib/auth';
+import { checkWorkspaceLimits, planErrorResponse } from '@/lib/billing/feature-gating';
+import { ensureWorkspaceForUser } from '@/lib/billing/workspace';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
@@ -11,6 +13,8 @@ export async function GET(req: NextRequest) {
   try {
     const user = await requireAuthenticatedUser(req);
     if (!user) return unauthorizedResponse();
+
+    await ensureWorkspaceForUser(user);
 
     const projects = await prisma.project.findMany({
       where: { ownerId: user.id },
@@ -36,17 +40,25 @@ export async function POST(req: NextRequest) {
   try {
     const user = await requireAuthenticatedUser(req);
     if (!user) return unauthorizedResponse();
+    const workspace = await ensureWorkspaceForUser(user);
 
     const body = await req.json();
     const { name } = createProjectSchema.parse(body);
+    await checkWorkspaceLimits(workspace, {
+      enforceProjectLimit: true,
+      enforceDocumentLimit: false,
+      enforceMonthlyDocumentLimit: false,
+    });
 
     const project = await prisma.project.create({
-      data: { name, ownerId: user.id },
+      data: { name, ownerId: user.id, workspaceId: workspace.id },
       include: { documents: true, shareLinks: true },
     });
 
     return NextResponse.json(project, { status: 201 });
   } catch (error) {
+    const gated = planErrorResponse(error);
+    if (gated) return gated;
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }

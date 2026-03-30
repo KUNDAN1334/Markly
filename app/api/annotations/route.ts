@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authorizeDocumentAccess } from '@/lib/auth';
+import { planErrorResponse, requireWorkspaceFeatureForDocument } from '@/lib/billing/feature-gating';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
@@ -42,6 +43,7 @@ export async function POST(req: NextRequest) {
     const { documentId, annotations } = bulkSaveSchema.parse(body);
     const access = await authorizeDocumentAccess(req, documentId, 'EDIT');
     if (!access.ok) return access.response;
+    await requireWorkspaceFeatureForDocument(documentId, 'canAnnotate');
 
     await prisma.annotation.deleteMany({ where: { documentId } });
 
@@ -71,6 +73,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(saved);
   } catch (error) {
+    const gated = planErrorResponse(error);
+    if (gated) return gated;
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }

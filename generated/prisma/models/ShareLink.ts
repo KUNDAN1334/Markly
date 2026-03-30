@@ -513,10 +513,6 @@ export type ShareLinkUncheckedUpdateManyWithoutDocumentNestedInput = {
   deleteMany?: Prisma.ShareLinkScalarWhereInput | Prisma.ShareLinkScalarWhereInput[]
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type ShareLinkCreateWithoutCreatedByUserInput = {
   id?: string
   token?: string

@@ -47,6 +47,11 @@ export { Prisma }
  */
 export type User = Prisma.UserModel
 /**
+ * Model Workspace
+ * 
+ */
+export type Workspace = Prisma.WorkspaceModel
+/**
  * Model Project
  * 
  */
@@ -71,3 +76,8 @@ export type Comment = Prisma.CommentModel
  * 
  */
 export type ShareLink = Prisma.ShareLinkModel
+/**
+ * Model BillingWebhookEvent
+ * 
+ */
+export type BillingWebhookEvent = Prisma.BillingWebhookEventModel

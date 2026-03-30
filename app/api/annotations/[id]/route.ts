@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authorizeDocumentAccess } from '@/lib/auth';
+import { planErrorResponse, requireWorkspaceFeatureForDocument } from '@/lib/billing/feature-gating';
 import { prisma } from '@/lib/prisma';
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -17,13 +18,16 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
     const access = await authorizeDocumentAccess(req, existingAnnotation.documentId, 'EDIT');
     if (!access.ok) return access.response;
+    await requireWorkspaceFeatureForDocument(existingAnnotation.documentId, 'canAnnotate');
 
     const annotation = await prisma.annotation.update({
       where: { id },
       data: body,
     });
     return NextResponse.json(annotation);
-  } catch {
+  } catch (error) {
+    const gated = planErrorResponse(error);
+    if (gated) return gated;
     return NextResponse.json({ error: 'Failed to update annotation' }, { status: 500 });
   }
 }
@@ -42,10 +46,13 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
 
     const access = await authorizeDocumentAccess(_req, existingAnnotation.documentId, 'EDIT');
     if (!access.ok) return access.response;
+    await requireWorkspaceFeatureForDocument(existingAnnotation.documentId, 'canAnnotate');
 
     await prisma.annotation.delete({ where: { id } });
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (error) {
+    const gated = planErrorResponse(error);
+    if (gated) return gated;
     return NextResponse.json({ error: 'Failed to delete annotation' }, { status: 500 });
   }
 }

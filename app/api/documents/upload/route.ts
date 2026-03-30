@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuthenticatedUser, unauthorizedResponse } from '@/lib/auth';
+import { checkWorkspaceLimits, planErrorResponse } from '@/lib/billing/feature-gating';
+import { getWorkspaceForProject } from '@/lib/billing/workspace';
 import { convertDocxToPdfBuffer } from '@/lib/document-conversion';
 import { DOCX_MIME_TYPE, getUploadSupportMessage, isDocxFile, isSupportedUpload } from '@/lib/document-formats';
 import { prisma } from '@/lib/prisma';
@@ -29,6 +31,13 @@ export async function POST(req: NextRequest) {
 
     const project = await prisma.project.findFirst({ where: { id: projectId, ownerId: user.id } });
     if (!project) return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+    const workspace = await getWorkspaceForProject(projectId);
+    if (!workspace) return NextResponse.json({ error: 'Workspace not found' }, { status: 404 });
+    await checkWorkspaceLimits(workspace, {
+      enforceProjectLimit: false,
+      enforceDocumentLimit: true,
+      enforceMonthlyDocumentLimit: true,
+    });
 
     const bytes = await file.arrayBuffer();
     const uploadBuffer = Buffer.from(bytes);
@@ -53,6 +62,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(document, { status: 201 });
   } catch (error) {
+    const gated = planErrorResponse(error);
+    if (gated) return gated;
     console.error('POST /api/documents/upload error:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Upload failed' },

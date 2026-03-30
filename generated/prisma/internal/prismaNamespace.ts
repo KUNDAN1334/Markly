@@ -385,11 +385,13 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   User: 'User',
+  Workspace: 'Workspace',
   Project: 'Project',
   Document: 'Document',
   Annotation: 'Annotation',
   Comment: 'Comment',
-  ShareLink: 'ShareLink'
+  ShareLink: 'ShareLink',
+  BillingWebhookEvent: 'BillingWebhookEvent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -405,7 +407,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "project" | "document" | "annotation" | "comment" | "shareLink"
+    modelProps: "user" | "workspace" | "project" | "document" | "annotation" | "comment" | "shareLink" | "billingWebhookEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -480,6 +482,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.UserCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.UserCountAggregateOutputType> | number
+        }
+      }
+    }
+    Workspace: {
+      payload: Prisma.$WorkspacePayload<ExtArgs>
+      fields: Prisma.WorkspaceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.WorkspaceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspacePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.WorkspaceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspacePayload>
+        }
+        findFirst: {
+          args: Prisma.WorkspaceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspacePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.WorkspaceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspacePayload>
+        }
+        findMany: {
+          args: Prisma.WorkspaceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspacePayload>[]
+        }
+        create: {
+          args: Prisma.WorkspaceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspacePayload>
+        }
+        createMany: {
+          args: Prisma.WorkspaceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.WorkspaceCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspacePayload>[]
+        }
+        delete: {
+          args: Prisma.WorkspaceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspacePayload>
+        }
+        update: {
+          args: Prisma.WorkspaceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspacePayload>
+        }
+        deleteMany: {
+          args: Prisma.WorkspaceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.WorkspaceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.WorkspaceUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspacePayload>[]
+        }
+        upsert: {
+          args: Prisma.WorkspaceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspacePayload>
+        }
+        aggregate: {
+          args: Prisma.WorkspaceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateWorkspace>
+        }
+        groupBy: {
+          args: Prisma.WorkspaceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkspaceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.WorkspaceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkspaceCountAggregateOutputType> | number
         }
       }
     }
@@ -853,6 +929,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    BillingWebhookEvent: {
+      payload: Prisma.$BillingWebhookEventPayload<ExtArgs>
+      fields: Prisma.BillingWebhookEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BillingWebhookEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingWebhookEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BillingWebhookEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingWebhookEventPayload>
+        }
+        findFirst: {
+          args: Prisma.BillingWebhookEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingWebhookEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BillingWebhookEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingWebhookEventPayload>
+        }
+        findMany: {
+          args: Prisma.BillingWebhookEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingWebhookEventPayload>[]
+        }
+        create: {
+          args: Prisma.BillingWebhookEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingWebhookEventPayload>
+        }
+        createMany: {
+          args: Prisma.BillingWebhookEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BillingWebhookEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingWebhookEventPayload>[]
+        }
+        delete: {
+          args: Prisma.BillingWebhookEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingWebhookEventPayload>
+        }
+        update: {
+          args: Prisma.BillingWebhookEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingWebhookEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.BillingWebhookEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BillingWebhookEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BillingWebhookEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingWebhookEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.BillingWebhookEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BillingWebhookEventPayload>
+        }
+        aggregate: {
+          args: Prisma.BillingWebhookEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBillingWebhookEvent>
+        }
+        groupBy: {
+          args: Prisma.BillingWebhookEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BillingWebhookEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BillingWebhookEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BillingWebhookEventCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -905,10 +1055,28 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const WorkspaceScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  ownerUserId: 'ownerUserId',
+  currentPlanId: 'currentPlanId',
+  razorpayCustomerId: 'razorpayCustomerId',
+  razorpaySubscriptionId: 'razorpaySubscriptionId',
+  subscriptionStatus: 'subscriptionStatus',
+  currentPlanStartedAt: 'currentPlanStartedAt',
+  currentPlanRenewsAt: 'currentPlanRenewsAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WorkspaceScalarFieldEnum = (typeof WorkspaceScalarFieldEnum)[keyof typeof WorkspaceScalarFieldEnum]
+
+
 export const ProjectScalarFieldEnum = {
   id: 'id',
   name: 'name',
   ownerId: 'ownerId',
+  workspaceId: 'workspaceId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -975,6 +1143,19 @@ export const ShareLinkScalarFieldEnum = {
 } as const
 
 export type ShareLinkScalarFieldEnum = (typeof ShareLinkScalarFieldEnum)[keyof typeof ShareLinkScalarFieldEnum]
+
+
+export const BillingWebhookEventScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  razorpayEventId: 'razorpayEventId',
+  razorpayEntityId: 'razorpayEntityId',
+  event: 'event',
+  payload: 'payload',
+  createdAt: 'createdAt'
+} as const
+
+export type BillingWebhookEventScalarFieldEnum = (typeof BillingWebhookEventScalarFieldEnum)[keyof typeof BillingWebhookEventScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1195,11 +1376,13 @@ export type PrismaClientOptions = ({
 }
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
+  workspace?: Prisma.WorkspaceOmit
   project?: Prisma.ProjectOmit
   document?: Prisma.DocumentOmit
   annotation?: Prisma.AnnotationOmit
   comment?: Prisma.CommentOmit
   shareLink?: Prisma.ShareLinkOmit
+  billingWebhookEvent?: Prisma.BillingWebhookEventOmit
 }
 
 /* Types for Logging */

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authorizeDocumentAccess, requireAuthenticatedUser, unauthorizedResponse } from '@/lib/auth';
+import { planErrorResponse, requireWorkspaceFeatureForDocument } from '@/lib/billing/feature-gating';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
@@ -31,6 +32,7 @@ export async function POST(req: NextRequest) {
     const data = commentSchema.parse(body);
     const access = await authorizeDocumentAccess(req, data.documentId, 'COMMENT');
     if (!access.ok) return access.response;
+    await requireWorkspaceFeatureForDocument(data.documentId, 'canComment');
 
     let authorUserId: string | null = null;
     let authorName: string | null = null;
@@ -53,6 +55,8 @@ export async function POST(req: NextRequest) {
     });
     return NextResponse.json(comment, { status: 201 });
   } catch (error) {
+    const gated = planErrorResponse(error);
+    if (gated) return gated;
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }

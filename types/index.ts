@@ -74,6 +74,7 @@ export interface Document {
 export interface Project {
   id: string;
   name: string;
+  workspaceId?: string | null;
   documents: Document[];
   shareLinks: ShareLink[];
   createdAt: string;
@@ -88,6 +89,51 @@ export interface ShareLink {
   access: AccessType;
   createdAt: string;
   expiresAt?: string;
+}
+
+export interface PlanFeatures {
+  canAnnotate: boolean;
+  canComment: boolean;
+  hasCommentStatus: boolean;
+  hasDocumentStatus: boolean;
+  hasEmailNotifications: boolean;
+  hasSlackIntegration: boolean;
+  hasBranding: boolean;
+  hasTeamOnlyComments: boolean;
+  hasPasswordProtectedLinks: boolean;
+  hasAnalytics: boolean;
+}
+
+export interface PlanLimits {
+  maxActiveProjects: number | null;
+  maxActiveDocuments: number | null;
+  softMonthlyNewDocumentsLimit: number | null;
+}
+
+export interface PricingPlan {
+  id: 'free' | 'pro' | 'team';
+  name: string;
+  description: string;
+  monthlyPriceInPaise: number;
+  limits: PlanLimits;
+  features: PlanFeatures;
+}
+
+export interface Workspace {
+  id: string;
+  name: string;
+  ownerUserId: string;
+  currentPlanId: 'free' | 'pro' | 'team';
+  subscriptionStatus: 'none' | 'pending' | 'trialing' | 'active' | 'past_due' | 'cancelled' | 'paused';
+  currentPlanStartedAt?: string | null;
+  currentPlanRenewsAt?: string | null;
+  razorpayCustomerId?: string | null;
+  razorpaySubscriptionId?: string | null;
+  currentPlan: PricingPlan;
+  usage: {
+    activeProjectsCount: number;
+    activeDocumentsCount: number;
+  };
 }
 
 export type Tool =

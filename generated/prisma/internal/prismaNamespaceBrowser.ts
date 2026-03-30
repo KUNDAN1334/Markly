@@ -52,11 +52,13 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
+  Workspace: 'Workspace',
   Project: 'Project',
   Document: 'Document',
   Annotation: 'Annotation',
   Comment: 'Comment',
-  ShareLink: 'ShareLink'
+  ShareLink: 'ShareLink',
+  BillingWebhookEvent: 'BillingWebhookEvent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -88,10 +90,28 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const WorkspaceScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  ownerUserId: 'ownerUserId',
+  currentPlanId: 'currentPlanId',
+  razorpayCustomerId: 'razorpayCustomerId',
+  razorpaySubscriptionId: 'razorpaySubscriptionId',
+  subscriptionStatus: 'subscriptionStatus',
+  currentPlanStartedAt: 'currentPlanStartedAt',
+  currentPlanRenewsAt: 'currentPlanRenewsAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WorkspaceScalarFieldEnum = (typeof WorkspaceScalarFieldEnum)[keyof typeof WorkspaceScalarFieldEnum]
+
+
 export const ProjectScalarFieldEnum = {
   id: 'id',
   name: 'name',
   ownerId: 'ownerId',
+  workspaceId: 'workspaceId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -158,6 +178,19 @@ export const ShareLinkScalarFieldEnum = {
 } as const
 
 export type ShareLinkScalarFieldEnum = (typeof ShareLinkScalarFieldEnum)[keyof typeof ShareLinkScalarFieldEnum]
+
+
+export const BillingWebhookEventScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  razorpayEventId: 'razorpayEventId',
+  razorpayEntityId: 'razorpayEntityId',
+  event: 'event',
+  payload: 'payload',
+  createdAt: 'createdAt'
+} as const
+
+export type BillingWebhookEventScalarFieldEnum = (typeof BillingWebhookEventScalarFieldEnum)[keyof typeof BillingWebhookEventScalarFieldEnum]
 
 
 export const SortOrder = {

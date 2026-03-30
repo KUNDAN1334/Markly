@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authorizeDocumentAccess } from '@/lib/auth';
+import { planErrorResponse, requireWorkspaceFeatureForDocument } from '@/lib/billing/feature-gating';
 import { prisma } from '@/lib/prisma';
 
 type RouteContext = {
@@ -20,6 +21,9 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
 
     const access = await authorizeDocumentAccess(req, existingComment.documentId, 'COMMENT');
     if (!access.ok) return access.response;
+    if (typeof body.resolved === 'boolean') {
+      await requireWorkspaceFeatureForDocument(existingComment.documentId, 'hasCommentStatus');
+    }
 
     const comment = await prisma.comment.update({
       where: { id },
@@ -28,6 +32,8 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
 
     return NextResponse.json(comment);
   } catch (error) {
+    const gated = planErrorResponse(error);
+    if (gated) return gated;
     console.error('PATCH comment error:', error);
     return NextResponse.json({ error: 'Failed to update comment' }, { status: 500 });
   }

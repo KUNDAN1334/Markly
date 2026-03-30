@@ -1,27 +1,27 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { BillingModal } from '@/components/billing/BillingModal';
 import { UploadZone } from '@/components/documents/UploadZone';
-import { Project } from '@/types';
-import { Plus, X, FolderOpen, Clock, Trash2, FileText, Sun, Moon } from 'lucide-react';
+import { Project, Workspace } from '@/types';
+import { Plus, X, FolderOpen, Clock, Trash2, FileText, Sun, Moon, CreditCard } from 'lucide-react';
 
-/* ── THEME TOGGLE ── */
 function ThemeToggle() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
     const saved = localStorage.getItem('markly-theme') as 'light' | 'dark' | null;
-    const t = saved || 'light';
-    setTheme(t);
-    document.documentElement.setAttribute('data-theme', t);
+    const nextTheme = saved || 'light';
+    setTheme(nextTheme);
+    document.documentElement.setAttribute('data-theme', nextTheme);
   }, []);
 
   function toggle() {
-    const next = theme === 'light' ? 'dark' : 'light';
-    setTheme(next);
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('markly-theme', next);
+    const nextTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(nextTheme);
+    document.documentElement.setAttribute('data-theme', nextTheme);
+    localStorage.setItem('markly-theme', nextTheme);
   }
 
   return (
@@ -36,22 +36,34 @@ function ThemeToggle() {
   );
 }
 
-/* ── NEW PROJECT MODAL ── */
 function NewProjectModal({ onClose, onCreate }: { onClose: () => void; onCreate: (p: Project) => void }) {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleCreate() {
     if (!name.trim()) return;
     setLoading(true);
-    const res = await fetch('/api/projects', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name.trim() }),
-    });
-    const project = await res.json();
-    onCreate(project);
-    setLoading(false);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim() }),
+      });
+
+      const project = await res.json().catch(() => ({ error: 'Failed to create project' }));
+      if (!res.ok) {
+        throw new Error(project.error || 'Failed to create project');
+      }
+
+      onCreate(project);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create project');
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -62,9 +74,13 @@ function NewProjectModal({ onClose, onCreate }: { onClose: () => void; onCreate:
             <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, letterSpacing: '-.01em', color: 'var(--text)' }}>New project</h2>
             <p style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>Give your review workspace a name</p>
           </div>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg transition-all" style={{ color: 'var(--text-3)', background: 'transparent' }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-2)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-lg transition-all"
+            style={{ color: 'var(--text-3)', background: 'transparent' }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-2)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+          >
             <X size={15} />
           </button>
         </div>
@@ -78,36 +94,52 @@ function NewProjectModal({ onClose, onCreate }: { onClose: () => void; onCreate:
               placeholder="e.g. Q4 Contracts Review"
               autoFocus
               style={{
-                width: '100%', background: 'var(--bg-2)', border: '1px solid var(--border)',
-                borderRadius: 10, padding: '10px 14px', fontSize: 14,
-                color: 'var(--text)', outline: 'none', fontFamily: "'Instrument Sans', sans-serif",
+                width: '100%',
+                background: 'var(--bg-2)',
+                border: '1px solid var(--border)',
+                borderRadius: 10,
+                padding: '10px 14px',
+                fontSize: 14,
+                color: 'var(--text)',
+                outline: 'none',
+                fontFamily: "'Instrument Sans', sans-serif",
                 transition: 'border-color .15s',
               }}
-              onFocus={e => (e.target.style.borderColor = 'var(--border-strong)')}
-              onBlur={e => (e.target.style.borderColor = 'var(--border)')}
+              onFocus={(e) => (e.target.style.borderColor = 'var(--border-strong)')}
+              onBlur={(e) => (e.target.style.borderColor = 'var(--border)')}
             />
           </div>
           <button
             onClick={handleCreate}
             disabled={!name.trim() || loading}
             style={{
-              width: '100%', background: 'var(--accent)', color: 'var(--accent-fg)',
-              border: 'none', borderRadius: 10, padding: '11px 0',
-              fontSize: 14, fontWeight: 500, cursor: 'pointer',
+              width: '100%',
+              background: 'var(--accent)',
+              color: 'var(--accent-fg)',
+              border: 'none',
+              borderRadius: 10,
+              padding: '11px 0',
+              fontSize: 14,
+              fontWeight: 500,
+              cursor: 'pointer',
               fontFamily: "'Instrument Sans', sans-serif",
-              opacity: !name.trim() || loading ? .45 : 1,
+              opacity: !name.trim() || loading ? 0.45 : 1,
               transition: 'opacity .15s',
             }}
           >
             {loading ? 'Creating...' : 'Create project →'}
           </button>
+          {error && (
+            <div style={{ fontSize: 12, color: '#b91c1c', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '10px 12px' }}>
+              {error}
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-/* ── UPLOAD MODAL ── */
 function UploadModal({ project, onClose, onUploaded }: { project: Project; onClose: () => void; onUploaded: (id: string) => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,.5)' }}>
@@ -117,9 +149,13 @@ function UploadModal({ project, onClose, onUploaded }: { project: Project; onClo
             <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, letterSpacing: '-.01em', color: 'var(--text)' }}>Upload Document</h2>
             <p style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>{project.name}</p>
           </div>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg transition-all" style={{ color: 'var(--text-3)' }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-2)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-lg transition-all"
+            style={{ color: 'var(--text-3)' }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-2)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+          >
             <X size={15} />
           </button>
         </div>
@@ -131,7 +167,6 @@ function UploadModal({ project, onClose, onUploaded }: { project: Project; onClo
   );
 }
 
-/* ── PROJECT CARD ── */
 function ProjectCard({ project, onUpload, onDelete, onOpenDoc }: {
   project: Project;
   onUpload: () => void;
@@ -145,21 +180,26 @@ function ProjectCard({ project, onUpload, onDelete, onOpenDoc }: {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        background: 'var(--bg-card)', border: '1px solid var(--border)',
-        borderRadius: 'var(--radius-lg)', overflow: 'hidden',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius-lg)',
+        overflow: 'hidden',
         boxShadow: hovered ? 'var(--shadow-md)' : 'var(--shadow-sm)',
         borderColor: hovered ? 'var(--border-strong)' : 'var(--border)',
         transition: 'all .2s',
       }}
     >
-      {/* Card header */}
       <div className="p-5" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="flex items-start justify-between mb-3">
           <div style={{
-            width: 36, height: 36, borderRadius: 10,
+            width: 36,
+            height: 36,
+            borderRadius: 10,
             background: hovered ? 'var(--accent)' : 'var(--bg-2)',
             border: '1px solid var(--border)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             transition: 'all .2s',
           }}>
             <FolderOpen size={15} style={{ color: hovered ? 'var(--accent-fg)' : 'var(--text-3)' }} />
@@ -168,14 +208,27 @@ function ProjectCard({ project, onUpload, onDelete, onOpenDoc }: {
             onClick={onDelete}
             title="Delete project"
             style={{
-              width: 28, height: 28, borderRadius: 8,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              opacity: hovered ? 1 : 0, color: 'var(--text-3)',
-              background: 'transparent', border: 'none', cursor: 'pointer',
+              width: 28,
+              height: 28,
+              borderRadius: 8,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: hovered ? 1 : 0,
+              color: 'var(--text-3)',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
               transition: 'all .15s',
             }}
-            onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = '#fef2f2'; }}
-            onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-3)'; e.currentTarget.style.background = 'transparent'; }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = '#ef4444';
+              e.currentTarget.style.background = '#fef2f2';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--text-3)';
+              e.currentTarget.style.background = 'transparent';
+            }}
           >
             <Trash2 size={13} />
           </button>
@@ -192,19 +245,26 @@ function ProjectCard({ project, onUpload, onDelete, onOpenDoc }: {
         </div>
       </div>
 
-      {/* Documents list */}
       <div className="px-3 py-2" style={{ minHeight: 60 }}>
         {(project.documents || []).slice(0, 3).map((doc) => (
           <button
             key={doc.id}
             onClick={() => onOpenDoc(doc.id)}
             style={{
-              width: '100%', display: 'flex', alignItems: 'center', gap: 8,
-              padding: '6px 8px', borderRadius: 8, border: 'none', background: 'transparent',
-              cursor: 'pointer', textAlign: 'left', transition: 'background .15s',
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '6px 8px',
+              borderRadius: 8,
+              border: 'none',
+              background: 'transparent',
+              cursor: 'pointer',
+              textAlign: 'left',
+              transition: 'background .15s',
             }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-2)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-2)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
           >
             <FileText size={12} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
             <span style={{ fontSize: 12, color: 'var(--text-2)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -220,18 +280,33 @@ function ProjectCard({ project, onUpload, onDelete, onOpenDoc }: {
         )}
       </div>
 
-      {/* Upload button */}
       <div className="px-3 pb-3">
         <button
           onClick={onUpload}
           style={{
-            width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            padding: '7px 0', borderRadius: 8, fontSize: 12, cursor: 'pointer',
-            border: '1px dashed var(--border)', background: 'transparent', color: 'var(--text-3)',
-            transition: 'all .15s', fontFamily: "'Instrument Sans', sans-serif",
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            padding: '7px 0',
+            borderRadius: 8,
+            fontSize: 12,
+            cursor: 'pointer',
+            border: '1px dashed var(--border)',
+            background: 'transparent',
+            color: 'var(--text-3)',
+            transition: 'all .15s',
+            fontFamily: "'Instrument Sans', sans-serif",
           }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border-strong)'; e.currentTarget.style.color = 'var(--text)'; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-3)'; }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = 'var(--border-strong)';
+            e.currentTarget.style.color = 'var(--text)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = 'var(--border)';
+            e.currentTarget.style.color = 'var(--text-3)';
+          }}
         >
           <Plus size={12} /> Upload PDF/DOCX
         </button>
@@ -240,14 +315,23 @@ function ProjectCard({ project, onUpload, onDelete, onOpenDoc }: {
   );
 }
 
-/* ── HOME PAGE ── */
 export default function HomePage() {
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
-  const [userName, setUserName] = useState<string>('');
+  const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [showNewProject, setShowNewProject] = useState(false);
   const [uploadingProject, setUploadingProject] = useState<Project | null>(null);
+  const [showBilling, setShowBilling] = useState(false);
+
+  async function loadWorkspace() {
+    const workspaceRes = await fetch('/api/workspaces/current');
+    if (!workspaceRes.ok) return;
+    const workspaceData = await workspaceRes.json();
+    setWorkspace(workspaceData);
+  }
 
   useEffect(() => {
     const saved = localStorage.getItem('markly-theme');
@@ -262,6 +346,9 @@ export default function HomePage() {
 
       const session = await sessionRes.json();
       setUserName(session.name || session.email || 'Workspace');
+      setUserEmail(session.email || '');
+
+      await loadWorkspace();
 
       const projectsRes = await fetch('/api/projects');
       if (!projectsRes.ok) {
@@ -283,47 +370,74 @@ export default function HomePage() {
     router.refresh();
   }
 
-  function handleProjectCreated(p: Project) {
-    setProjects((prev) => [p, ...prev]);
+  async function handleProjectCreated(project: Project) {
+    setProjects((prev) => [project, ...prev]);
     setShowNewProject(false);
-    setUploadingProject(p);
+    setUploadingProject(project);
+    await loadWorkspace();
   }
 
-  function handleUploaded(documentId: string) {
+  async function handleUploaded(documentId: string) {
     setUploadingProject(null);
+    await loadWorkspace();
     router.push(`/editor/${documentId}`);
   }
 
   async function handleDeleteProject(id: string) {
     if (!confirm('Delete this project and all its documents?')) return;
     await fetch(`/api/projects/${id}`, { method: 'DELETE' });
-    setProjects((prev) => prev.filter((p) => p.id !== id));
+    setProjects((prev) => prev.filter((project) => project.id !== id));
+    await loadWorkspace();
   }
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', position: 'relative' }}>
-      {/* NAV */}
-      <nav style={{
-        position: 'sticky', top: 0, zIndex: 100,
-        background: 'color-mix(in srgb, var(--bg) 85%, transparent)',
-        backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-        borderBottom: '1px solid var(--border)',
-      }}>
+      <nav
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 100,
+          background: 'color-mix(in srgb, var(--bg) 85%, transparent)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderBottom: '1px solid var(--border)',
+        }}
+      >
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', height: 56, gap: 16 }}>
-          {/* Logo */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
-          <div style={{display:'flex',alignItems:'center',justifyContent:'center',width:32,height:32}}>
-  <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
-    <path d="M20 6 L8 6 L8 20" stroke="var(--text)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M20 34 L32 34 L32 20" stroke="var(--text)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-    <circle cx="20" cy="20" r="3" fill="var(--text)"/>
-    <path d="M13 20 Q17 18 20 20 Q23 22 27 20" stroke="var(--text)" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
-  </svg>
-</div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32 }}>
+              <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+                <path d="M20 6 L8 6 L8 20" stroke="var(--text)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M20 34 L32 34 L32 20" stroke="var(--text)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx="20" cy="20" r="3" fill="var(--text)" />
+                <path d="M13 20 Q17 18 20 20 Q23 22 27 20" stroke="var(--text)" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+              </svg>
+            </div>
             <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, color: 'var(--text)', letterSpacing: '-.01em' }}>Markly</span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {workspace && (
+              <button
+                onClick={() => setShowBilling(true)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  background: 'var(--bg-2)',
+                  color: 'var(--text)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 10,
+                  padding: '8px 12px',
+                  fontSize: 12,
+                  cursor: 'pointer',
+                  fontFamily: "'Instrument Sans', sans-serif",
+                }}
+              >
+                <CreditCard size={13} />
+                {workspace.currentPlan.name}
+              </button>
+            )}
             {userName && (
               <span style={{ fontSize: 12, color: 'var(--text-2)', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {userName}
@@ -350,15 +464,22 @@ export default function HomePage() {
           <button
             onClick={() => setShowNewProject(true)}
             style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              background: 'var(--accent)', color: 'var(--accent-fg)',
-              border: 'none', borderRadius: 10, padding: '8px 16px',
-              fontSize: 13, fontWeight: 500, cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              background: 'var(--accent)',
+              color: 'var(--accent-fg)',
+              border: 'none',
+              borderRadius: 10,
+              padding: '8px 16px',
+              fontSize: 13,
+              fontWeight: 500,
+              cursor: 'pointer',
               fontFamily: "'Instrument Sans', sans-serif",
               transition: 'opacity .15s',
             }}
-            onMouseEnter={e => (e.currentTarget.style.opacity = '.8')}
-            onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = '.8')}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
           >
             <Plus size={14} /> New Project
           </button>
@@ -366,13 +487,18 @@ export default function HomePage() {
       </nav>
 
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '48px 24px', position: 'relative', zIndex: 1 }}>
-
-        {/* EMPTY STATE */}
         {!loading && projects.length === 0 && (
           <div className="animate-fade-up" style={{ textAlign: 'center', padding: '80px 0' }}>
             <div style={{
-              width: 64, height: 64, background: 'var(--bg-2)', border: '1px solid var(--border)',
-              borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px',
+              width: 64,
+              height: 64,
+              background: 'var(--bg-2)',
+              border: '1px solid var(--border)',
+              borderRadius: 16,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 24px',
             }}>
               <FileText size={26} style={{ color: 'var(--text-3)' }} />
             </div>
@@ -380,15 +506,22 @@ export default function HomePage() {
               Welcome to Markly
             </h1>
             <p style={{ fontSize: 15, color: 'var(--text-2)', maxWidth: 380, margin: '0 auto 32px', lineHeight: 1.6 }}>
-              Annotate PDFs and DOCX files with Excalidraw-style tools. Share with a link — no login required.
+              Annotate PDFs and DOCX files with Excalidraw-style tools. Share with a link - no login required.
             </p>
             <button
               onClick={() => setShowNewProject(true)}
               style={{
-                display: 'inline-flex', alignItems: 'center', gap: 8,
-                background: 'var(--accent)', color: 'var(--accent-fg)',
-                border: 'none', borderRadius: 12, padding: '12px 24px',
-                fontSize: 14, fontWeight: 500, cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                background: 'var(--accent)',
+                color: 'var(--accent-fg)',
+                border: 'none',
+                borderRadius: 12,
+                padding: '12px 24px',
+                fontSize: 14,
+                fontWeight: 500,
+                cursor: 'pointer',
                 fontFamily: "'Instrument Sans', sans-serif",
               }}
             >
@@ -397,27 +530,30 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* SKELETON LOADING */}
         {loading && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="animate-pulse" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, height: 200 }} />
+            {[1, 2, 3].map((index) => (
+              <div key={index} className="animate-pulse" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, height: 200 }} />
             ))}
           </div>
         )}
 
-        {/* PROJECTS GRID */}
         {!loading && projects.length > 0 && (
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, gap: 16, flexWrap: 'wrap' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                   <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '.07em', textTransform: 'uppercase', color: 'var(--text-3)' }}>
                     Projects
                   </span>
                   <span style={{
-                    fontSize: 10, fontWeight: 600, background: 'var(--bg-2)', border: '1px solid var(--border)',
-                    borderRadius: 99, padding: '1px 7px', color: 'var(--text-2)',
+                    fontSize: 10,
+                    fontWeight: 600,
+                    background: 'var(--bg-2)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 99,
+                    padding: '1px 7px',
+                    color: 'var(--text-2)',
                   }}>
                     {projects.length}
                   </span>
@@ -425,12 +561,34 @@ export default function HomePage() {
                 <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 24, letterSpacing: '-.02em', color: 'var(--text)' }}>
                   Your workspaces
                 </h2>
+                {workspace && (
+                  <p style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 6 }}>
+                    {workspace.currentPlan.name} plan - {workspace.subscriptionStatus.replace('_', ' ')}
+                  </p>
+                )}
               </div>
+              {workspace && (
+                <button
+                  onClick={() => setShowBilling(true)}
+                  style={{
+                    background: 'transparent',
+                    color: 'var(--text-2)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 10,
+                    padding: '8px 12px',
+                    fontSize: 12,
+                    cursor: 'pointer',
+                    fontFamily: "'Instrument Sans', sans-serif",
+                  }}
+                >
+                  Manage billing
+                </button>
+              )}
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
-              {projects.map((project, i) => (
-                <div key={project.id} className="animate-fade-up" style={{ animationDelay: `${i * 0.05}s` }}>
+              {projects.map((project, index) => (
+                <div key={project.id} className="animate-fade-up" style={{ animationDelay: `${index * 0.05}s` }}>
                   <ProjectCard
                     project={project}
                     onUpload={() => setUploadingProject(project)}
@@ -440,17 +598,30 @@ export default function HomePage() {
                 </div>
               ))}
 
-              {/* Add new project card */}
               <button
                 onClick={() => setShowNewProject(true)}
                 style={{
-                  background: 'transparent', border: '1.5px dashed var(--border)',
-                  borderRadius: 16, padding: '32px 24px', cursor: 'pointer',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                  gap: 10, minHeight: 160, transition: 'all .2s',
+                  background: 'transparent',
+                  border: '1.5px dashed var(--border)',
+                  borderRadius: 16,
+                  padding: '32px 24px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 10,
+                  minHeight: 160,
+                  transition: 'all .2s',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border-strong)'; e.currentTarget.style.background = 'var(--bg-2)'; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'transparent'; }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border-strong)';
+                  e.currentTarget.style.background = 'var(--bg-2)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border)';
+                  e.currentTarget.style.background = 'transparent';
+                }}
               >
                 <div style={{ width: 36, height: 36, background: 'var(--bg-2)', borderRadius: 10, border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Plus size={16} style={{ color: 'var(--text-3)' }} />
@@ -464,6 +635,13 @@ export default function HomePage() {
 
       {showNewProject && <NewProjectModal onClose={() => setShowNewProject(false)} onCreate={handleProjectCreated} />}
       {uploadingProject && <UploadModal project={uploadingProject} onClose={() => setUploadingProject(null)} onUploaded={handleUploaded} />}
+      <BillingModal
+        open={showBilling}
+        onClose={() => setShowBilling(false)}
+        workspace={workspace}
+        currentUser={{ name: userName, email: userEmail }}
+        onWorkspaceRefresh={loadWorkspace}
+      />
     </div>
   );
 }

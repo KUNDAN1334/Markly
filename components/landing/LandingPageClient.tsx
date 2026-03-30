@@ -3,6 +3,7 @@
 import type { CSSProperties, MouseEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import type { PricingPlan } from '@/types';
 
 function useTheme() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
@@ -260,11 +261,20 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
   const router = useRouter();
   const { theme, toggle } = useTheme();
   const [isAuthed, setIsAuthed] = useState(initialIsAuthed);
+  const [pricingPlans, setPricingPlans] = useState<PricingPlan[]>([]);
 
   useEffect(() => {
     fetch('/api/auth/session')
       .then((res) => setIsAuthed(res.ok))
       .catch(() => setIsAuthed(false));
+
+    fetch('/api/pricing/plans')
+      .then(async (res) => {
+        if (!res.ok) throw new Error('Failed to load pricing');
+        return res.json();
+      })
+      .then((data: PricingPlan[]) => setPricingPlans(data))
+      .catch(() => setPricingPlans([]));
   }, []);
 
   async function handleLogout() {
@@ -272,6 +282,68 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
     setIsAuthed(false);
     router.refresh();
   }
+
+  const visiblePlans = pricingPlans.length > 0
+    ? pricingPlans
+    : [
+        {
+          id: 'free',
+          name: 'Free',
+          description: 'Perfect for individuals.',
+          monthlyPriceInPaise: 0,
+          limits: { maxActiveProjects: 1, maxActiveDocuments: 5, softMonthlyNewDocumentsLimit: 5 },
+          features: {
+            canAnnotate: true,
+            canComment: true,
+            hasCommentStatus: false,
+            hasDocumentStatus: false,
+            hasEmailNotifications: false,
+            hasSlackIntegration: false,
+            hasBranding: false,
+            hasTeamOnlyComments: false,
+            hasPasswordProtectedLinks: false,
+            hasAnalytics: false,
+          },
+        },
+        {
+          id: 'pro',
+          name: 'Pro',
+          description: 'For professionals and small teams.',
+          monthlyPriceInPaise: 99900,
+          limits: { maxActiveProjects: null, maxActiveDocuments: null, softMonthlyNewDocumentsLimit: 50 },
+          features: {
+            canAnnotate: true,
+            canComment: true,
+            hasCommentStatus: true,
+            hasDocumentStatus: true,
+            hasEmailNotifications: true,
+            hasSlackIntegration: false,
+            hasBranding: false,
+            hasTeamOnlyComments: false,
+            hasPasswordProtectedLinks: false,
+            hasAnalytics: false,
+          },
+        },
+        {
+          id: 'team',
+          name: 'Team',
+          description: 'Everything for growing teams.',
+          monthlyPriceInPaise: 299900,
+          limits: { maxActiveProjects: null, maxActiveDocuments: null, softMonthlyNewDocumentsLimit: null },
+          features: {
+            canAnnotate: true,
+            canComment: true,
+            hasCommentStatus: true,
+            hasDocumentStatus: true,
+            hasEmailNotifications: true,
+            hasSlackIntegration: true,
+            hasBranding: true,
+            hasTeamOnlyComments: true,
+            hasPasswordProtectedLinks: true,
+            hasAnalytics: true,
+          },
+        },
+      ] satisfies PricingPlan[];
 
   return (
     <>
@@ -1033,24 +1105,29 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
             <p className="section-sub">Start free. Upgrade when you need more.</p>
           </div>
           <div className="pricing-grid">
-            {[
-              { name:'Free', price:'$0', desc:'Perfect for individuals.', featured:false,
-                features:[{y:true,t:'3 documents / month'},{y:true,t:'All annotation tools'},{y:true,t:'Shareable links'},{y:false,t:'PDF export'}] },
-              { name:'Pro', price:'$12', desc:'For professionals and small teams.', featured:true,
-                features:[{y:true,t:'Unlimited documents'},{y:true,t:'All annotation tools'},{y:true,t:'PDF export'},{y:true,t:'Custom permissions'}] },
-              { name:'Team', price:'$39', desc:'Everything for growing teams.', featured:false,
-                features:[{y:true,t:'Up to 15 members'},{y:true,t:'Shared workspaces'},{y:true,t:'Admin controls'},{y:true,t:'Priority support'}] },
-            ].map((p,i) => (
-              <div key={i} className={`price-card${p.featured?' featured':''}`}>
-                {p.featured && <div className="price-popular">Most popular</div>}
+            {visiblePlans.map((p) => {
+              const featured = p.id === 'pro';
+              const featureRows = [
+                { y: true, t: `${p.limits.softMonthlyNewDocumentsLimit ?? 'Unlimited'} new docs / month` },
+                { y: true, t: p.features.hasCommentStatus ? 'Open and resolved comments' : 'Basic comments' },
+                { y: p.features.hasDocumentStatus, t: 'Document approval states' },
+                { y: p.features.hasAnalytics, t: 'Workspace analytics' },
+              ];
+
+              return (
+              <div key={p.id} className={`price-card${featured?' featured':''}`}>
+                {featured && <div className="price-popular">Most popular</div>}
                 <div>
                   <div className="price-plan">{p.name}</div>
-                  <div className="price-amount">{p.price} <span className="price-per">/ mo</span></div>
-                  <div className="price-desc" style={{marginTop:10}}>{p.desc}</div>
+                  <div className="price-amount">
+                    {new Intl.NumberFormat('en-US', { style:'currency', currency:'USD', maximumFractionDigits:0 }).format((p.monthlyPriceInPaise / 100) / 83)}
+                    <span className="price-per">/ mo</span>
+                  </div>
+                  <div className="price-desc" style={{marginTop:10}}>{p.description}</div>
                 </div>
                 <div className="price-divider"/>
                 <ul className="price-features">
-                  {p.features.map((f,j) => (
+                  {featureRows.map((f,j) => (
                     <li key={j} className="price-feat" style={{opacity:f.y?1:.38}}>
                       <span className="price-feat-icon">
                         <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
@@ -1066,15 +1143,15 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
                   className="btn btn-primary"
                   style={{
                     justifyContent:'center', width:'100%', borderRadius:10,
-                    background: p.featured ? 'var(--accent-fg)' : 'var(--accent)',
-                    color: p.featured ? 'var(--text)' : 'var(--accent-fg)',
+                    background: featured ? 'var(--accent-fg)' : 'var(--accent)',
+                    color: featured ? 'var(--text)' : 'var(--accent-fg)',
                     padding:'11px 0',
                   }}
                 >
-                  {isAuthed ? 'Open dashboard' : (p.featured ? 'Start Pro free' : 'Get started')}
+                  {isAuthed ? 'Open dashboard' : (featured ? 'Start Pro' : 'Get started')}
                 </button>
               </div>
-            ))}
+            )})}
           </div>
         </div>
       </section>

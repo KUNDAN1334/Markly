@@ -42,6 +42,14 @@ function featureList(plan: PricingPlan) {
   ];
 }
 
+function formatLimit(value: number | null) {
+  return value ?? 'Unlimited';
+}
+
+function hasFeature(feature: string) {
+  return !feature.startsWith('No ');
+}
+
 async function ensureRazorpayScript() {
   if (typeof window === 'undefined') return false;
   if (window.Razorpay) return true;
@@ -76,6 +84,25 @@ export function BillingModal({
   const [submittingPlanId, setSubmittingPlanId] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ type: 'error' | 'success'; text: string } | null>(null);
   const [cancelling, setCancelling] = useState(false);
+
+  useEffect(() => {
+    if (!open || typeof document === 'undefined') return;
+
+    const { body, documentElement } = document;
+    const previousBodyOverflow = body.style.overflow;
+    const previousBodyTouchAction = body.style.touchAction;
+    const previousHtmlOverflow = documentElement.style.overflow;
+
+    body.style.overflow = 'hidden';
+    body.style.touchAction = 'none';
+    documentElement.style.overflow = 'hidden';
+
+    return () => {
+      body.style.overflow = previousBodyOverflow;
+      body.style.touchAction = previousBodyTouchAction;
+      documentElement.style.overflow = previousHtmlOverflow;
+    };
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -115,7 +142,7 @@ export function BillingModal({
       {
         label: 'Usage',
         value: workspace
-          ? `${workspace.usage.activeProjectsCount} project${workspace.usage.activeProjectsCount === 1 ? '' : 's'} • ${workspace.usage.activeDocumentsCount} doc${workspace.usage.activeDocumentsCount === 1 ? '' : 's'}`
+          ? `${workspace.usage.activeProjectsCount} project${workspace.usage.activeProjectsCount === 1 ? '' : 's'} / ${workspace.usage.activeDocumentsCount} doc${workspace.usage.activeDocumentsCount === 1 ? '' : 's'}`
           : 'Loading...',
       },
     ];
@@ -211,92 +238,84 @@ export function BillingModal({
   return (
     <div
       className="fixed inset-0 z-[300] flex items-center justify-center"
-      style={{ background: 'rgba(8, 8, 8, .56)', padding: '34px 20px' }}
+      style={{ background: 'rgba(8, 8, 8, .48)', padding: '18px 20px' }}
     >
       <div
-        className="w-full rounded-[26px] overflow-hidden animate-fade-up"
+        className="w-full overflow-hidden animate-fade-up"
         style={{
-          maxWidth: 1380,
-          maxHeight: 'calc(100vh - 68px)',
-          background: 'linear-gradient(180deg, color-mix(in srgb, var(--bg-card) 96%, white 4%), var(--bg-card))',
-          boxShadow: '0 30px 80px rgba(0,0,0,.18)',
+          maxWidth: 1220,
+          maxHeight: 'calc(100vh - 36px)',
+          margin: '0 auto',
+          background: 'var(--bg-card)',
+          borderRadius: 22,
           border: '1px solid var(--border)',
+          boxShadow: '0 24px 64px rgba(0, 0, 0, .18)',
+          display: 'flex',
+          flexDirection: 'column',
         }}
+        onClick={(event) => event.stopPropagation()}
       >
-        <div
-          className="flex items-start justify-between gap-6 px-7 py-4"
-          style={{ borderBottom: '1px solid var(--border)', background: 'color-mix(in srgb, var(--bg-card) 90%, var(--bg) 10%)' }}
-        >
-          <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 6, fontSize: 11, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--text-3)' }}>
-              <Sparkles size={12} />
-              Billing
+        <div className="flex flex-col gap-4 px-5 py-5 sm:px-6 sm:py-5" style={{ borderBottom: '1px solid var(--border)' }}>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h2 style={{ margin: 0, fontSize: 20, fontWeight: 500, color: 'var(--text)', lineHeight: 1.15 }}>
+                Billing & plans
+              </h2>
+              <p style={{ marginTop: 6, fontSize: 12, color: 'var(--text-2)', maxWidth: 460, lineHeight: 1.45 }}>
+                Review usage and upgrade when you need more capacity.
+              </p>
             </div>
-            <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 24, letterSpacing: '-.03em', color: 'var(--text)', lineHeight: 1 }}>
-              Billing & Plans
-            </h2>
-            <p style={{ marginTop: 8, fontSize: 12, color: 'var(--text-2)', maxWidth: 460, lineHeight: 1.55 }}>
-              Review usage and upgrade when you need more capacity.
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="w-11 h-11 flex items-center justify-center rounded-xl transition-all"
-            style={{ color: 'var(--text-3)', border: '1px solid var(--border)', background: 'var(--bg-2)' }}
-          >
-            <X size={17} />
-          </button>
-        </div>
 
-        <div style={{ padding: 14 }}>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-              gap: 10,
-              marginBottom: 12,
-            }}
-          >
+            <button
+              onClick={onClose}
+              className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors"
+              style={{ color: 'var(--text-2)', border: '1px solid var(--border)', background: 'transparent', flexShrink: 0 }}
+            >
+              <X size={14} />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {summary.map((item) => (
               <div
                 key={item.label}
                 style={{
-                  borderRadius: 16,
-                  border: '1px solid var(--border)',
-                  background: 'var(--bg-card)',
-                  padding: '12px 14px',
-                  boxShadow: 'var(--shadow-sm)',
-                  minHeight: 78,
+                  background: 'var(--bg-2)',
+                  borderRadius: 14,
+                  padding: '10px 12px',
+                  minHeight: 68,
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 6, fontSize: 11, fontWeight: 700, letterSpacing: '.07em', textTransform: 'uppercase', color: 'var(--text-3)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 5, fontSize: 11, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-3)' }}>
                   {item.icon}
                   {item.label}
                 </div>
-                <div style={{ color: 'var(--text)', fontSize: 15, lineHeight: 1.3, fontFamily: item.label === 'Plan' ? "'DM Serif Display', serif" : "'Instrument Sans', sans-serif" }}>
+                <div style={{ color: 'var(--text)', fontSize: 14, fontWeight: 500, lineHeight: 1.3 }}>
                   {item.value}
                 </div>
                 {item.label === 'Plan' && workspace?.subscriptionStatus && (
-                  <div style={{ marginTop: 4, fontSize: 11, color: 'var(--text-3)', textTransform: 'capitalize' }}>
+                  <div style={{ marginTop: 3, fontSize: 11, color: 'var(--text-3)', textTransform: 'capitalize' }}>
                     {workspace.subscriptionStatus.replace('_', ' ')}
                   </div>
                 )}
               </div>
             ))}
           </div>
+        </div>
 
+        <div className="px-5 py-5 sm:px-6 sm:py-5" style={{ overflow: 'hidden' }}>
           {notice && (
             <div
               style={{
-                marginBottom: 12,
+                marginBottom: 16,
                 display: 'flex',
                 gap: 10,
                 alignItems: 'flex-start',
                 fontSize: 12,
                 lineHeight: 1.5,
                 color: notice.type === 'error' ? '#b91c1c' : '#166534',
-                background: notice.type === 'error' ? '#fef2f2' : '#f0fdf4',
-                border: `1px solid ${notice.type === 'error' ? '#fecaca' : '#bbf7d0'}`,
+                background: notice.type === 'error' ? 'color-mix(in srgb, #b91c1c 8%, var(--bg-card))' : 'color-mix(in srgb, #166534 9%, var(--bg-card))',
+                border: `1px solid ${notice.type === 'error' ? 'color-mix(in srgb, #b91c1c 22%, var(--border))' : 'color-mix(in srgb, #166534 22%, var(--border))'}`,
                 borderRadius: 14,
                 padding: '11px 14px',
               }}
@@ -311,74 +330,95 @@ export function BillingModal({
               <Loader2 size={18} className="animate-spin" />
             </div>
           ) : (
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-                gap: 12,
-                alignItems: 'stretch',
-              }}
-            >
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
               {plans.map((plan) => {
                 const isCurrent = plan.id === currentPlanId;
                 const isUpgrade = plan.id === 'pro' || plan.id === 'team';
+                const features = featureList(plan);
 
                 return (
                   <div
                     key={plan.id}
                     style={{
-                      borderRadius: 22,
-                      border: isCurrent ? '1px solid var(--accent)' : '1px solid var(--border)',
-                      background: isCurrent
-                        ? 'linear-gradient(180deg, color-mix(in srgb, var(--accent) 4%, var(--bg-card)), var(--bg-card))'
-                        : 'var(--bg-card)',
+                      borderRadius: 18,
+                      border: isCurrent ? '1.5px solid var(--border-strong)' : '1px solid var(--border)',
+                      background: isCurrent ? 'color-mix(in srgb, var(--bg-card) 88%, var(--bg-2))' : 'var(--bg-card)',
                       padding: 16,
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: 12,
-                      boxShadow: isCurrent ? 'var(--shadow-md)' : 'var(--shadow-sm)',
-                      minHeight: 400,
+                      minHeight: 0,
                     }}
                   >
                     <div>
-                      <div style={{ fontSize: 11, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--text-3)', fontWeight: 700 }}>
-                        {plan.name}
+                      <div className="flex items-start justify-between gap-3">
+                        <div style={{ fontSize: 11, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--text-3)', fontWeight: 600 }}>
+                          {plan.name}
+                        </div>
+                        {isCurrent && (
+                          <div
+                            style={{
+                              fontSize: 10,
+                              fontWeight: 700,
+                              letterSpacing: '.08em',
+                              textTransform: 'uppercase',
+                              color: 'var(--text)',
+                              background: 'var(--bg-2)',
+                              border: '1px solid var(--border)',
+                              borderRadius: 999,
+                              padding: '4px 8px',
+                            }}
+                          >
+                            Current
+                          </div>
+                        )}
                       </div>
-                      <div style={{ marginTop: 6, display: 'flex', alignItems: 'flex-end', gap: 6 }}>
-                        <div style={{ fontSize: 34, color: 'var(--text)', fontFamily: "'DM Serif Display', serif", lineHeight: .95 }}>
+
+                      <div style={{ marginTop: 8, display: 'flex', alignItems: 'flex-end', gap: 6 }}>
+                        <div style={{ fontSize: 30, color: 'var(--text)', fontWeight: 500, lineHeight: 1 }}>
                           {formatPrice(plan.monthlyPriceInPaise)}
                         </div>
-                        <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 4 }}>
-                          / month
+                        <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 5 }}>
+                          per month
                         </div>
                       </div>
-                      <p style={{ marginTop: 8, fontSize: 12, color: 'var(--text-2)', lineHeight: 1.5 }}>
+
+                      <p style={{ marginTop: 8, marginBottom: 0, paddingBottom: 12, fontSize: 11, color: 'var(--text-2)', lineHeight: 1.55, borderBottom: '1px solid var(--border)' }}>
                         {plan.description}
                       </p>
                     </div>
 
-                    <div
-                      style={{
-                        borderRadius: 14,
-                        background: 'var(--bg-2)',
-                        border: '1px solid var(--border)',
-                        padding: '10px 12px',
-                      }}
-                    >
-                      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.07em', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: 6 }}>
+                    <div style={{ marginTop: 12, marginBottom: 12 }}>
+                      <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '.07em', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: 8 }}>
                         Limits
                       </div>
-                      <div style={{ color: 'var(--text)', lineHeight: 1.55, fontSize: 11 }}>
-                        <div>Projects: {plan.limits.maxActiveProjects ?? 'Unlimited'}</div>
-                        <div>Active docs: {plan.limits.maxActiveDocuments ?? 'Unlimited'}</div>
-                        <div>Monthly new docs: {plan.limits.softMonthlyNewDocumentsLimit ?? 'Unlimited'}</div>
+                      <div style={{ display: 'grid', gap: 4, color: 'var(--text-2)', fontSize: 11, lineHeight: 1.45 }}>
+                        <div>Projects: {formatLimit(plan.limits.maxActiveProjects)}</div>
+                        <div>Active docs: {formatLimit(plan.limits.maxActiveDocuments)}</div>
+                        <div>Monthly new docs: {formatLimit(plan.limits.softMonthlyNewDocumentsLimit)}</div>
                       </div>
                     </div>
 
-                    <div style={{ display: 'grid', gap: 6 }}>
-                      {featureList(plan).map((feature) => (
-                        <div key={feature} style={{ display: 'flex', gap: 7, fontSize: 11, color: 'var(--text-2)', lineHeight: 1.35 }}>
-                          <CheckCircle2 size={14} style={{ color: 'var(--text-3)', flexShrink: 0, marginTop: 1 }} />
+                    <div style={{ display: 'grid', gap: 6, marginBottom: 14 }}>
+                      {features.map((feature) => (
+                        <div
+                          key={feature}
+                          style={{
+                            display: 'flex',
+                            gap: 8,
+                            fontSize: 11,
+                            color: hasFeature(feature) ? 'var(--text-2)' : 'var(--text-3)',
+                            lineHeight: 1.4,
+                          }}
+                        >
+                          <CheckCircle2
+                            size={14}
+                            style={{
+                              color: hasFeature(feature) ? 'var(--text-2)' : 'var(--text-3)',
+                              opacity: hasFeature(feature) ? 1 : 0.5,
+                              flexShrink: 0,
+                              marginTop: 1,
+                            }}
+                          />
                           <span>{feature}</span>
                         </div>
                       ))}
@@ -390,12 +430,12 @@ export function BillingModal({
                           disabled
                           style={{
                             width: '100%',
-                            borderRadius: 14,
+                            borderRadius: 10,
                             border: '1px solid var(--border)',
-                            background: 'var(--bg-2)',
+                            background: 'transparent',
                             color: 'var(--text-2)',
-                            padding: '11px 12px',
-                            fontSize: 13,
+                            padding: '9px 12px',
+                            fontSize: 12,
                           }}
                         >
                           Current plan
@@ -406,13 +446,13 @@ export function BillingModal({
                           disabled={submittingPlanId !== null}
                           style={{
                             width: '100%',
-                            borderRadius: 14,
+                            borderRadius: 10,
                             border: 'none',
-                            background: 'var(--accent)',
-                            color: 'var(--accent-fg)',
-                            padding: '11px 12px',
-                            fontSize: 13,
-                            fontWeight: 600,
+                            background: 'var(--text)',
+                            color: 'var(--bg-card)',
+                            padding: '9px 12px',
+                            fontSize: 12,
+                            fontWeight: 500,
                             cursor: submittingPlanId !== null ? 'default' : 'pointer',
                             opacity: submittingPlanId !== null ? 0.7 : 1,
                           }}
@@ -424,12 +464,12 @@ export function BillingModal({
                           disabled
                           style={{
                             width: '100%',
-                            borderRadius: 14,
+                            borderRadius: 10,
                             border: '1px solid var(--border)',
                             background: 'transparent',
                             color: 'var(--text-3)',
-                            padding: '11px 12px',
-                            fontSize: 13,
+                            padding: '9px 12px',
+                            fontSize: 12,
                           }}
                         >
                           Included by default
@@ -444,9 +484,9 @@ export function BillingModal({
                             width: '100%',
                             background: 'transparent',
                             color: '#b91c1c',
-                            border: '1px solid #fecaca',
-                            borderRadius: 14,
-                            padding: '10px 12px',
+                            border: '1px solid color-mix(in srgb, #b91c1c 20%, var(--border))',
+                            borderRadius: 10,
+                            padding: '9px 12px',
                             fontSize: 12,
                             cursor: cancelling ? 'default' : 'pointer',
                             opacity: cancelling ? 0.6 : 1,

@@ -1,6 +1,6 @@
 'use client';
 
-import type { CSSProperties, MouseEvent } from 'react';
+import type { CSSProperties, MouseEvent, ReactNode } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { PricingPlan } from '@/types';
@@ -21,7 +21,7 @@ function useTheme() {
   return { theme, toggle };
 }
 
-/* ── LOGO COMPONENT (Option D — stacked docs + red checkmark) ── */
+/* LOGO COMPONENT (Option D - stacked docs + red checkmark) */
 function MarklyLogo({ size = 36, forDark = false }: { size?: number; forDark?: boolean }) {
   const c = forDark ? '#f4f4f0' : '#0d0d0c';
   const s = size;
@@ -56,25 +56,31 @@ type WorkflowStep = {
   icon: 'upload' | 'annotate' | 'share' | 'export';
 };
 
+type FeatureItem = {
+  t: string;
+  d: string;
+  icon: ReactNode;
+};
+
 const workflowSteps: WorkflowStep[] = [
   {
     n: '01',
     t: 'Upload your PDF',
-    d: 'Drag and drop any PDF. Rendered with pdf.js — multi-page, high-fidelity, instant.',
+    d: 'Drag and drop any PDF. Rendered with pdf.js - multi-page, high-fidelity, instant.',
     meta: 'Drop file',
     icon: 'upload',
   },
   {
     n: '02',
     t: 'Annotate visually',
-    d: 'Draw shapes, write with Virgil font, highlight sections — hand-drawn feel on every mark.',
+    d: 'Draw shapes, write with Virgil font, highlight sections - hand-drawn feel on every mark.',
     meta: 'Mark clearly',
     icon: 'annotate',
   },
   {
     n: '03',
     t: 'Share the link',
-    d: 'Send a secure link. Your reviewer opens it instantly — no account, no download needed.',
+    d: 'Send a secure link. Your reviewer opens it instantly - no account, no download needed.',
     meta: 'Send review',
     icon: 'share',
   },
@@ -84,6 +90,69 @@ const workflowSteps: WorkflowStep[] = [
     d: 'Download the annotated PDF for your records. Clean, professional, ready to archive.',
     meta: 'Deliver final',
     icon: 'export',
+  },
+];
+
+const featureItems: FeatureItem[] = [
+  {
+    t: 'Hand-drawn annotations',
+    d: 'Excalidraw-style shapes with Virgil font - sketch-like text and doodles that feel natural.',
+    icon: (
+      <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+      </svg>
+    ),
+  },
+  {
+    t: 'Multi-page PDF support',
+    d: 'Navigate long documents with page thumbnails. Annotations stay perfectly positioned at any zoom.',
+    icon: (
+      <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+      </svg>
+    ),
+  },
+  {
+    t: 'One-click sharing',
+    d: 'No accounts needed. Share a link with view, comment, or edit access - works instantly.',
+    icon: (
+      <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+        <polyline points="16 6 12 2 8 6" />
+        <line x1="12" y1="2" x2="12" y2="15" />
+      </svg>
+    ),
+  },
+  {
+    t: 'Threaded comments',
+    d: 'Attach comments to specific annotations or pages. Resolve, reply, and track feedback inline.',
+    icon: (
+      <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
+    ),
+  },
+  {
+    t: 'Auto-save & undo/redo',
+    d: 'Debounce autosave + full history. Ctrl+Z / Ctrl+Y work just like Excalidraw.',
+    icon: (
+      <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
+        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+        <polyline points="17 6 23 6 23 12" />
+      </svg>
+    ),
+  },
+  {
+    t: 'Export annotated PDF',
+    d: 'Download the final PDF with all annotations baked in. Original file stays untouched.',
+    icon: (
+      <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" y1="15" x2="12" y2="3" />
+      </svg>
+    ),
   },
 ];
 
@@ -193,6 +262,54 @@ function HowItWorksHoverGrid({ steps }: { steps: WorkflowStep[] }) {
           <div className="step-title">{step.t}</div>
           <div className="step-desc">{step.d}</div>
         </div>
+      ))}
+    </div>
+  );
+}
+
+function NotebookFeatures({ items }: { items: FeatureItem[] }) {
+  const cardLayout = [
+    { x: 12, y: 52, rotate: -16, z: 1 },
+    { x: 27, y: 72, rotate: -9, z: 2 },
+    { x: 42, y: 46, rotate: -3, z: 3 },
+    { x: 58, y: 70, rotate: 4, z: 4 },
+    { x: 73, y: 58, rotate: 11, z: 5 },
+    { x: 88, y: 78, rotate: 17, z: 6 },
+  ];
+
+  return (
+    <div className="notebook-fan">
+      {items.map((item, index) => (
+        <article
+          key={item.t}
+          className="notebook-card"
+          style={
+            {
+              '--card-x': `${cardLayout[index]?.x ?? 0}%`,
+              '--card-y': `${cardLayout[index]?.y ?? 60}px`,
+              '--card-rotate': `${cardLayout[index]?.rotate ?? 0}deg`,
+              '--card-z': cardLayout[index]?.z ?? index + 1,
+            } as CSSProperties
+          }
+        >
+          <div className="notebook-card-inner">
+            <div className="notebook-rings" aria-hidden="true">
+              {Array.from({ length: 7 }).map((_, ringIndex) => (
+                <span key={ringIndex} className="notebook-ring" />
+              ))}
+            </div>
+
+            <div className="notebook-page-number">0{index + 1}</div>
+            <div className="notebook-icon">{item.icon}</div>
+            <h3 className="notebook-title">{item.t}</h3>
+            <p className="notebook-copy">{item.d}</p>
+            <div className="notebook-rule-stack" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </div>
+          </div>
+        </article>
       ))}
     </div>
   );
@@ -381,14 +498,14 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
           line-height: 1.5; -webkit-font-smoothing: antialiased;
         }
 
-        /* ── NOISE TEXTURE ── */
+        /*  NOISE TEXTURE  */
         body::before {
           content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
           opacity: 0.018;
           background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
         }
 
-        /* ── NAV ── */
+        /*  NAV  */
         .nav {
           position: sticky; top: 0; z-index: 200;
           background: color-mix(in srgb, var(--bg) 88%, transparent);
@@ -413,7 +530,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
         .nav-links a:hover { color: var(--text); background: var(--bg-2); }
         .nav-actions { display: flex; align-items: center; gap: 8px; }
 
-        /* ── BUTTONS ── */
+        /*  BUTTONS  */
         .btn {
           display: inline-flex; align-items: center; gap: 7px;
           padding: 9px 18px; border-radius: var(--radius-md);
@@ -444,7 +561,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
         }
         .btn-icon:hover { background: var(--bg-card); color: var(--text); border-color: var(--border-strong); }
 
-        /* ── BADGE ── */
+        /*  BADGE  */
         .badge {
           display: inline-flex; align-items: center; gap: 7px;
           padding: 5px 14px; border-radius: 999px;
@@ -457,10 +574,10 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
           box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 20%, transparent);
         }
 
-        /* ── CONTAINER ── */
+        /*  CONTAINER  */
         .container { max-width: 1120px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
 
-        /* ── SECTION ── */
+        /*  SECTION  */
         .section { padding: 100px 0; border-top: 1px solid var(--border); }
         .section-header { text-align: center; margin-bottom: 64px; }
         .section-label {
@@ -475,10 +592,10 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
         }
         .section-sub { color: var(--text-2); max-width: 480px; margin: 0 auto; font-size: 15px; line-height: 1.7; }
 
-        /* ── DIVIDER ── */
+        /*  DIVIDER  */
         .divider { height: 1px; background: var(--border); }
 
-        /* ── HERO ── */
+        /*  HERO  */
         .hero {
           padding: 100px 0 80px;
           display: flex; flex-direction: column; align-items: center;
@@ -503,7 +620,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
         }
         .hero-proof-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-3); }
 
-        /* ── MOCKUP ── */
+        /*  MOCKUP  */
         .mockup-wrap { width: 100%; max-width: 960px; margin: 0 auto; }
         .mockup-window {
           background: var(--bg-card); border: 1px solid var(--border);
@@ -583,29 +700,178 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
           font-family: 'Instrument Sans', sans-serif; font-weight: 600;
         }
 
-        /* ── FEATURES GRID ── */
-        .features-grid {
-          display: grid; grid-template-columns: repeat(3, 1fr);
-          border: 1px solid var(--border); border-radius: var(--radius-xl); overflow: hidden;
-          background: var(--border); gap: 1px;
+        /*  FEATURES NOTEBOOK  */
+        .notebook-fan {
+          position: relative;
+          max-width: 940px;
+          height: 300px;
+          margin: -10px auto 0;
         }
-        .feat-card {
-          background: var(--bg-card); padding: 36px 32px;
-          display: flex; flex-direction: column; gap: 18px;
-          transition: background .2s;
+        .notebook-card {
+          position: absolute;
+          left: var(--card-x);
+          top: var(--card-y);
+          width: 220px;
+          padding: 0;
+          border: none;
+          background: transparent;
+          cursor: pointer;
+          text-align: left;
+          transform: translateX(-50%) rotate(var(--card-rotate));
+          transform-origin: center bottom;
+          z-index: var(--card-z);
+          opacity: 1;
+          transition: transform .52s cubic-bezier(.22, 1, .36, 1), opacity .28s ease, filter .28s ease;
         }
-        .feat-card:hover { background: var(--bg-2); }
-        .feat-icon {
-          width: 46px; height: 46px; border-radius: 11px;
-          border: 1px solid var(--border); background: var(--bg-2);
-          display: flex; align-items: center; justify-content: center;
-          color: var(--text); transition: all .2s;
+        .notebook-card:focus-visible {
+          outline: 2px solid #111;
+          outline-offset: 8px;
         }
-        .feat-card:hover .feat-icon { background: var(--text); color: var(--accent-fg); }
-        .feat-title { font-weight: 600; font-size: 15px; letter-spacing: -.01em; color: var(--text); }
-        .feat-desc { font-size: 13.5px; color: var(--text-2); line-height: 1.65; }
+        .notebook-fan:hover .notebook-card {
+          opacity: .48;
+          filter: blur(.2px);
+        }
+        .notebook-fan:hover .notebook-card:hover {
+          opacity: 1;
+          filter: none;
+          transform: translateX(-50%) translateY(-14px) rotate(0deg) scale(1.03);
+          z-index: 20;
+        }
+        .notebook-card-inner {
+          display: grid;
+          position: relative;
+          min-height: 220px;
+          padding: 50px 24px 14px 30px;
+          border: 4px solid #111;
+          border-radius: 14px 18px 16px 14px;
+          background:
+            repeating-linear-gradient(
+              to bottom,
+              #fff 0 22px,
+              rgba(0, 0, 0, 0.12) 22px 24px
+            ),
+            linear-gradient(180deg, #fff, #f6f6f6);
+          box-shadow:
+            0 10px 0 rgba(17, 17, 17, 0.08),
+            0 18px 34px rgba(17, 17, 17, 0.12);
+          overflow: hidden;
+        }
+        .notebook-card-inner::before {
+          content: '';
+          position: absolute;
+          inset: 10px 10px 9px 9px;
+          border: 2px solid rgba(17, 17, 17, 0.88);
+          border-radius: 10px 13px 12px 10px;
+          pointer-events: none;
+        }
+        .notebook-card-inner::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 20px;
+          bottom: 0;
+          width: 2px;
+          background: rgba(0, 0, 0, 0.16);
+          pointer-events: none;
+        }
+        .notebook-rings {
+          position: absolute;
+          top: -16px;
+          left: 18px;
+          right: 14px;
+          display: flex;
+          justify-content: space-between;
+        }
+        .notebook-ring {
+          width: 14px;
+          height: 38px;
+          border: 4px solid #111;
+          border-bottom-width: 8px;
+          border-radius: 12px 12px 8px 8px;
+          background: transparent;
+          box-shadow: inset 0 -4px 0 #111;
+        }
+        .notebook-page-number {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 34px;
+          height: 26px;
+          border: 2px solid #111;
+          border-radius: 999px;
+          background: #fff;
+          font-family: 'DM Mono', monospace;
+          font-size: 10px;
+          letter-spacing: .08em;
+          text-transform: uppercase;
+          color: #111;
+        }
+        .notebook-icon {
+          width: 44px;
+          height: 44px;
+          margin-top: 10px;
+          border: 2px solid #111;
+          border-radius: 16px 18px 14px 16px;
+          background: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #111;
+          box-shadow: 3px 4px 0 rgba(17, 17, 17, 0.08);
+          transform: rotate(-3deg);
+        }
+        .notebook-title {
+          margin-top: 10px;
+          max-width: 10ch;
+          font-family: 'DM Serif Display', serif;
+          font-size: clamp(17px, 1.7vw, 24px);
+          line-height: 1.08;
+          letter-spacing: -.04em;
+          color: #111;
+        }
+        .notebook-copy {
+          margin-top: 7px;
+          max-width: 24ch;
+          font-size: 12.5px;
+          line-height: 1.5;
+          color: rgba(17, 17, 17, 0.9);
+        }
+        .notebook-rule-stack {
+          position: absolute;
+          left: 30px;
+          right: 20px;
+          bottom: 12px;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+        .notebook-rule-stack span {
+          display: block;
+          height: 2px;
+          border-radius: 999px;
+          background: rgba(17, 17, 17, 0.16);
+        }
+        .notebook-rule-stack span:nth-child(2) { width: 84%; }
+        .notebook-rule-stack span:nth-child(3) { width: 68%; }
 
-        /* ── STEPS ── */
+        .features-header {
+          margin-bottom: 10px;
+          padding-bottom: 0;
+        }
+        .features-header .section-sub {
+          max-width: 640px;
+          font-size: 14px;
+          line-height: 1.5;
+        }
+        .features-header .section-label {
+          margin-bottom: 10px;
+        }
+        .features-header .section-title {
+          margin-bottom: 10px;
+          line-height: 1;
+        }
+
+        /*  STEPS  */
         .steps-hover-grid {
           position: relative;
           display: grid;
@@ -688,7 +954,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
         .step-title { font-weight: 600; font-size: 20px; line-height: 1.2; letter-spacing: -.02em; color: var(--text); }
         .step-desc { font-size: 14px; color: var(--text-2); line-height: 1.75; max-width: 25ch; }
 
-        /* ── TESTIMONIALS ── */
+        /*  TESTIMONIALS  */
         .testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
         .testi-card-wrap { perspective: 1400px; }
         .testi-card {
@@ -743,7 +1009,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
         .testi-name { font-size: 13px; font-weight: 600; color: var(--text); }
         .testi-role { font-size: 11px; color: var(--text-3); margin-top: 2px; }
 
-        /* ── PRICING ── */
+        /*  PRICING  */
         .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 900px; margin: 0 auto; }
         .price-card {
           background: var(--bg-card); border: 1px solid var(--border);
@@ -775,7 +1041,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
         .price-card.featured .price-feat { color: color-mix(in srgb, var(--accent-fg) 65%, transparent); }
         .price-feat-icon { flex-shrink: 0; }
 
-        /* ── CTA ── */
+        /*  CTA  */
         .cta-wrap { padding: 0 0 100px; }
         .cta-block {
           background: var(--text); color: var(--accent-fg);
@@ -797,7 +1063,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
         .cta-sub { opacity: .6; max-width: 420px; margin: 0 auto 36px; font-size: 15px; line-height: 1.65; }
         .cta-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 
-        /* ── FOOTER ── */
+        /*  FOOTER  */
         .footer { border-top: 1px solid var(--border); padding: 56px 0 44px; }
         .footer-grid { display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 40px; margin-bottom: 44px; }
         .footer-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; margin-bottom: 14px; }
@@ -816,28 +1082,64 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
         .footer-bottom-links a { color: var(--text-3); text-decoration: none; transition: color .15s; }
         .footer-bottom-links a:hover { color: var(--text-2); }
 
-        /* ── ANIMATIONS ── */
+        /*  ANIMATIONS  */
         @keyframes fadeUp { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
         .anim { animation: fadeUp .65s cubic-bezier(.22,1,.36,1) both; }
         .d1 { animation-delay: .08s; } .d2 { animation-delay: .18s; }
         .d3 { animation-delay: .28s; } .d4 { animation-delay: .40s; }
 
-        /* ── RESPONSIVE ── */
+        /*  RESPONSIVE  */
         @media (max-width: 960px) {
-          .features-grid, .testi-grid, .pricing-grid { grid-template-columns: 1fr 1fr; }
+          .testi-grid, .pricing-grid { grid-template-columns: 1fr 1fr; }
           .steps-hover-grid { grid-template-columns: 1fr 1fr; }
           .footer-grid { grid-template-columns: 1fr 1fr; }
           .editor-panel { display: none; }
           .nav-links { display: none; }
+          .notebook-fan {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+            height: auto;
+            max-width: 800px;
+            margin-top: 0;
+          }
+          .notebook-fan:hover .notebook-card,
+          .notebook-fan:hover .notebook-card:hover {
+            opacity: 1;
+            filter: none;
+            transform: none;
+          }
+          .notebook-card {
+            position: relative;
+            left: auto;
+            top: auto;
+            width: auto;
+            transform: none;
+          }
         }
         @media (max-width: 640px) {
-          .features-grid, .testi-grid, .pricing-grid, .steps-hover-grid { grid-template-columns: 1fr; }
+          .testi-grid, .pricing-grid, .steps-hover-grid { grid-template-columns: 1fr; }
           .footer-grid { grid-template-columns: 1fr; }
           .cta-block { padding: 52px 28px; }
           .hero { padding: 72px 0 56px; }
           .section { padding: 72px 0; }
           .testi-card { min-height: unset; }
-          .step-card { min-height: unset; }
+          .notebook-fan { grid-template-columns: 1fr; gap: 16px; margin-top: 0; }
+          .notebook-card-inner {
+            min-height: 220px;
+            padding: 52px 20px 16px 28px;
+          }
+          .notebook-card-inner::after { left: 18px; }
+          .notebook-rings { left: 16px; right: 12px; }
+          .notebook-ring {
+            width: 12px;
+            height: 34px;
+            border-width: 3px;
+            border-bottom-width: 7px;
+          }
+          .features-header { margin-bottom: 20px; }
+          .notebook-title { max-width: none; font-size: clamp(20px, 8vw, 28px); }
+          .notebook-copy { font-size: 13px; max-width: none; }
           .step-desc { max-width: none; }
         }
         @media (hover: none) {
@@ -849,15 +1151,21 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
           .steps-hover-bg { display: none; }
           .step-card:hover,
           .step-card.is-active { transform: none; }
+          .notebook-fan:hover .notebook-card,
+          .notebook-fan:hover .notebook-card:hover {
+            opacity: 1;
+            transform: none;
+            filter: none;
+          }
         }
         @media (prefers-reduced-motion: reduce) {
           .testi-card, .testi-card::before { transition: none; }
           .testi-card { transform: none !important; }
-          .steps-hover-bg, .step-card, .step-icon-shell { transition: none; }
+          .steps-hover-bg, .step-card, .step-icon-shell, .notebook-card { transition: none; }
         }
       `}</style>
 
-      {/* ── NAV ── */}
+      {/*  NAV  */}
       <nav className="nav">
         <div className="nav-inner">
           <a href="/" className="nav-brand">
@@ -900,14 +1208,14 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
         </div>
       </nav>
 
-      {/* ── HERO ── */}
+      {/*  HERO  */}
       <section className="hero">
         <div className="container" style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
 
           <div className="hero-eyebrow anim d1">
             <span className="badge">
               <span className="badge-dot"/>
-              Excalidraw for Documents — now in beta
+              Excalidraw for Documents - now in beta
             </span>
           </div>
 
@@ -916,7 +1224,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
           </h1>
 
           <p className="hero-sub anim d3">
-            Markly brings the fluidity of Excalidraw to your PDFs. Draw, write, and comment directly on documents — then share in one click.
+            Markly brings the fluidity of Excalidraw to your PDFs. Draw, write, and comment directly on documents - then share in one click.
           </p>
 
           <div className="hero-actions anim d3">
@@ -994,7 +1302,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
                   <div className="anno-text" style={{left:'calc(50% - 152px)',top:62}}>Review this!</div>
                   <div className="anno-hl" style={{left:'calc(50% - 158px)',top:172,width:196,background:'#f1c40f'}}/>
                   <div className="anno-rect" style={{left:'calc(50% + 12px)',top:118,width:88,height:30,borderColor:'#2ecc71'}}/>
-                  <div className="anno-text" style={{left:'calc(50% + 16px)',top:152,color:'#2ecc71',fontSize:12}}>Looks good ✓</div>
+                  <div className="anno-text" style={{left:'calc(50% + 16px)',top:152,color:'#2ecc71',fontSize:12}}>Looks good</div>
                   <svg style={{position:'absolute',left:'calc(50% - 168px)',top:88,pointerEvents:'none'}} width="56" height="38">
                     <path d="M10,33 Q28,9 48,20" stroke="#e74c3c" strokeWidth="1.8" fill="none" strokeDasharray="4,2"/>
                     <polygon points="46,14 53,22 42,23" fill="#e74c3c"/>
@@ -1025,7 +1333,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
                       <div className="comment-avatar">AR</div>
                       <div>
                         <div style={{fontSize:11,color:'var(--text-2)',lineHeight:1.5}}>"Review highlighted section"</div>
-                        <div style={{fontSize:10,color:'var(--text-3)',marginTop:4}}>2 min ago · Resolved</div>
+                        <div style={{fontSize:10,color:'var(--text-3)',marginTop:4}}>2 min ago - Resolved</div>
                       </div>
                     </div>
                   </div>
@@ -1036,48 +1344,31 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
         </div>
       </section>
 
-      {/* ── FEATURES ── */}
+      {/*  FEATURES  */}
       <section className="section" id="features">
         <div className="container">
-          <div className="section-header">
+          <div className="section-header features-header">
             <div className="section-label">Features</div>
             <h2 className="section-title">Everything you need to<br/>review documents visually</h2>
-            <p className="section-sub">From quick annotations to full-scale document reviews — Markly gives your team a shared visual language.</p>
+            <p className="section-sub">From quick annotations to full-scale document reviews - Markly gives your team a shared visual language.</p>
           </div>
-          <div className="features-grid">
-            {[
-              { icon:<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>, t:'Hand-drawn annotations', d:'Excalidraw-style shapes with Virgil font — sketch-like text and doodles that feel natural.' },
-              { icon:<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>, t:'Multi-page PDF support', d:'Navigate long documents with page thumbnails. Annotations stay perfectly positioned at any zoom.' },
-              { icon:<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>, t:'One-click sharing', d:'No accounts needed. Share a link with view, comment, or edit access — works instantly.' },
-              { icon:<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>, t:'Threaded comments', d:'Attach comments to specific annotations or pages. Resolve, reply, and track feedback inline.' },
-              { icon:<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>, t:'Auto-save & undo/redo', d:'Debounce autosave + full history. Ctrl+Z / Ctrl+Y work just like Excalidraw.' },
-              { icon:<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>, t:'Export annotated PDF', d:'Download the final PDF with all annotations baked in. Original file stays untouched.' },
-            ].map((f,i) => (
-              <div key={i} className="feat-card">
-                <div className="feat-icon">{f.icon}</div>
-                <div>
-                  <div className="feat-title">{f.t}</div>
-                  <div className="feat-desc" style={{marginTop:7}}>{f.d}</div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <NotebookFeatures items={featureItems} />
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ── */}
+      {/*  HOW IT WORKS  */}
       <section className="section" id="how">
         <div className="container">
           <div className="section-header">
             <div className="section-label">How it works</div>
             <h2 className="section-title">From upload to sign-off<br/>in four steps</h2>
-            <p className="section-sub">Markly streamlines your entire review workflow — no onboarding required.</p>
+            <p className="section-sub">Markly streamlines your entire review workflow - no onboarding required.</p>
           </div>
           <HowItWorksHoverGrid steps={workflowSteps} />
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ── */}
+      {/*  TESTIMONIALS  */}
       <section className="section">
         <div className="container">
           <div className="section-header">
@@ -1088,7 +1379,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
             {[
               { q:'"Finally a review tool that feels like sketching on a whiteboard. Clients actually understand our feedback now."', name:'Sarah M.', role:'Product Designer' },
               { q:'"We replaced three tools with Markly. The hand-drawn annotations with Virgil font feel personal and readable."', name:'Rohan K.', role:'Founder, legal-tech' },
-              { q:'"Our architecture team reviews drawings daily. Free-form annotation is perfect — like sketching on paper but shareable."', name:'Jenna L.', role:'Senior Architect' },
+              { q:'"Our architecture team reviews drawings daily. Free-form annotation is perfect - like sketching on paper but shareable."', name:'Jenna L.', role:'Senior Architect' },
             ].map((t,i) => (
               <TestimonialCard key={i} testimonial={t} />
             ))}
@@ -1096,7 +1387,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
         </div>
       </section>
 
-      {/* ── PRICING ── */}
+      {/*  PRICING  */}
       <section className="section" id="pricing">
         <div className="container">
           <div className="section-header">
@@ -1156,7 +1447,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
         </div>
       </section>
 
-      {/* ── CTA ── */}
+      {/*  CTA  */}
       <div className="cta-wrap">
         <div className="container">
           <div className="cta-block">
@@ -1168,7 +1459,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
                   {isAuthed ? 'Open your workspace' : 'Create free account'}
                 </button>
                 <button className="btn btn-lg" style={{background:'transparent',color:'var(--accent-fg)',border:'1px solid color-mix(in srgb,var(--accent-fg) 25%,transparent)'}}>
-                  View example review →
+                  View example review
                 </button>
               </div>
             </div>
@@ -1176,7 +1467,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
         </div>
       </div>
 
-      {/* ── FOOTER ── */}
+      {/*  FOOTER  */}
       <footer className="footer">
         <div className="container">
           <div className="footer-grid">
@@ -1192,7 +1483,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
 </div>
                 <span className="footer-brand-text">Markly</span>
               </a>
-              <p className="footer-tagline">Excalidraw for Documents. Visual feedback for any PDF — draw, annotate, share.</p>
+              <p className="footer-tagline">Excalidraw for Documents. Visual feedback for any PDF - draw, annotate, share.</p>
             </div>
             {[
               { h:'Product', links:['Features','Pricing','Changelog','Roadmap'] },
@@ -1206,7 +1497,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
             ))}
           </div>
           <div className="footer-bottom">
-            <span>© 2025 Markly. All rights reserved.</span>
+            <span>Copyright 2025 Markly. All rights reserved.</span>
             <div className="footer-bottom-links">
               <a href="#">Privacy</a>
               <a href="#">Terms</a>

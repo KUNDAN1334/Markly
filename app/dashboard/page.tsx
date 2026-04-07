@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BillingModal } from '@/components/billing/BillingModal';
@@ -404,7 +405,11 @@ export default function HomePage() {
         }}
       >
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', height: 56, gap: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+          <Link
+            href="/"
+            aria-label="Go to Markly landing page"
+            style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, textDecoration: 'none', color: 'inherit' }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32 }}>
               <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
                 <path d="M20 6 L8 6 L8 20" stroke="var(--text)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
@@ -414,7 +419,7 @@ export default function HomePage() {
               </svg>
             </div>
             <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: 20, color: 'var(--text)', letterSpacing: '-.01em' }}>Markly</span>
-          </div>
+          </Link>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {workspace && (

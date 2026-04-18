@@ -971,11 +971,11 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
           min-height: 258px; will-change: transform;
         }
         .testi-card::before {
-          content: ''; position: absolute; inset: 0; pointer-events: none;
-          background:
-            radial-gradient(circle at var(--mx) var(--my), color-mix(in srgb, white 72%, transparent) 0%, transparent 36%),
-            linear-gradient(135deg, color-mix(in srgb, var(--accent) 5%, transparent), transparent 55%);
-          opacity: .72; transition: opacity .22s;
+          background: radial-gradient(
+            circle at var(--mx) var(--my),
+            rgba(255, 255, 255, 0.05),  /* reduced */
+            transparent 50%
+          );
         }
         .testi-card::after {
           content: ''; position: absolute; inset: 1px; pointer-events: none;

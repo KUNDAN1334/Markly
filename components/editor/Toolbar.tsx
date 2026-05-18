@@ -1,15 +1,12 @@
 'use client';
 
 import { useEditorStore } from '@/lib/store';
-import { Tool } from '@/types';
-import { cn } from '@/lib/utils';
+import { AnnotationStyle, Tool } from '@/types';
 import {
   MousePointer2, Square, Circle, Minus, ArrowRight,
   Highlighter, Pen, Type, ZoomIn, ZoomOut, Save,
   Undo2, Redo2, Download, Share2, ChevronLeft, ChevronRight,
-  Sun, Moon,
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
 
 const TOOLS: { id: Tool; icon: React.ReactNode; label: string; shortcut: string }[] = [
   { id: 'select',    icon: <MousePointer2 size={14} />, label: 'Select',    shortcut: 'S' },
@@ -31,9 +28,10 @@ interface ToolbarProps {
   onShare: () => void;
   isSaving: boolean;
   isDirty: boolean;
+  onUpdateSelectedStyle?: (style: Partial<AnnotationStyle>) => void;
 }
 
-export function Toolbar({ onSave, onExport, onShare, isSaving, isDirty }: ToolbarProps) {
+export function Toolbar({ onSave, onExport, onShare, isSaving, isDirty, onUpdateSelectedStyle }: ToolbarProps) {
   const {
     activeTool, setActiveTool,
     strokeColor, setStrokeColor,
@@ -45,18 +43,24 @@ export function Toolbar({ onSave, onExport, onShare, isSaving, isDirty }: Toolba
     undo, redo,
   } = useEditorStore();
 
-  const [theme, setTheme] = useState<'light'|'dark'>('light');
+  function updateStrokeColor(color: string) {
+    setStrokeColor(color);
+    onUpdateSelectedStyle?.({ stroke: color });
+  }
 
-  useEffect(() => {
-    const saved = localStorage.getItem('markly-theme') as 'light'|'dark'|null;
-    if (saved) setTheme(saved);
-  }, []);
+  function updateStrokeWidth(width: number) {
+    setStrokeWidth(width);
+    onUpdateSelectedStyle?.({ strokeWidth: width });
+  }
 
-  function toggleTheme() {
-    const next = theme === 'light' ? 'dark' : 'light';
-    setTheme(next);
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('markly-theme', next);
+  function updateFontSize(size: number) {
+    setFontSize(size);
+    onUpdateSelectedStyle?.({ fontSize: size });
+  }
+
+  function updateOpacity(nextOpacity: number) {
+    setOpacity(nextOpacity);
+    onUpdateSelectedStyle?.({ opacity: nextOpacity });
   }
 
   const divider = <div style={{ width: 1, height: 28, background: 'var(--border)', flexShrink: 0 }} />;
@@ -99,7 +103,7 @@ export function Toolbar({ onSave, onExport, onShare, isSaving, isDirty }: Toolba
           {STROKE_COLORS.map((color) => (
             <button
               key={color}
-              onClick={() => setStrokeColor(color)}
+              onClick={() => updateStrokeColor(color)}
               style={{
                 width: 18, height: 18, borderRadius: '50%', border: 'none', cursor: 'pointer',
                 background: color,
@@ -112,7 +116,7 @@ export function Toolbar({ onSave, onExport, onShare, isSaving, isDirty }: Toolba
           ))}
           <input
             type="color" value={strokeColor}
-            onChange={(e) => setStrokeColor(e.target.value)}
+            onChange={(e) => updateStrokeColor(e.target.value)}
             title="Custom color"
             style={{ width: 18, height: 18, borderRadius: '50%', border: 'none', cursor: 'pointer', padding: 0 }}
           />
@@ -127,7 +131,7 @@ export function Toolbar({ onSave, onExport, onShare, isSaving, isDirty }: Toolba
         {STROKE_WIDTHS.map((w) => (
           <button
             key={w}
-            onClick={() => setStrokeWidth(w)}
+            onClick={() => updateStrokeWidth(w)}
             style={{
               width: 26, height: 26, borderRadius: 6, border: '1px solid',
               borderColor: strokeWidth === w ? 'var(--border-strong)' : 'transparent',
@@ -149,7 +153,7 @@ export function Toolbar({ onSave, onExport, onShare, isSaving, isDirty }: Toolba
             <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-3)' }}>Size</span>
             <select
               value={fontSize}
-              onChange={(e) => setFontSize(Number(e.target.value))}
+              onChange={(e) => updateFontSize(Number(e.target.value))}
               style={{
                 background: 'var(--bg-2)', border: '1px solid var(--border)',
                 borderRadius: 6, padding: '3px 6px', fontSize: 11, color: 'var(--text)',
@@ -170,7 +174,7 @@ export function Toolbar({ onSave, onExport, onShare, isSaving, isDirty }: Toolba
         <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-3)' }}>Opacity</span>
         <input
           type="range" min="0.1" max="1" step="0.1" value={opacity}
-          onChange={(e) => setOpacity(Number(e.target.value))}
+          onChange={(e) => updateOpacity(Number(e.target.value))}
           style={{ width: 60, accentColor: 'var(--accent)', cursor: 'pointer' }}
         />
         <span style={{ fontSize: 10, color: 'var(--text-3)', fontFamily: "'DM Mono', monospace", minWidth: 28 }}>

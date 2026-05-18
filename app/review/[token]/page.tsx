@@ -9,7 +9,7 @@ import { Toolbar } from '@/components/editor/Toolbar';
 import { ShareModal } from '@/components/sharing/ShareModal';
 import { useEditorStore } from '@/lib/store';
 import { debounce } from '@/lib/utils';
-import { Annotation, Comment, Document as MarklyDoc, AccessType, ShareLink } from '@/types';
+import { Annotation, AnnotationStyle, Comment, Document as MarklyDoc, AccessType, ShareLink } from '@/types';
 import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight, MessageSquare, Eye, Edit3, Sun, Moon, Copy, Check } from 'lucide-react';
 
 export default function ReviewPage() {
@@ -31,7 +31,7 @@ export default function ReviewPage() {
   const [saved, setSaved] = useState(true);
   const [copied, setCopied] = useState(false);
 
-  const { currentPage, totalPages, setTotalPages, zoom, zoomIn, zoomOut, setCurrentPage, isDirty, setIsDirty, pushHistory } = useEditorStore();
+  const { currentPage, totalPages, setTotalPages, zoom, zoomIn, zoomOut, setCurrentPage, isDirty, setIsDirty, pushHistory, selectedAnnotationIds } = useEditorStore();
 
   useEffect(() => {
     const saved = localStorage.getItem('markly-theme') as 'light' | 'dark' | null;
@@ -98,6 +98,21 @@ export default function ReviewPage() {
     setSaved(false);
     pushHistory(newAnnotations);
     saveAnnotations(newAnnotations, document.id);
+  }
+
+  function handleUpdateSelectedStyle(style: Partial<AnnotationStyle>) {
+    if (selectedAnnotationIds.length === 0) return;
+
+    const updated = annotations.map((annotation) =>
+      selectedAnnotationIds.includes(annotation.id)
+        ? {
+            ...annotation,
+            style: { ...annotation.style, ...style },
+            updatedAt: new Date().toISOString(),
+          }
+        : annotation
+    );
+    handleAnnotationsChange(updated);
   }
 
   function toggleTheme() {
@@ -313,6 +328,7 @@ export default function ReviewPage() {
           onShare={() => setShowShare(true)}
           isSaving={isSaving}
           isDirty={isDirty}
+          onUpdateSelectedStyle={handleUpdateSelectedStyle}
         />
       )}
 

@@ -10,7 +10,7 @@ import { CommentsSidebar } from '@/components/comments/CommentsSidebar';
 import { ShareModal } from '@/components/sharing/ShareModal';
 import { useEditorStore } from '@/lib/store';
 import { debounce } from '@/lib/utils';
-import { Annotation, Comment, Document as MarklyDoc, ShareLink, AccessType } from '@/types';
+import { Annotation, AnnotationStyle, Comment, Document as MarklyDoc, ShareLink, AccessType } from '@/types';
 import { MessageSquare, Layers, ArrowLeft } from 'lucide-react';
 
 type SidebarTab = 'pages' | 'comments';
@@ -31,7 +31,7 @@ export default function EditorPage() {
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>('pages');
   const [canvasDimensions, setCanvasDimensions] = useState({ width: 0, height: 0 });
 
-  const { currentPage, totalPages, setTotalPages, zoom, isDirty, setIsDirty, resetHistory, pushHistory, undo, redo } = useEditorStore();
+  const { currentPage, totalPages, setTotalPages, zoom, isDirty, setIsDirty, resetHistory, pushHistory, undo, redo, selectedAnnotationIds } = useEditorStore();
 
   const syncDocument = useCallback(async () => {
     const res = await fetch(`/api/documents/${documentId}`);
@@ -113,6 +113,21 @@ export default function EditorPage() {
     setIsDirty(true);
     pushHistory(newAnnotations);
     saveAnnotations(newAnnotations);
+  }
+
+  function handleUpdateSelectedStyle(style: Partial<AnnotationStyle>) {
+    if (selectedAnnotationIds.length === 0) return;
+
+    const updated = annotations.map((annotation) =>
+      selectedAnnotationIds.includes(annotation.id)
+        ? {
+            ...annotation,
+            style: { ...annotation.style, ...style },
+            updatedAt: new Date().toISOString(),
+          }
+        : annotation
+    );
+    handleAnnotationsChange(updated);
   }
 
   async function handleManualSave() {
@@ -266,7 +281,14 @@ export default function EditorPage() {
       </div>
 
       {/* TOOLBAR */}
-      <Toolbar onSave={handleManualSave} onExport={() => window.open(`/api/export?documentId=${documentId}`, '_blank')} onShare={() => setShowShare(true)} isSaving={isSaving} isDirty={isDirty} />
+      <Toolbar
+        onSave={handleManualSave}
+        onExport={() => window.open(`/api/export?documentId=${documentId}`, '_blank')}
+        onShare={() => setShowShare(true)}
+        isSaving={isSaving}
+        isDirty={isDirty}
+        onUpdateSelectedStyle={handleUpdateSelectedStyle}
+      />
 
       {/* MAIN AREA */}
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>

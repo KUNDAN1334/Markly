@@ -278,17 +278,18 @@ export default function EditorPage() {
                 key={tab.id}
                 onClick={() => setSidebarTab(tab.id)}
                 style={{
-                  flex: 1, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                  fontSize: 11, border: 'none', cursor: 'pointer', fontFamily: "'Instrument Sans', sans-serif",
-                  fontWeight: 500, position: 'relative', transition: 'all .15s',
+                  flex: 1, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                  fontSize: 11, borderTop: 'none', borderRight: 'none', borderBottom: 'none', borderLeft: 'none', cursor: 'pointer', fontFamily: "'Instrument Sans', sans-serif",
+                  fontWeight: 500, transition: 'all .15s', padding: '0 8px 4px',
                   background: 'transparent',
                   color: sidebarTab === tab.id ? 'var(--text)' : 'var(--text-3)',
-                  borderBottom: sidebarTab === tab.id ? '2px solid var(--accent)' : '2px solid transparent',
+                  boxShadow: sidebarTab === tab.id ? 'inset 0 -2px 0 var(--accent)' : 'inset 0 -2px 0 transparent',
                 }}
               >
-                {tab.icon} {tab.label}
+                <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>{tab.icon}</span>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tab.label}</span>
                 {'badge' in tab && tab.badge > 0 && (
-                  <span style={{ position: 'absolute', top: 5, right: 8, width: 14, height: 14, background: 'var(--accent)', color: 'var(--accent-fg)', borderRadius: '50%', fontSize: 9, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ minWidth: 16, height: 16, padding: '0 5px', background: 'var(--accent)', color: 'var(--accent-fg)', borderRadius: 99, fontSize: 9, lineHeight: '16px', fontWeight: 700, flexShrink: 0 }}>
                     {tab.badge}
                   </span>
                 )}

@@ -26,10 +26,13 @@ export function CommentsSidebar({ comments, onAdd, onResolve, onDelete, readonly
   async function handleAdd() {
     if (!newComment.trim()) return;
     setLoading('add');
-    await onAdd(newComment.trim(), currentPage);
-    setNewComment('');
-    setAdding(false);
-    setLoading(null);
+    try {
+      await onAdd(newComment.trim(), currentPage);
+      setNewComment('');
+      setAdding(false);
+    } finally {
+      setLoading(null);
+    }
   }
 
   return (
@@ -91,7 +94,14 @@ export function CommentsSidebar({ comments, onAdd, onResolve, onDelete, readonly
               {!readonly && (
                 <div style={{ display: 'flex', gap: 4, marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--border)' }}>
                   <button
-                    onClick={async () => { setLoading(comment.id); await onResolve(comment.id, !comment.resolved); setLoading(null); }}
+                    onClick={async () => {
+                      setLoading(comment.id);
+                      try {
+                        await onResolve(comment.id, !comment.resolved);
+                      } finally {
+                        setLoading(null);
+                      }
+                    }}
                     disabled={loading === comment.id}
                     style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, padding: '4px 0', borderRadius: 6, border: '1px solid var(--border)', background: 'transparent', cursor: 'pointer', fontSize: 10, fontWeight: 500, color: comment.resolved ? 'var(--text-3)' : '#16a34a', fontFamily: "'Instrument Sans', sans-serif", transition: 'all .15s' }}
                   >
@@ -99,7 +109,14 @@ export function CommentsSidebar({ comments, onAdd, onResolve, onDelete, readonly
                     {comment.resolved ? 'Unresolve' : 'Resolve'}
                   </button>
                   <button
-                    onClick={async () => { setLoading(comment.id); await onDelete(comment.id); setLoading(null); }}
+                    onClick={async () => {
+                      setLoading(comment.id);
+                      try {
+                        await onDelete(comment.id);
+                      } finally {
+                        setLoading(null);
+                      }
+                    }}
                     disabled={loading === comment.id}
                     style={{ width: 28, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, border: '1px solid var(--border)', background: 'transparent', cursor: 'pointer', color: '#ef4444', transition: 'all .15s' }}
                     onMouseEnter={e => (e.currentTarget.style.background = '#fef2f2')}

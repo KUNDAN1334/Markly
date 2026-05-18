@@ -118,12 +118,17 @@ export default function ReviewPage() {
   }
 
   async function handleResolveComment(id: string, resolved: boolean) {
-    await fetch(`/api/comments/${id}`, {
+    const res = await fetch(`/api/comments/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'x-share-token': token },
       body: JSON.stringify({ resolved }),
     });
-    setComments((prev) => prev.map((c) => c.id === id ? { ...c, resolved } : c));
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Failed to update comment' }));
+      throw new Error(err.error || 'Failed to update comment');
+    }
+    const comment = await res.json();
+    setComments((prev) => prev.map((c) => c.id === id ? comment : c));
   }
 
   async function handleDeleteComment(id: string) {

@@ -1,15 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authorizeDocumentAccess } from '@/lib/auth';
-import { planErrorResponse, requireWorkspaceFeatureForDocument } from '@/lib/billing/feature-gating';
 import { prisma } from '@/lib/prisma';
+import { z } from 'zod';
 
 type RouteContext = {
   params: Promise<{ id: string }>;
 };
+
+const updateCommentSchema = z.object({
+  resolved: z.boolean(),
+});
+
 export async function PATCH(req: NextRequest, { params }: RouteContext) {
   try {
     const { id } = await params;
-    const body = await req.json();
+    const body = updateCommentSchema.parse(await req.json());
     const existingComment = await prisma.comment.findUnique({
       where: { id },
       select: { documentId: true },
@@ -21,19 +26,17 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
 
     const access = await authorizeDocumentAccess(req, existingComment.documentId, 'COMMENT');
     if (!access.ok) return access.response;
-    if (typeof body.resolved === 'boolean') {
-      await requireWorkspaceFeatureForDocument(existingComment.documentId, 'hasCommentStatus');
-    }
 
     const comment = await prisma.comment.update({
       where: { id },
-      data: body,
+      data: { resolved: body.resolved },
     });
 
     return NextResponse.json(comment);
   } catch (error) {
-    const gated = planErrorResponse(error);
-    if (gated) return gated;
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     console.error('PATCH comment error:', error);
     return NextResponse.json({ error: 'Failed to update comment' }, { status: 500 });
   }

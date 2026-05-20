@@ -38,6 +38,8 @@ interface TextMetrics {
   lines: string[];
 }
 
+const TEXT_FONT_FAMILY = '"Excalifont", "Comic Sans MS", cursive';
+
 export function AnnotationCanvas({
   documentId,
   pageNumber,
@@ -95,7 +97,7 @@ export function AnnotationCanvas({
 
     const measureContext = measureCanvas?.getContext('2d') || null;
     if (measureContext) {
-      measureContext.font = `${fontSizePx}px "Virgil", "Comic Sans MS", cursive`;
+      measureContext.font = `${fontSizePx}px ${TEXT_FONT_FAMILY}`;
     }
 
     const measureTextWidth = (value: string) =>
@@ -442,7 +444,7 @@ export function AnnotationCanvas({
           const fs = (style.fontSize || 18) * zoom;
           const textBoxWidth = Math.max((ann.geometry.width || 200) * zoom, fs * 2);
           const textMetrics = measureWrappedText(ann.content, textBoxWidth, fs);
-          ctx.font = `${fs}px "Virgil", "Comic Sans MS", cursive`;
+          ctx.font = `${fs}px ${TEXT_FONT_FAMILY}`;
           ctx.fillStyle = style.stroke || '#000';
           ctx.globalAlpha = style.opacity ?? 1;
           textMetrics.lines.forEach((line, i) => {
@@ -906,7 +908,7 @@ export function AnnotationCanvas({
             borderRadius: 4,
             padding: '2px 6px',
             fontSize: editingText.fontSize * zoom,
-            fontFamily: "'Virgil', 'Comic Sans MS', cursive",
+            fontFamily: TEXT_FONT_FAMILY,
             color: editingText.stroke,
             resize: 'both',
             outline: 'none',

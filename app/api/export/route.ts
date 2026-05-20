@@ -1,17 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authorizeDocumentAccess } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { PDFDocument, rgb } from 'pdf-lib';
+import fontkit from '@pdf-lib/fontkit';
 import path from 'path';
 import fs from 'fs/promises';
 
 const STORAGE_BASE = process.env.STORAGE_PATH || './storage/documents';
+const EXCALIFONT_PATH = path.join(
+  process.cwd(),
+  'public',
+  'fonts',
+  'Excalifont',
+  'Excalifont-Regular-a88b72a24fb54c9f94e3b5fdaa7481c9.woff2'
+);
 
 function hexToRgb(hex: string) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? { r: parseInt(result[1], 16) / 255, g: parseInt(result[2], 16) / 255, b: parseInt(result[3], 16) / 255 }
     : { r: 0, g: 0, b: 0 };
+}
+
+function scalePoint(value: number | undefined, scale: number) {
+  return (value || 0) * scale;
 }
 
 export async function GET(req: NextRequest) {
@@ -42,27 +54,33 @@ export async function GET(req: NextRequest) {
     const filePath = path.join(STORAGE_BASE, path.basename(doc.filename));
     const pdfBytes = await fs.readFile(filePath);
     const pdfDoc = await PDFDocument.load(pdfBytes);
+    pdfDoc.registerFontkit(fontkit);
     const pages = pdfDoc.getPages();
-    const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const excalifontBytes = await fs.readFile(EXCALIFONT_PATH);
+    const excalifont = await pdfDoc.embedFont(excalifontBytes, { subset: true });
 
     for (const annotation of doc.annotations) {
       const pageIndex = annotation.pageNumber - 1;
       if (pageIndex < 0 || pageIndex >= pages.length) continue;
       const page = pages[pageIndex];
-      const { height } = page.getSize();
+      const { width: pageWidth, height: pageHeight } = page.getSize();
+      const cropBox = page.getCropBox();
+      const scaleX = pageWidth / cropBox.width;
+      const scaleY = pageHeight / cropBox.height;
       const geo = annotation.geometry as Record<string, number>;
       const style = annotation.style as Record<string, unknown>;
 
       const strokeHex = (style.stroke as string) || '#000000';
       const { r, g, b } = hexToRgb(strokeHex);
-      const strokeWidth = (style.strokeWidth as number) || 2;
+      const strokeWidth = ((style.strokeWidth as number) || 2) * Math.min(scaleX, scaleY);
       const opacity = (style.opacity as number) || 1;
       const color = rgb(r, g, b);
 
-      const x = geo.x || 0;
-      const y = height - (geo.y || 0) - (geo.height || 0);
-      const w = geo.width || 100;
-      const h = geo.height || 50;
+      const x = scalePoint(geo.x, scaleX);
+      const topY = scalePoint(geo.y, scaleY);
+      const w = (geo.width || 100) * scaleX;
+      const h = (geo.height || 50) * scaleY;
+      const y = pageHeight - topY - h;
 
       switch (annotation.type) {
         case 'rectangle':
@@ -76,18 +94,37 @@ export async function GET(req: NextRequest) {
           break;
         case 'line':
         case 'arrow':
-          page.drawLine({ start: { x: geo.x, y: height - geo.y }, end: { x: geo.endX || 0, y: height - (geo.endY || 0) }, color, thickness: strokeWidth, opacity });
+          page.drawLine({
+            start: { x, y: pageHeight - topY },
+            end: { x: scalePoint(geo.endX, scaleX), y: pageHeight - scalePoint(geo.endY, scaleY) },
+            color,
+            thickness: strokeWidth,
+            opacity,
+          });
           break;
         case 'text':
           if (annotation.content) {
-            const fontSize = (style.fontSize as number) || 16;
-            page.drawText(annotation.content, { x, y: height - (geo.y || 0) - fontSize, size: fontSize, font: helvetica, color, opacity });
+            const fontSize = ((style.fontSize as number) || 16) * Math.min(scaleX, scaleY);
+            page.drawText(annotation.content, {
+              x,
+              y: pageHeight - topY - fontSize,
+              size: fontSize,
+              font: excalifont,
+              color,
+              opacity,
+            });
           }
           break;
         case 'freehand': {
           const pts = (geo as unknown as { points: number[] }).points || [];
           for (let i = 0; i < pts.length - 3; i += 2) {
-            page.drawLine({ start: { x: pts[i], y: height - pts[i+1] }, end: { x: pts[i+2], y: height - pts[i+3] }, color, thickness: strokeWidth, opacity });
+            page.drawLine({
+              start: { x: pts[i] * scaleX, y: pageHeight - pts[i + 1] * scaleY },
+              end: { x: pts[i + 2] * scaleX, y: pageHeight - pts[i + 3] * scaleY },
+              color,
+              thickness: strokeWidth,
+              opacity,
+            });
           }
           break;
         }

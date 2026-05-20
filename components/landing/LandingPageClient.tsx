@@ -73,7 +73,7 @@ const workflowSteps: WorkflowStep[] = [
   {
     n: '02',
     t: 'Annotate visually',
-    d: 'Draw shapes, write with Virgil font, highlight sections - hand-drawn feel on every mark.',
+    d: 'Draw shapes, write with Excalifont, highlight sections - hand-drawn feel on every mark.',
     meta: 'Mark clearly',
     icon: 'annotate',
   },
@@ -96,7 +96,7 @@ const workflowSteps: WorkflowStep[] = [
 const featureItems: FeatureItem[] = [
   {
     t: 'Hand-drawn annotations',
-    d: 'Excalidraw-style shapes with Virgil font - sketch-like text and doodles that feel natural.',
+    d: 'Excalidraw-style shapes with Excalifont - sketch-like text and doodles that feel natural.',
     icon: (
       <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
@@ -466,7 +466,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
-        @font-face { font-family:'Virgil'; src:url('https://excalidraw.com/Virgil.woff2') format('woff2'); font-display:swap; }
+        @font-face { font-family:'Excalifont'; src:url('/fonts/Excalifont/Excalifont-Regular-a88b72a24fb54c9f94e3b5fdaa7481c9.woff2') format('woff2'); font-display:swap; }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -673,7 +673,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
         .pdf-line.med { width: 82%; }
         .pdf-line.short { width: 58%; }
         .anno-rect { position: absolute; border: 2px solid; border-radius: 3px; }
-        .anno-text { position: absolute; font-family: 'Virgil', cursive; font-size: 13px; color: var(--red); white-space: nowrap; pointer-events: none; }
+        .anno-text { position: absolute; font-family: 'Excalifont', cursive; font-size: 13px; color: var(--red); white-space: nowrap; pointer-events: none; }
         .anno-hl { position: absolute; height: 8px; border-radius: 2px; opacity: .38; }
 
         /* PANEL */
@@ -1321,7 +1321,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
                   </div>
                   <div style={{display:'flex',flexDirection:'column',gap:10}}>
                     <div className="panel-label">Font</div>
-                    <div style={{fontSize:12,color:'var(--text-2)',fontFamily:"'Virgil',cursive",background:'var(--bg-2)',border:'1px solid var(--border)',borderRadius:6,padding:'6px 9px'}}>Virgil</div>
+                    <div style={{fontSize:12,color:'var(--text-2)',fontFamily:"'Excalifont',cursive",background:'var(--bg-2)',border:'1px solid var(--border)',borderRadius:6,padding:'6px 9px'}}>Excalifont</div>
                   </div>
                   <div style={{display:'flex',flexDirection:'column',gap:10}}>
                     <div className="panel-label">Opacity</div>
@@ -1378,7 +1378,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
           <div className="testi-grid">
             {[
               { q:'"Finally a review tool that feels like sketching on a whiteboard. Clients actually understand our feedback now."', name:'Sarah M.', role:'Product Designer' },
-              { q:'"We replaced three tools with Markly. The hand-drawn annotations with Virgil font feel personal and readable."', name:'Rohan K.', role:'Founder, legal-tech' },
+              { q:'"We replaced three tools with Markly. The hand-drawn annotations with Excalifont feel personal and readable."', name:'Rohan K.', role:'Founder, legal-tech' },
               { q:'"Our architecture team reviews drawings daily. Free-form annotation is perfect - like sketching on paper but shareable."', name:'Jenna L.', role:'Senior Architect' },
             ].map((t,i) => (
               <TestimonialCard key={i} testimonial={t} />

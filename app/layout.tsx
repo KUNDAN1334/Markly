@@ -17,14 +17,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap"
           rel="stylesheet"
         />
-        {/* Virgil — Excalidraw's hand-drawn font */}
-        <style>{`
-          @font-face {
-            font-family: 'Virgil';
-            src: url('https://excalidraw.com/Virgil.woff2') format('woff2');
-            font-display: swap;
-          }
-        `}</style>
       </head>
       <body suppressHydrationWarning>
         <Providers>{children}</Providers>

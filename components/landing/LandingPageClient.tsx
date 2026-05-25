@@ -1541,38 +1541,6 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
     {/* mkly-body — cursor ka parent, position:relative */}
     <div className="mockup-body mkly-body">
 
-<<<<<<< Updated upstream
-                {/* PANEL */}
-                <div className="editor-panel">
-                  <div style={{display:'flex',flexDirection:'column',gap:10}}>
-                    <div className="panel-label">Stroke color</div>
-                    <div style={{display:'flex',gap:7}}>
-                      {['#e74c3c','#2ecc71','#f1c40f','var(--text)'].map((c,i) => (
-                        <div key={i} className="color-dot" style={{background:c}}/>
-                      ))}
-                    </div>
-                  </div>
-                  <div style={{display:'flex',flexDirection:'column',gap:10}}>
-                    <div className="panel-label">Font</div>
-                    <div style={{fontSize:12,color:'var(--text-2)',fontFamily:"'Virgil',cursive",background:'var(--bg-2)',border:'1px solid var(--border)',borderRadius:6,padding:'6px 9px'}}>Virgil</div>
-                  </div>
-                  <div style={{display:'flex',flexDirection:'column',gap:10}}>
-                    <div className="panel-label">Opacity</div>
-                    <input className="panel-input" value="100%" readOnly/>
-                  </div>
-                  <div style={{marginTop:'auto',display:'flex',flexDirection:'column',gap:10}}>
-                    <div className="panel-label">Comment</div>
-                    <div className="comment-bubble">
-                      <div className="comment-avatar">AR</div>
-                      <div>
-                        <div style={{fontSize:11,color:'var(--text-2)',lineHeight:1.5}}>"Review highlighted section"</div>
-                        <div style={{fontSize:10,color:'var(--text-3)',marginTop:4}}>2 min ago - Resolved</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-=======
       <div className="editor-toolbar">
         <button className="tool-btn mkly-tb-arrow">
           <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M5 3l14 9-7 1-4 7z"/></svg>
@@ -1652,7 +1620,6 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
             <div>
               <div style={{fontSize:11,color:'var(--text-2)',lineHeight:1.5}}>"Review highlighted section"</div>
               <div style={{fontSize:10,color:'var(--text-3)',marginTop:4}}>2 min ago - Resolved</div>
->>>>>>> Stashed changes
             </div>
           </div>
         </div>

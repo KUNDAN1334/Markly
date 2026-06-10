@@ -77,7 +77,17 @@ export function CommentsSidebar({ comments, onAdd, onResolve, onDelete, readonly
                 <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'var(--bg-2)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <span style={{ fontSize: 8, fontWeight: 700, color: 'var(--text-2)', fontFamily: "'Instrument Sans', sans-serif" }}>P{comment.pageNumber}</span>
                 </div>
-                <p style={{ fontSize: 11, color: 'var(--text-2)', lineHeight: 1.5, flex: 1 }}>{comment.content}</p>
+                <p style={{
+  fontSize: 11,
+  color: 'var(--text-2)',
+  lineHeight: 1.5,
+  flex: 1,
+  minWidth: 0,          
+  wordBreak: 'break-word',
+  overflowWrap: 'break-word',
+}}>
+  {comment.content}
+</p>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>

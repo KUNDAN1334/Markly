@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Comment } from '@/types';
 import { CheckCircle2, Trash2, Plus, MessageSquare, X } from 'lucide-react';
 import { useEditorStore } from '@/lib/store';
@@ -19,6 +20,7 @@ export function CommentsSidebar({ comments, onAdd, onResolve, onDelete, readonly
   const [adding, setAdding] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
   const [showResolved, setShowResolved] = useState(false);
+  const [tooltip, setTooltip] = useState<{ id: string; top: number; comment: Comment } | null>(null);
 
   const visible = comments.filter((c) => showResolved || !c.resolved);
   const unresolvedCount = comments.filter((c) => !c.resolved).length;
@@ -66,28 +68,37 @@ export function CommentsSidebar({ comments, onAdd, onResolve, onDelete, readonly
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {visible.map((comment) => (
-            <div key={comment.id} style={{
-              background: comment.resolved ? 'transparent' : 'var(--bg-card)',
-              border: '1px solid var(--border)',
-              borderRadius: 10, padding: 10,
-              opacity: comment.resolved ? .55 : 1,
-              transition: 'all .15s',
-            }}>
+            <div
+              key={comment.id}
+              onMouseEnter={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                setTooltip({ id: comment.id, top: rect.top, comment });
+              }}
+              onMouseLeave={() => setTooltip(null)}
+              style={{
+                position: 'relative',
+                background: comment.resolved ? 'transparent' : 'var(--bg-card)',
+                border: '1px solid var(--border)',
+                borderRadius: 10, padding: 10,
+                opacity: comment.resolved ? .55 : 1,
+                transition: 'all .15s',
+              }}
+            >
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
                 <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'var(--bg-2)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <span style={{ fontSize: 8, fontWeight: 700, color: 'var(--text-2)', fontFamily: "'Instrument Sans', sans-serif" }}>P{comment.pageNumber}</span>
                 </div>
                 <p style={{
-  fontSize: 11,
-  color: 'var(--text-2)',
-  lineHeight: 1.5,
-  flex: 1,
-  minWidth: 0,          
-  wordBreak: 'break-word',
-  overflowWrap: 'break-word',
-}}>
-  {comment.content}
-</p>
+                  fontSize: 11,
+                  color: 'var(--text-2)',
+                  lineHeight: 1.5,
+                  flex: 1,
+                  minWidth: 0,
+                  wordBreak: 'break-word',
+                  overflowWrap: 'break-word',
+                }}>
+                  {comment.content}
+                </p>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
@@ -195,6 +206,60 @@ export function CommentsSidebar({ comments, onAdd, onResolve, onDelete, readonly
             </button>
           )}
         </div>
+      )}
+
+      {/* Portal tooltip — renders into document.body, bypasses all overflow clipping */}
+      {tooltip && typeof window !== 'undefined' && createPortal(
+        <div style={{
+          position: 'fixed',
+          top: tooltip.top,
+          right: 268,
+          zIndex: 9999,
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border)',
+          borderRadius: 12,
+          padding: '10px 13px',
+          width: 200,
+          boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+          pointerEvents: 'none',
+        }}>
+          {/* Arrow pointing right toward sidebar */}
+          <div style={{
+            position: 'absolute',
+            right: -6,
+            top: 16,
+            width: 10,
+            height: 10,
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border)',
+            borderLeft: 'none',
+            borderBottom: 'none',
+            transform: 'rotate(45deg)',
+          }} />
+          <p style={{
+            fontSize: 11,
+            color: 'var(--text)',
+            lineHeight: 1.6,
+            margin: 0,
+            wordBreak: 'break-word',
+            overflowWrap: 'break-word',
+            fontFamily: "'Instrument Sans', sans-serif",
+          }}>
+            {tooltip.comment.content}
+          </p>
+          <span style={{
+            display: 'block',
+            marginTop: 7,
+            paddingTop: 7,
+            borderTop: '1px solid var(--border)',
+            fontSize: 9,
+            color: 'var(--text-3)',
+            fontFamily: "'DM Mono', monospace",
+          }}>
+            Page {tooltip.comment.pageNumber} · {new Date(tooltip.comment.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+          </span>
+        </div>,
+        document.body
       )}
     </div>
   );

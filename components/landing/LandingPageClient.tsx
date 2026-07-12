@@ -266,50 +266,58 @@ function HowItWorksHoverGrid({ steps }: { steps: WorkflowStep[] }) {
   );
 }
 
-function NotebookFeatures({ items }: { items: FeatureItem[] }) {
-  const cardLayout = [
-    { x: 12, y: 52, rotate: -16, z: 1 },
-    { x: 27, y: 72, rotate: -9, z: 2 },
-    { x: 42, y: 46, rotate: -3, z: 3 },
-    { x: 58, y: 70, rotate: 4, z: 4 },
-    { x: 73, y: 58, rotate: 11, z: 5 },
-    { x: 88, y: 78, rotate: 17, z: 6 },
-  ];
+type CardTint = { x: number; y: number; rotate: number; z: number; tintA: string; tintB: string; accent: string };
 
+const notebookCardLayout: CardTint[] = [
+  { x: 12, y: 52, rotate: -16, z: 1, tintA: '#fff9f0', tintB: '#f7ecd9', accent: '#c9a876' }, // warm gold
+  { x: 27, y: 72, rotate: -9, z: 2, tintA: '#f3faf6', tintB: '#e6f2ec', accent: '#7fb69a' }, // sage
+  { x: 42, y: 46, rotate: -3, z: 3, tintA: '#f2f7fc', tintB: '#e4edf9', accent: '#7c96c2' }, // dusty blue
+  { x: 58, y: 70, rotate: 4, z: 4, tintA: '#fdf3f3', tintB: '#f8e6e6', accent: '#d98a7f' }, // blush
+  { x: 73, y: 58, rotate: 11, z: 5, tintA: '#f8f5fc', tintB: '#efe6f8', accent: '#a888c9' }, // lavender
+  { x: 88, y: 78, rotate: 17, z: 6, tintA: '#fffaf0', tintB: '#fbe8cd', accent: '#d1a44f' }, // amber
+];
+
+function NotebookFeatures({ items }: { items: FeatureItem[] }) {
   return (
     <div className="notebook-fan">
-      {items.map((item, index) => (
-        <article
-          key={item.t}
-          className="notebook-card"
-          style={
-            {
-              '--card-x': `${cardLayout[index]?.x ?? 0}%`,
-              '--card-y': `${cardLayout[index]?.y ?? 60}px`,
-              '--card-rotate': `${cardLayout[index]?.rotate ?? 0}deg`,
-              '--card-z': cardLayout[index]?.z ?? index + 1,
-            } as CSSProperties
-          }
-        >
-          <div className="notebook-card-inner">
-            <div className="notebook-rings" aria-hidden="true">
-              {Array.from({ length: 7 }).map((_, ringIndex) => (
-                <span key={ringIndex} className="notebook-ring" />
-              ))}
-            </div>
+      {items.map((item, index) => {
+        const layout = notebookCardLayout[index];
+        return (
+          <article
+            key={item.t}
+            className="notebook-card"
+            style={
+              {
+                '--card-x': `${layout?.x ?? 0}%`,
+                '--card-y': `${layout?.y ?? 60}px`,
+                '--card-rotate': `${layout?.rotate ?? 0}deg`,
+                '--card-z': layout?.z ?? index + 1,
+                '--card-tint-a': layout?.tintA ?? '#ffffff',
+                '--card-tint-b': layout?.tintB ?? '#f6f6f6',
+                '--card-accent': layout?.accent ?? '#111111',
+              } as CSSProperties
+            }
+          >
+            <div className="notebook-card-inner">
+              <div className="notebook-rings" aria-hidden="true">
+                {Array.from({ length: 7 }).map((_, ringIndex) => (
+                  <span key={ringIndex} className="notebook-ring" />
+                ))}
+              </div>
 
-            <div className="notebook-page-number">0{index + 1}</div>
-            <div className="notebook-icon">{item.icon}</div>
-            <h3 className="notebook-title">{item.t}</h3>
-            <p className="notebook-copy">{item.d}</p>
-            <div className="notebook-rule-stack" aria-hidden="true">
-              <span />
-              <span />
-              <span />
+              <div className="notebook-page-number">0{index + 1}</div>
+              <div className="notebook-icon">{item.icon}</div>
+              <h3 className="notebook-title">{item.t}</h3>
+              <p className="notebook-copy">{item.d}</p>
+              <div className="notebook-rule-stack" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </div>
             </div>
-          </div>
-        </article>
-      ))}
+          </article>
+        );
+      })}
     </div>
   );
 }
@@ -378,7 +386,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
   const { theme, toggle } = useTheme();
   const [isAuthed, setIsAuthed] = useState(initialIsAuthed);
   const [pricingPlans, setPricingPlans] = useState<PricingPlan[]>([]);
-  const mockupRef = useRef<HTMLDivElement>(null); 
+  const mockupRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch('/api/auth/session')
@@ -396,7 +404,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
   useEffect(() => {
     const root = mockupRef.current;
     if (!root) return;
-  
+
     // ── element refs ──────────────────────────────────────────────────────────
     const canvas  = root.querySelector<HTMLElement>('.mkly-canvas')!;
     const body = root.querySelector<HTMLElement>('.mkly-body')!;
@@ -414,14 +422,14 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
     const hl  = root.querySelector<SVGRectElement>('.mkly-hl')!;
     const tx1 = root.querySelector<SVGTextElement>('.mkly-tx1')!;
     const tx2 = root.querySelector<SVGTextElement>('.mkly-tx2')!;
-  
+
     // ── state ─────────────────────────────────────────────────────────────────
     let S=1, Tx=0, Ty=0, tS=1, tTx=0, tTy=0, lerpId: number|null = null;
     let cX=0, cY=0;
     const tmrs: ReturnType<typeof setTimeout>[] = [];
     const rafs: number[] = [];
     let stopped = false;
-  
+
     function kill() {
       stopped = true;
       tmrs.forEach(clearTimeout); rafs.forEach(cancelAnimationFrame);
@@ -433,7 +441,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
     });
     const eio = (t: number) => t < .5 ? 2*t*t : -1 + (4 - 2*t)*t;
     const eo3 = (t: number) => 1 - Math.pow(1 - t, 3);
-  
+
     function applyT() { world.style.transform = `matrix(${S},0,0,${S},${Tx},${Ty})`; }
     function lerpTick() {
       if (stopped) return;
@@ -446,10 +454,10 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
       else { S=tS; Tx=tTx; Ty=tTy; applyT(); lerpId=null; }
     }
     function startLerp() { if (!lerpId && !stopped) lerpId = requestAnimationFrame(lerpTick); }
-  
+
     // coords are canvas-relative (canvas = .mkly-canvas = the zoomable area)
     function setCur(x: number, y: number) { cX=x; cY=y; curEl.style.left=x+'px'; curEl.style.top=y+'px'; }
-  
+
     function elC(el: Element) {
       const er = el.getBoundingClientRect(), br = body.getBoundingClientRect();
       return { x: er.left - br.left + er.width/2, y: er.top - br.top + er.height/2 };
@@ -469,12 +477,12 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
       const offX = cr.left - br.left, offY = cr.top - br.top;
       return { x: wx*S + Tx + offX, y: wy*S + Ty + offY };
     }
-  
+
     function setTool(n: string|null) {
       Object.values(tbs).forEach(b => { b.style.background='transparent'; b.style.color='var(--text-3)'; });
       if (n && tbs[n]) { tbs[n].style.background='var(--accent)'; tbs[n].style.color='var(--accent-fg)'; }
     }
-  
+
     function moveCur(tx: number, ty: number, dur: number, opts: { zoomInScale?: number; zoomOutFirst?: boolean } = {}): Promise<void> {
       return new Promise(resolve => {
         if (stopped) { resolve(); return; }
@@ -495,7 +503,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
         tick();
       });
     }
-  
+
     function dragRect(el: SVGRectElement, wx: number, wy: number, rW: number, rH: number, dur: number): Promise<void> {
       return new Promise(resolve => {
         if (stopped) { resolve(); return; }
@@ -515,7 +523,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
         tick();
       });
     }
-  
+
     function growHl(el: SVGRectElement, wx: number, wy: number, maxW: number, dur: number): Promise<void> {
       return new Promise(resolve => {
         if (stopped) { resolve(); return; }
@@ -532,7 +540,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
         tick();
       });
     }
-  
+
     function typeText(el: SVGTextElement, wx: number, wy: number, text: string, dur: number): Promise<void> {
       return new Promise(resolve => {
         if (stopped) { resolve(); return; }
@@ -549,14 +557,14 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
         next();
       });
     }
-  
+
     function waitLerp(): Promise<void> {
       return new Promise(resolve => {
         function check() { if (!lerpId || stopped) resolve(); else tmrs.push(setTimeout(check, 30)); }
         check();
       });
     }
-  
+
     async function run() {
       if (stopped) return;
       stopped = false;
@@ -567,42 +575,42 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
       S=1; Tx=0; Ty=0; tS=1; tTx=0; tTy=0; applyT();
       setTool(null);
       expBtn.style.cssText = '';
-  
+
       const vpW = canvas.offsetWidth, vpH = canvas.offsetHeight;
       const pgW = pdfPage.offsetWidth, pgH = pdfPage.scrollHeight || 280;
       pdfPage.style.left = Math.round((vpW-pgW)/2) + 'px';
       pdfPage.style.top  = Math.round((vpH-pgH)/2 - 10) + 'px';
-  
+
       await new Promise<void>(res => { rafs.push(requestAnimationFrame(() => rafs.push(requestAnimationFrame(() => res())))); });
-  
+
       const pfCtl = elCtl(pdfPage);
       setCur(pfCtl.x + pdfPage.offsetWidth + 10, pfCtl.y + pgH - 10);
       await wait(400);
-  
+
       // 1. rect tool
       await moveCur(elC(tbs.rect).x, elC(tbs.rect).y, 850);
       await wait(120); setTool('rect'); await wait(300);
-  
+
       // 2. arrive on PDF → zoom in
       await moveCur(elC(root.querySelector('.mkly-ln0')!).x, elC(root.querySelector('.mkly-ln0')!).y, 1100, { zoomInScale: 1.28 });
       await waitLerp(); await wait(300);
-  
+
       // 3. draw red rect
       const ln0w = elWorld(root.querySelector('.mkly-ln0')!);
       const ln1w = elWorld(root.querySelector('.mkly-ln1')!);
       const rX=ln0w.x-2, rY=ln0w.y-2, rW=Math.max(ln0w.w,ln1w.w)+4, rH=(ln1w.y+ln1w.h)-ln0w.y+4;
       await moveCur(w2c(rX,rY).x, w2c(rX,rY).y, 650); await wait(100);
       await dragRect(r1, rX, rY, rW, rH, 1200); await wait(250);
-  
+
       // 4. text tool → zoom out
       await moveCur(elC(tbs.text).x, elC(tbs.text).y, 850, { zoomOutFirst: true });
       await waitLerp(); await wait(140); setTool('text'); await wait(300);
-  
+
       // 5. type "Review this!"
       await moveCur(w2c(rX,rY-3).x, w2c(rX,rY-3).y, 900, { zoomInScale: 1.32 });
       await waitLerp(); await wait(130);
       await typeText(tx1, rX, rY-3, 'Review this!', 720); await wait(350);
-  
+
       // 6. highlight ln3
       setTool('arrow'); await wait(80);
       const ln3w = elWorld(root.querySelector('.mkly-ln3')!);
@@ -610,11 +618,11 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
       await moveCur(w2c(hlX+ln3w.w*.3,hlY).x, w2c(hlX+ln3w.w*.3,hlY).y, 1000, { zoomInScale: 1.25, zoomOutFirst: true });
       await waitLerp(); await wait(140);
       await growHl(hl, hlX, hlY, ln3w.w, 680); await wait(300);
-  
+
       // 7. rect tool → zoom out
       await moveCur(elC(tbs.rect).x, elC(tbs.rect).y, 820, { zoomOutFirst: true });
       await waitLerp(); await wait(140); setTool('rect'); await wait(300);
-  
+
       // 8. draw green rect
       const ln5w = elWorld(root.querySelector('.mkly-ln5')!);
       const ln6w = elWorld(root.querySelector('.mkly-ln6')!);
@@ -622,16 +630,16 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
       await moveCur(w2c(g2X,g2Y).x, w2c(g2X,g2Y).y, 950, { zoomInScale: 1.28 });
       await waitLerp(); await wait(110);
       await dragRect(r2, g2X, g2Y, g2W, g2H, 1000); await wait(220);
-  
+
       // 9. text tool → zoom out
       await moveCur(elC(tbs.text).x, elC(tbs.text).y, 780, { zoomOutFirst: true });
       await waitLerp(); await wait(130); setTool('text'); await wait(250);
-  
+
       // 10. type "Looks good ✓"
       await moveCur(w2c(g2X,g2Y+g2H+15).x, w2c(g2X,g2Y+g2H+15).y, 820, { zoomInScale: 1.32 });
       await waitLerp(); await wait(130);
       await typeText(tx2, g2X, g2Y+g2H+15, 'Looks good ✓', 600); await wait(450);
-  
+
       // 11. Export button click + zoom
       setTool('arrow');
       await moveCur(elC(expBtn).x, elC(expBtn).y, 1200, { zoomOutFirst: true });
@@ -644,10 +652,10 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
       const ec = elC(expBtn);
       tS=1.5; tTx=ec.x-((ec.x-Tx)/S)*1.5; tTy=ec.y-((ec.y-Ty)/S)*1.5; startLerp();
       await wait(1300);
-  
+
       if (!stopped) { await wait(500); run(); }
     }
-  
+
     const t = setTimeout(() => run(), 700);
     return () => { kill(); clearTimeout(t); };
   }, []);
@@ -739,6 +747,8 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
           --shadow-lg:0 16px 48px rgba(0,0,0,.10);
           --shadow-xl:0 32px 80px rgba(0,0,0,.12);
           --radius-sm:6px; --radius-md:10px; --radius-lg:16px; --radius-xl:24px;
+          --doc-accent: #b98a4e;
+          --doc-accent-soft: rgba(185, 138, 78, 0.16);
         }
         [data-theme="dark"] {
           --bg:#0c0c0b; --bg-2:#161614; --bg-card:#1a1a18;
@@ -747,6 +757,25 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
           --accent:#f4f4f0; --accent-fg:#0c0c0b;
           --shadow-lg:0 16px 48px rgba(0,0,0,.4);
           --shadow-xl:0 32px 80px rgba(0,0,0,.5);
+          --doc-accent: #e0b374;
+          --doc-accent-soft: rgba(224, 179, 116, 0.14);
+        }
+
+        .hero-title-accent {
+          color: var(--doc-accent);
+          position: relative;
+          font-style: normal;
+        }
+        .hero-title-accent::after {
+          content: '';
+          position: absolute;
+          left: 2%;
+          right: 2%;
+          bottom: 0.06em;
+          height: 0.14em;
+          background: var(--doc-accent-soft);
+          border-radius: 2px;
+          z-index: -1;
         }
 
         html { scroll-behavior: smooth; }
@@ -1005,14 +1034,22 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
           background:
             repeating-linear-gradient(
               to bottom,
-              #fff 0 22px,
-              rgba(0, 0, 0, 0.12) 22px 24px
+              transparent 0 22px,
+              rgba(0, 0, 0, 0.08) 22px 24px
             ),
-            linear-gradient(180deg, #fff, #f6f6f6);
+            linear-gradient(160deg, var(--card-tint-a, #fff), var(--card-tint-b, #f6f6f6));
           box-shadow:
             0 10px 0 rgba(17, 17, 17, 0.08),
             0 18px 34px rgba(17, 17, 17, 0.12);
           overflow: hidden;
+          transition: box-shadow .32s ease, border-color .32s ease;
+        }
+        .notebook-fan:hover .notebook-card:hover .notebook-card-inner {
+          border-color: var(--card-accent, #111);
+          box-shadow:
+            0 10px 0 rgba(17, 17, 17, 0.08),
+            0 22px 44px rgba(17, 17, 17, 0.14),
+            0 0 0 3px color-mix(in srgb, var(--card-accent, #111) 22%, transparent);
         }
         .notebook-card-inner::before {
           content: '';
@@ -1063,6 +1100,11 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
           letter-spacing: .08em;
           text-transform: uppercase;
           color: #111;
+          transition: border-color .28s ease, color .28s ease;
+        }
+        .notebook-fan:hover .notebook-card:hover .notebook-page-number {
+          border-color: var(--card-accent, #111);
+          color: var(--card-accent, #111);
         }
         .notebook-icon {
           width: 44px;
@@ -1070,13 +1112,18 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
           margin-top: 10px;
           border: 2px solid #111;
           border-radius: 16px 18px 14px 16px;
-          background: #fff;
+          background: color-mix(in srgb, var(--card-accent, #fff) 14%, #fff);
           display: flex;
           align-items: center;
           justify-content: center;
           color: #111;
           box-shadow: 3px 4px 0 rgba(17, 17, 17, 0.08);
           transform: rotate(-3deg);
+          transition: background .28s ease, transform .28s ease;
+        }
+        .notebook-fan:hover .notebook-card:hover .notebook-icon {
+          transform: rotate(0deg) scale(1.06);
+          background: color-mix(in srgb, var(--card-accent, #fff) 30%, #fff);
         }
         .notebook-title {
           margin-top: 10px;
@@ -1470,15 +1517,15 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
       <section className="hero">
         <div className="container" style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
 
-          <div className="hero-eyebrow anim d1">
+          {/* <div className="hero-eyebrow anim d1">
             <span className="badge">
               <span className="badge-dot"/>
-              Excalidraw for Documents - now in beta
+              Excalidraw for Documents
             </span>
-          </div>
+          </div> */}
 
           <h1 className="hero-title anim d2">
-            Annotate documents<br/><em>like an artist</em>
+            Annotate <span className="hero-title-accent">documents</span><br/><em>like an artist</em>
           </h1>
 
           <p className="hero-sub anim d3">
@@ -1760,14 +1807,14 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
           <div className="footer-grid">
             <div>
               <a href="/" className="footer-brand">
-              <div style={{display:'flex',alignItems:'center',justifyContent:'center',width:32,height:32}}>
-  <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
-    <path d="M20 6 L8 6 L8 20" stroke="var(--text)" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M20 34 L32 34 L32 20" stroke="var(--text)" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"/>
-    <circle cx="20" cy="20" r="3.5" fill="var(--text)"/>
-    <path d="M13 20 Q17 18 20 20 Q23 22 27 20" stroke="var(--text)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-  </svg>
-</div>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'center',width:32,height:32}}>
+                  <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+                    <path d="M20 6 L8 6 L8 20" stroke="var(--text)" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M20 34 L32 34 L32 20" stroke="var(--text)" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="20" cy="20" r="3.5" fill="var(--text)"/>
+                    <path d="M13 20 Q17 18 20 20 Q23 22 27 20" stroke="var(--text)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                  </svg>
+                </div>
                 <span className="footer-brand-text">Markly</span>
               </a>
               <p className="footer-tagline">Excalidraw for Documents. Visual feedback for any PDF - draw, annotate, share.</p>
@@ -1796,4 +1843,3 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
     </>
   );
 }
-

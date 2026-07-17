@@ -179,7 +179,7 @@ export type ShareLinkGroupByOutputType = {
   _max: ShareLinkMaxAggregateOutputType | null
 }
 
-type GetShareLinkGroupByPayload<T extends ShareLinkGroupByArgs> = Prisma.PrismaPromise<
+export type GetShareLinkGroupByPayload<T extends ShareLinkGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ShareLinkGroupByOutputType, T['by']> &
       {
@@ -1503,6 +1503,11 @@ export type ShareLinkFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Skip the first `n` ShareLinks.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of ShareLinks.
+   */
   distinct?: Prisma.ShareLinkScalarFieldEnum | Prisma.ShareLinkScalarFieldEnum[]
 }
 

@@ -4,9 +4,21 @@ import { Github, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { firebaseAuth, githubProvider, googleProvider } from '@/lib/firebase-client';
-import { signInWithPopup } from 'firebase/auth';
+import type { User } from 'firebase/auth';
+import {
+  getRedirectResult,
+  signInWithPopup,
+  signInWithRedirect,
+} from 'firebase/auth';
 
 type ProviderId = 'google' | 'github';
+
+// Errors where falling back from popup to full-page redirect is the right move.
+const POPUP_FALLBACK_CODES = new Set([
+  'auth/popup-blocked',
+  'auth/operation-not-supported-in-this-environment',
+  'auth/cancelled-popup-request',
+]);
 
 export function AuthScreen({
   mode,
@@ -15,41 +27,74 @@ export function AuthScreen({
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState<ProviderId | null>(null);
+  const [checking, setChecking] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetch('/api/auth/session').then((res) => {
-      if (res.ok) {
-        router.replace('/dashboard');
-      }
+  async function completeLogin(user: User) {
+    const idToken = await user.getIdToken();
+    const res = await fetch('/api/auth/session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken }),
     });
+
+    if (!res.ok) {
+      const payload = await res.json().catch(() => ({ error: 'Login failed' }));
+      throw new Error(payload.error || 'Login failed');
+    }
+
+    router.push('/dashboard');
+    router.refresh();
+  }
+
+  useEffect(() => {
+    getRedirectResult(firebaseAuth)
+      .then(async (result) => {
+        if (result) {
+          await completeLogin(result.user);
+          return;
+        }
+
+        // No redirect result: check for an existing server session.
+        const res = await fetch('/api/auth/session');
+        if (res.ok) {
+          router.replace('/dashboard');
+        } else {
+          setChecking(false);
+        }
+      })
+      .catch((err) => {
+        setError(err instanceof Error ? err.message : 'Authentication failed');
+        setChecking(false);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
   async function handleAuth(providerId: ProviderId) {
     setLoading(providerId);
     setError(null);
 
+    const provider = providerId === 'google' ? googleProvider : githubProvider;
+
     try {
-      const provider = providerId === 'google' ? googleProvider : githubProvider;
       const result = await signInWithPopup(firebaseAuth, provider);
-      const idToken = await result.user.getIdToken();
+      await completeLogin(result.user);
+    } catch (err) {
+      const code = (err as { code?: string })?.code ?? '';
 
-      const res = await fetch('/api/auth/session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idToken }),
-      });
-
-      if (!res.ok) {
-        const payload = await res.json().catch(() => ({ error: 'Login failed' }));
-        throw new Error(payload.error || 'Login failed');
+      // Popup blocked or unsupported -> fall back to full-page redirect.
+      if (POPUP_FALLBACK_CODES.has(code)) {
+        await signInWithRedirect(firebaseAuth, provider);
+        return;
       }
 
-      router.push('/dashboard');
-      router.refresh();
-    } catch (err) {
+      // User closed the popup themselves: quietly reset, no error banner.
+      if (code === 'auth/popup-closed-by-user') {
+        setLoading(null);
+        return;
+      }
+
       setError(err instanceof Error ? err.message : 'Authentication failed');
-    } finally {
       setLoading(null);
     }
   }
@@ -92,7 +137,7 @@ export function AuthScreen({
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <button
             onClick={() => handleAuth('google')}
-            disabled={loading !== null}
+            disabled={checking || loading !== null}
             style={{
               height: 48,
               borderRadius: 14,
@@ -114,7 +159,7 @@ export function AuthScreen({
 
           <button
             onClick={() => handleAuth('github')}
-            disabled={loading !== null}
+            disabled={checking || loading !== null}
             style={{
               height: 48,
               borderRadius: 14,

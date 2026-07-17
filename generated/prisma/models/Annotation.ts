@@ -212,7 +212,7 @@ export type AnnotationGroupByOutputType = {
   _max: AnnotationMaxAggregateOutputType | null
 }
 
-type GetAnnotationGroupByPayload<T extends AnnotationGroupByArgs> = Prisma.PrismaPromise<
+export type GetAnnotationGroupByPayload<T extends AnnotationGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<AnnotationGroupByOutputType, T['by']> &
       {
@@ -1425,6 +1425,11 @@ export type AnnotationFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Skip the first `n` Annotations.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Annotations.
+   */
   distinct?: Prisma.AnnotationScalarFieldEnum | Prisma.AnnotationScalarFieldEnum[]
 }
 

@@ -22,20 +22,13 @@ model User {
 }
 
 model Workspace {
-  id                     String               @id @default(cuid())
-  name                   String
-  ownerUserId            String
-  ownerUser              User                 @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
-  currentPlanId          String               @default("free")
-  razorpayCustomerId     String?              @unique
-  razorpaySubscriptionId String?              @unique
-  subscriptionStatus     String               @default("none")
-  currentPlanStartedAt   DateTime?
-  currentPlanRenewsAt    DateTime?
-  createdAt              DateTime             @default(now())
-  updatedAt              DateTime             @updatedAt
-  projects               Project[]
-  billingWebhookEvents   BillingWebhookEvent[]
+  id          String    @id @default(cuid())
+  name        String
+  ownerUserId String
+  ownerUser   User      @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  projects    Project[]
 
   @@index([ownerUserId])
 }
@@ -117,18 +110,4 @@ model ShareLink {
   access          String    @default("VIEW")
   createdAt       DateTime  @default(now())
   expiresAt       DateTime?
-}
-
-model BillingWebhookEvent {
-  id                 String     @id @default(cuid())
-  workspaceId        String?
-  workspace          Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
-  razorpayEventId    String?    @unique
-  razorpayEntityId   String?
-  event              String
-  payload            Json
-  createdAt          DateTime   @default(now())
-
-  @@index([workspaceId, createdAt])
-  @@index([event, createdAt])
 }

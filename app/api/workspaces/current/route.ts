@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuthenticatedUser, unauthorizedResponse } from '@/lib/auth';
-import { getPlanForWorkspace, serializePlan } from '@/lib/billing/plans';
-import { ensureWorkspaceForUser } from '@/lib/billing/workspace';
+import { ensureWorkspaceForUser } from '@/lib/workspace';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(req: NextRequest) {
@@ -45,7 +44,6 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({
     ...hydratedWorkspace,
-    currentPlan: serializePlan(getPlanForWorkspace(hydratedWorkspace)),
     usage: {
       activeProjectsCount: hydratedWorkspace._count.projects,
       activeDocumentsCount: documentCount,

@@ -3,7 +3,6 @@
 import type { CSSProperties, MouseEvent, ReactNode } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import type { PricingPlan } from '@/types';
 import MorphLoader from '@/components/MorphLoader';
 function useTheme() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
@@ -386,21 +385,12 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
   const router = useRouter();
   const { theme, toggle } = useTheme();
   const [isAuthed, setIsAuthed] = useState(initialIsAuthed);
-  const [pricingPlans, setPricingPlans] = useState<PricingPlan[]>([]);
   const mockupRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch('/api/auth/session')
       .then((res) => setIsAuthed(res.ok))
       .catch(() => setIsAuthed(false));
-
-    fetch('/api/pricing/plans')
-      .then(async (res) => {
-        if (!res.ok) throw new Error('Failed to load pricing');
-        return res.json();
-      })
-      .then((data: PricingPlan[]) => setPricingPlans(data))
-      .catch(() => setPricingPlans([]));
   }, []);
   useEffect(() => {
     const root = mockupRef.current;
@@ -666,68 +656,6 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
     setIsAuthed(false);
     router.refresh();
   }
-
-  const visiblePlans = pricingPlans.length > 0
-    ? pricingPlans
-    : [
-        {
-          id: 'free',
-          name: 'Free',
-          description: 'Perfect for individuals.',
-          monthlyPriceInPaise: 0,
-          limits: { maxActiveProjects: 1, maxActiveDocuments: 5, softMonthlyNewDocumentsLimit: 5 },
-          features: {
-            canAnnotate: true,
-            canComment: true,
-            hasCommentStatus: false,
-            hasDocumentStatus: false,
-            hasEmailNotifications: false,
-            hasSlackIntegration: false,
-            hasBranding: false,
-            hasTeamOnlyComments: false,
-            hasPasswordProtectedLinks: false,
-            hasAnalytics: false,
-          },
-        },
-        {
-          id: 'pro',
-          name: 'Pro',
-          description: 'For professionals and small teams.',
-          monthlyPriceInPaise: 99900,
-          limits: { maxActiveProjects: null, maxActiveDocuments: null, softMonthlyNewDocumentsLimit: 50 },
-          features: {
-            canAnnotate: true,
-            canComment: true,
-            hasCommentStatus: true,
-            hasDocumentStatus: true,
-            hasEmailNotifications: true,
-            hasSlackIntegration: false,
-            hasBranding: false,
-            hasTeamOnlyComments: false,
-            hasPasswordProtectedLinks: false,
-            hasAnalytics: false,
-          },
-        },
-        {
-          id: 'team',
-          name: 'Team',
-          description: 'Everything for growing teams.',
-          monthlyPriceInPaise: 299900,
-          limits: { maxActiveProjects: null, maxActiveDocuments: null, softMonthlyNewDocumentsLimit: null },
-          features: {
-            canAnnotate: true,
-            canComment: true,
-            hasCommentStatus: true,
-            hasDocumentStatus: true,
-            hasEmailNotifications: true,
-            hasSlackIntegration: true,
-            hasBranding: true,
-            hasTeamOnlyComments: true,
-            hasPasswordProtectedLinks: true,
-            hasAnalytics: true,
-          },
-        },
-      ] satisfies PricingPlan[];
 
   return (
     <>
@@ -1316,38 +1244,6 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
         .testi-name { font-size: 13px; font-weight: 600; color: var(--text); }
         .testi-role { font-size: 11px; color: var(--text-3); margin-top: 2px; }
 
-        /*  PRICING  */
-        .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 900px; margin: 0 auto; }
-        .price-card {
-          background: var(--bg-card); border: 1px solid var(--border);
-          border-radius: var(--radius-lg); padding: 32px 28px;
-          display: flex; flex-direction: column; gap: 24px;
-          position: relative; transition: box-shadow .2s;
-        }
-        .price-card:hover { box-shadow: var(--shadow-md); }
-        .price-card.featured {
-          background: var(--text); color: var(--accent-fg);
-          border-color: var(--text); box-shadow: var(--shadow-lg);
-        }
-        .price-popular {
-          position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-          background: var(--red); color: white; padding: 3px 14px; border-radius: 999px;
-          font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
-          white-space: nowrap;
-        }
-        .price-plan { font-size: 12px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--text-3); font-family: 'DM Mono', monospace; }
-        .price-card.featured .price-plan { color: color-mix(in srgb, var(--accent-fg) 50%, transparent); }
-        .price-amount { font-family: 'DM Serif Display', serif; font-size: 46px; letter-spacing: -.03em; line-height: 1; }
-        .price-per { font-size: 13px; opacity: .55; font-weight: 400; font-family: 'Instrument Sans', sans-serif; }
-        .price-desc { font-size: 13px; color: var(--text-2); line-height: 1.6; }
-        .price-card.featured .price-desc { color: color-mix(in srgb, var(--accent-fg) 60%, transparent); }
-        .price-divider { height: 1px; background: var(--border); }
-        .price-card.featured .price-divider { background: color-mix(in srgb, var(--accent-fg) 15%, transparent); }
-        .price-features { list-style: none; display: flex; flex-direction: column; gap: 11px; }
-        .price-feat { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-2); }
-        .price-card.featured .price-feat { color: color-mix(in srgb, var(--accent-fg) 65%, transparent); }
-        .price-feat-icon { flex-shrink: 0; }
-
         /*  CTA  */
         .cta-wrap { padding: 0 0 100px; }
         .cta-block {
@@ -1397,7 +1293,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
 
         /*  RESPONSIVE  */
         @media (max-width: 960px) {
-          .testi-grid, .pricing-grid { grid-template-columns: 1fr 1fr; }
+          .testi-grid { grid-template-columns: 1fr 1fr; }
           .steps-hover-grid { grid-template-columns: 1fr 1fr; }
           .footer-grid { grid-template-columns: 1fr 1fr; }
           .editor-panel { display: none; }
@@ -1425,7 +1321,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
           }
         }
         @media (max-width: 640px) {
-          .testi-grid, .pricing-grid, .steps-hover-grid { grid-template-columns: 1fr; }
+          .testi-grid, .steps-hover-grid { grid-template-columns: 1fr; }
           .footer-grid { grid-template-columns: 1fr; }
           .cta-block { padding: 52px 28px; }
           .hero { padding: 72px 0 56px; }
@@ -1490,7 +1386,6 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
           <ul className="nav-links">
             <li><a href="#features">Features</a></li>
             <li><a href="#how">How it works</a></li>
-            <li><a href="#pricing">Pricing</a></li>
           </ul>
 
           <div className="nav-actions">
@@ -1723,66 +1618,6 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
         </div>
       </section>
 
-      {/*  PRICING  */}
-      <section className="section" id="pricing">
-        <div className="container">
-          <div className="section-header">
-            <div className="section-label">Pricing</div>
-            <h2 className="section-title">Simple, honest pricing</h2>
-            <p className="section-sub">Start free. Upgrade when you need more.</p>
-          </div>
-          <div className="pricing-grid">
-            {visiblePlans.map((p) => {
-              const featured = p.id === 'pro';
-              const featureRows = [
-                { y: true, t: `${p.limits.softMonthlyNewDocumentsLimit ?? 'Unlimited'} new docs / month` },
-                { y: true, t: p.features.hasCommentStatus ? 'Open and resolved comments' : 'Basic comments' },
-                { y: p.features.hasDocumentStatus, t: 'Document approval states' },
-                { y: p.features.hasAnalytics, t: 'Workspace analytics' },
-              ];
-
-              return (
-              <div key={p.id} className={`price-card${featured?' featured':''}`}>
-                {featured && <div className="price-popular">Most popular</div>}
-                <div>
-                  <div className="price-plan">{p.name}</div>
-                  <div className="price-amount">
-                    {new Intl.NumberFormat('en-US', { style:'currency', currency:'USD', maximumFractionDigits:0 }).format((p.monthlyPriceInPaise / 100) / 83)}
-                    <span className="price-per">/ mo</span>
-                  </div>
-                  <div className="price-desc" style={{marginTop:10}}>{p.description}</div>
-                </div>
-                <div className="price-divider"/>
-                <ul className="price-features">
-                  {featureRows.map((f,j) => (
-                    <li key={j} className="price-feat" style={{opacity:f.y?1:.38}}>
-                      <span className="price-feat-icon">
-                        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
-                          {f.y ? <polyline points="20 6 9 17 4 12"/> : <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>}
-                        </svg>
-                      </span>
-                      {f.t}
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  onClick={() => router.push(isAuthed ? '/dashboard' : '/signup')}
-                  className="btn btn-primary"
-                  style={{
-                    justifyContent:'center', width:'100%', borderRadius:10,
-                    background: featured ? 'var(--accent-fg)' : 'var(--accent)',
-                    color: featured ? 'var(--text)' : 'var(--accent-fg)',
-                    padding:'11px 0',
-                  }}
-                >
-                  {isAuthed ? 'Open dashboard' : (featured ? 'Start Pro' : 'Get started')}
-                </button>
-              </div>
-            )})}
-          </div>
-        </div>
-      </section>
-
       {/*  CTA  */}
       <div className="cta-wrap">
         <div className="container">
@@ -1822,7 +1657,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
               <p className="footer-tagline">Excalidraw for Documents. Visual feedback for any PDF - draw, annotate, share.</p>
             </div>
             {[
-              { h:'Product', links:['Features','Pricing','Changelog','Roadmap'] },
+              { h:'Product', links:['Features','Changelog','Roadmap'] },
               { h:'Resources', links:['Documentation','API Reference','Blog','Status'] },
               { h:'Company', links:['About','Twitter / X','GitHub','Contact'] },
             ].map(col => (

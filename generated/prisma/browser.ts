@@ -52,8 +52,3 @@ export type Comment = Prisma.CommentModel
  * 
  */
 export type ShareLink = Prisma.ShareLinkModel
-/**
- * Model BillingWebhookEvent
- * 
- */
-export type BillingWebhookEvent = Prisma.BillingWebhookEventModel

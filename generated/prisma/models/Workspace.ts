@@ -28,12 +28,6 @@ export type WorkspaceMinAggregateOutputType = {
   id: string | null
   name: string | null
   ownerUserId: string | null
-  currentPlanId: string | null
-  razorpayCustomerId: string | null
-  razorpaySubscriptionId: string | null
-  subscriptionStatus: string | null
-  currentPlanStartedAt: Date | null
-  currentPlanRenewsAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -42,12 +36,6 @@ export type WorkspaceMaxAggregateOutputType = {
   id: string | null
   name: string | null
   ownerUserId: string | null
-  currentPlanId: string | null
-  razorpayCustomerId: string | null
-  razorpaySubscriptionId: string | null
-  subscriptionStatus: string | null
-  currentPlanStartedAt: Date | null
-  currentPlanRenewsAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -56,12 +44,6 @@ export type WorkspaceCountAggregateOutputType = {
   id: number
   name: number
   ownerUserId: number
-  currentPlanId: number
-  razorpayCustomerId: number
-  razorpaySubscriptionId: number
-  subscriptionStatus: number
-  currentPlanStartedAt: number
-  currentPlanRenewsAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -72,12 +54,6 @@ export type WorkspaceMinAggregateInputType = {
   id?: true
   name?: true
   ownerUserId?: true
-  currentPlanId?: true
-  razorpayCustomerId?: true
-  razorpaySubscriptionId?: true
-  subscriptionStatus?: true
-  currentPlanStartedAt?: true
-  currentPlanRenewsAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -86,12 +62,6 @@ export type WorkspaceMaxAggregateInputType = {
   id?: true
   name?: true
   ownerUserId?: true
-  currentPlanId?: true
-  razorpayCustomerId?: true
-  razorpaySubscriptionId?: true
-  subscriptionStatus?: true
-  currentPlanStartedAt?: true
-  currentPlanRenewsAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -100,12 +70,6 @@ export type WorkspaceCountAggregateInputType = {
   id?: true
   name?: true
   ownerUserId?: true
-  currentPlanId?: true
-  razorpayCustomerId?: true
-  razorpaySubscriptionId?: true
-  subscriptionStatus?: true
-  currentPlanStartedAt?: true
-  currentPlanRenewsAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -187,12 +151,6 @@ export type WorkspaceGroupByOutputType = {
   id: string
   name: string
   ownerUserId: string
-  currentPlanId: string
-  razorpayCustomerId: string | null
-  razorpaySubscriptionId: string | null
-  subscriptionStatus: string
-  currentPlanStartedAt: Date | null
-  currentPlanRenewsAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: WorkspaceCountAggregateOutputType | null
@@ -222,66 +180,39 @@ export type WorkspaceWhereInput = {
   id?: Prisma.StringFilter<"Workspace"> | string
   name?: Prisma.StringFilter<"Workspace"> | string
   ownerUserId?: Prisma.StringFilter<"Workspace"> | string
-  currentPlanId?: Prisma.StringFilter<"Workspace"> | string
-  razorpayCustomerId?: Prisma.StringNullableFilter<"Workspace"> | string | null
-  razorpaySubscriptionId?: Prisma.StringNullableFilter<"Workspace"> | string | null
-  subscriptionStatus?: Prisma.StringFilter<"Workspace"> | string
-  currentPlanStartedAt?: Prisma.DateTimeNullableFilter<"Workspace"> | Date | string | null
-  currentPlanRenewsAt?: Prisma.DateTimeNullableFilter<"Workspace"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Workspace"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Workspace"> | Date | string
   ownerUser?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   projects?: Prisma.ProjectListRelationFilter
-  billingWebhookEvents?: Prisma.BillingWebhookEventListRelationFilter
 }
 
 export type WorkspaceOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   ownerUserId?: Prisma.SortOrder
-  currentPlanId?: Prisma.SortOrder
-  razorpayCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
-  razorpaySubscriptionId?: Prisma.SortOrderInput | Prisma.SortOrder
-  subscriptionStatus?: Prisma.SortOrder
-  currentPlanStartedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  currentPlanRenewsAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownerUser?: Prisma.UserOrderByWithRelationInput
   projects?: Prisma.ProjectOrderByRelationAggregateInput
-  billingWebhookEvents?: Prisma.BillingWebhookEventOrderByRelationAggregateInput
 }
 
 export type WorkspaceWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  razorpayCustomerId?: string
-  razorpaySubscriptionId?: string
   AND?: Prisma.WorkspaceWhereInput | Prisma.WorkspaceWhereInput[]
   OR?: Prisma.WorkspaceWhereInput[]
   NOT?: Prisma.WorkspaceWhereInput | Prisma.WorkspaceWhereInput[]
   name?: Prisma.StringFilter<"Workspace"> | string
   ownerUserId?: Prisma.StringFilter<"Workspace"> | string
-  currentPlanId?: Prisma.StringFilter<"Workspace"> | string
-  subscriptionStatus?: Prisma.StringFilter<"Workspace"> | string
-  currentPlanStartedAt?: Prisma.DateTimeNullableFilter<"Workspace"> | Date | string | null
-  currentPlanRenewsAt?: Prisma.DateTimeNullableFilter<"Workspace"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Workspace"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Workspace"> | Date | string
   ownerUser?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   projects?: Prisma.ProjectListRelationFilter
-  billingWebhookEvents?: Prisma.BillingWebhookEventListRelationFilter
-}, "id" | "razorpayCustomerId" | "razorpaySubscriptionId">
+}, "id">
 
 export type WorkspaceOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   ownerUserId?: Prisma.SortOrder
-  currentPlanId?: Prisma.SortOrder
-  razorpayCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
-  razorpaySubscriptionId?: Prisma.SortOrderInput | Prisma.SortOrder
-  subscriptionStatus?: Prisma.SortOrder
-  currentPlanStartedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  currentPlanRenewsAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.WorkspaceCountOrderByAggregateInput
@@ -296,12 +227,6 @@ export type WorkspaceScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Workspace"> | string
   name?: Prisma.StringWithAggregatesFilter<"Workspace"> | string
   ownerUserId?: Prisma.StringWithAggregatesFilter<"Workspace"> | string
-  currentPlanId?: Prisma.StringWithAggregatesFilter<"Workspace"> | string
-  razorpayCustomerId?: Prisma.StringNullableWithAggregatesFilter<"Workspace"> | string | null
-  razorpaySubscriptionId?: Prisma.StringNullableWithAggregatesFilter<"Workspace"> | string | null
-  subscriptionStatus?: Prisma.StringWithAggregatesFilter<"Workspace"> | string
-  currentPlanStartedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Workspace"> | Date | string | null
-  currentPlanRenewsAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Workspace"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Workspace"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Workspace"> | Date | string
 }
@@ -309,77 +234,43 @@ export type WorkspaceScalarWhereWithAggregatesInput = {
 export type WorkspaceCreateInput = {
   id?: string
   name: string
-  currentPlanId?: string
-  razorpayCustomerId?: string | null
-  razorpaySubscriptionId?: string | null
-  subscriptionStatus?: string
-  currentPlanStartedAt?: Date | string | null
-  currentPlanRenewsAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerUser: Prisma.UserCreateNestedOneWithoutWorkspacesInput
   projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
-  billingWebhookEvents?: Prisma.BillingWebhookEventCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateInput = {
   id?: string
   name: string
   ownerUserId: string
-  currentPlanId?: string
-  razorpayCustomerId?: string | null
-  razorpaySubscriptionId?: string | null
-  subscriptionStatus?: string
-  currentPlanStartedAt?: Date | string | null
-  currentPlanRenewsAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
-  billingWebhookEvents?: Prisma.BillingWebhookEventUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  currentPlanId?: Prisma.StringFieldUpdateOperationsInput | string
-  razorpayCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  razorpaySubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  currentPlanStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  currentPlanRenewsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerUser?: Prisma.UserUpdateOneRequiredWithoutWorkspacesNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
-  billingWebhookEvents?: Prisma.BillingWebhookEventUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   ownerUserId?: Prisma.StringFieldUpdateOperationsInput | string
-  currentPlanId?: Prisma.StringFieldUpdateOperationsInput | string
-  razorpayCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  razorpaySubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  currentPlanStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  currentPlanRenewsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
-  billingWebhookEvents?: Prisma.BillingWebhookEventUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateManyInput = {
   id?: string
   name: string
   ownerUserId: string
-  currentPlanId?: string
-  razorpayCustomerId?: string | null
-  razorpaySubscriptionId?: string | null
-  subscriptionStatus?: string
-  currentPlanStartedAt?: Date | string | null
-  currentPlanRenewsAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -387,12 +278,6 @@ export type WorkspaceCreateManyInput = {
 export type WorkspaceUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  currentPlanId?: Prisma.StringFieldUpdateOperationsInput | string
-  razorpayCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  razorpaySubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  currentPlanStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  currentPlanRenewsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -401,12 +286,6 @@ export type WorkspaceUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   ownerUserId?: Prisma.StringFieldUpdateOperationsInput | string
-  currentPlanId?: Prisma.StringFieldUpdateOperationsInput | string
-  razorpayCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  razorpaySubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  currentPlanStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  currentPlanRenewsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -425,12 +304,6 @@ export type WorkspaceCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   ownerUserId?: Prisma.SortOrder
-  currentPlanId?: Prisma.SortOrder
-  razorpayCustomerId?: Prisma.SortOrder
-  razorpaySubscriptionId?: Prisma.SortOrder
-  subscriptionStatus?: Prisma.SortOrder
-  currentPlanStartedAt?: Prisma.SortOrder
-  currentPlanRenewsAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -439,12 +312,6 @@ export type WorkspaceMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   ownerUserId?: Prisma.SortOrder
-  currentPlanId?: Prisma.SortOrder
-  razorpayCustomerId?: Prisma.SortOrder
-  razorpaySubscriptionId?: Prisma.SortOrder
-  subscriptionStatus?: Prisma.SortOrder
-  currentPlanStartedAt?: Prisma.SortOrder
-  currentPlanRenewsAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -453,12 +320,6 @@ export type WorkspaceMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   ownerUserId?: Prisma.SortOrder
-  currentPlanId?: Prisma.SortOrder
-  razorpayCustomerId?: Prisma.SortOrder
-  razorpaySubscriptionId?: Prisma.SortOrder
-  subscriptionStatus?: Prisma.SortOrder
-  currentPlanStartedAt?: Prisma.SortOrder
-  currentPlanRenewsAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -510,10 +371,6 @@ export type WorkspaceUncheckedUpdateManyWithoutOwnerUserNestedInput = {
   deleteMany?: Prisma.WorkspaceScalarWhereInput | Prisma.WorkspaceScalarWhereInput[]
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type WorkspaceCreateNestedOneWithoutProjectsInput = {
   create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutProjectsInput, Prisma.WorkspaceUncheckedCreateWithoutProjectsInput>
   connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutProjectsInput
@@ -530,50 +387,20 @@ export type WorkspaceUpdateOneWithoutProjectsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceUpdateToOneWithWhereWithoutProjectsInput, Prisma.WorkspaceUpdateWithoutProjectsInput>, Prisma.WorkspaceUncheckedUpdateWithoutProjectsInput>
 }
 
-export type WorkspaceCreateNestedOneWithoutBillingWebhookEventsInput = {
-  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutBillingWebhookEventsInput, Prisma.WorkspaceUncheckedCreateWithoutBillingWebhookEventsInput>
-  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutBillingWebhookEventsInput
-  connect?: Prisma.WorkspaceWhereUniqueInput
-}
-
-export type WorkspaceUpdateOneWithoutBillingWebhookEventsNestedInput = {
-  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutBillingWebhookEventsInput, Prisma.WorkspaceUncheckedCreateWithoutBillingWebhookEventsInput>
-  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutBillingWebhookEventsInput
-  upsert?: Prisma.WorkspaceUpsertWithoutBillingWebhookEventsInput
-  disconnect?: Prisma.WorkspaceWhereInput | boolean
-  delete?: Prisma.WorkspaceWhereInput | boolean
-  connect?: Prisma.WorkspaceWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceUpdateToOneWithWhereWithoutBillingWebhookEventsInput, Prisma.WorkspaceUpdateWithoutBillingWebhookEventsInput>, Prisma.WorkspaceUncheckedUpdateWithoutBillingWebhookEventsInput>
-}
-
 export type WorkspaceCreateWithoutOwnerUserInput = {
   id?: string
   name: string
-  currentPlanId?: string
-  razorpayCustomerId?: string | null
-  razorpaySubscriptionId?: string | null
-  subscriptionStatus?: string
-  currentPlanStartedAt?: Date | string | null
-  currentPlanRenewsAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
-  billingWebhookEvents?: Prisma.BillingWebhookEventCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutOwnerUserInput = {
   id?: string
   name: string
-  currentPlanId?: string
-  razorpayCustomerId?: string | null
-  razorpaySubscriptionId?: string | null
-  subscriptionStatus?: string
-  currentPlanStartedAt?: Date | string | null
-  currentPlanRenewsAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
-  billingWebhookEvents?: Prisma.BillingWebhookEventUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutOwnerUserInput = {
@@ -609,12 +436,6 @@ export type WorkspaceScalarWhereInput = {
   id?: Prisma.StringFilter<"Workspace"> | string
   name?: Prisma.StringFilter<"Workspace"> | string
   ownerUserId?: Prisma.StringFilter<"Workspace"> | string
-  currentPlanId?: Prisma.StringFilter<"Workspace"> | string
-  razorpayCustomerId?: Prisma.StringNullableFilter<"Workspace"> | string | null
-  razorpaySubscriptionId?: Prisma.StringNullableFilter<"Workspace"> | string | null
-  subscriptionStatus?: Prisma.StringFilter<"Workspace"> | string
-  currentPlanStartedAt?: Prisma.DateTimeNullableFilter<"Workspace"> | Date | string | null
-  currentPlanRenewsAt?: Prisma.DateTimeNullableFilter<"Workspace"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Workspace"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Workspace"> | Date | string
 }
@@ -622,31 +443,17 @@ export type WorkspaceScalarWhereInput = {
 export type WorkspaceCreateWithoutProjectsInput = {
   id?: string
   name: string
-  currentPlanId?: string
-  razorpayCustomerId?: string | null
-  razorpaySubscriptionId?: string | null
-  subscriptionStatus?: string
-  currentPlanStartedAt?: Date | string | null
-  currentPlanRenewsAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownerUser: Prisma.UserCreateNestedOneWithoutWorkspacesInput
-  billingWebhookEvents?: Prisma.BillingWebhookEventCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutProjectsInput = {
   id?: string
   name: string
   ownerUserId: string
-  currentPlanId?: string
-  razorpayCustomerId?: string | null
-  razorpaySubscriptionId?: string | null
-  subscriptionStatus?: string
-  currentPlanStartedAt?: Date | string | null
-  currentPlanRenewsAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  billingWebhookEvents?: Prisma.BillingWebhookEventUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutProjectsInput = {
@@ -668,118 +475,22 @@ export type WorkspaceUpdateToOneWithWhereWithoutProjectsInput = {
 export type WorkspaceUpdateWithoutProjectsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  currentPlanId?: Prisma.StringFieldUpdateOperationsInput | string
-  razorpayCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  razorpaySubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  currentPlanStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  currentPlanRenewsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerUser?: Prisma.UserUpdateOneRequiredWithoutWorkspacesNestedInput
-  billingWebhookEvents?: Prisma.BillingWebhookEventUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutProjectsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   ownerUserId?: Prisma.StringFieldUpdateOperationsInput | string
-  currentPlanId?: Prisma.StringFieldUpdateOperationsInput | string
-  razorpayCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  razorpaySubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  currentPlanStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  currentPlanRenewsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  billingWebhookEvents?: Prisma.BillingWebhookEventUncheckedUpdateManyWithoutWorkspaceNestedInput
-}
-
-export type WorkspaceCreateWithoutBillingWebhookEventsInput = {
-  id?: string
-  name: string
-  currentPlanId?: string
-  razorpayCustomerId?: string | null
-  razorpaySubscriptionId?: string | null
-  subscriptionStatus?: string
-  currentPlanStartedAt?: Date | string | null
-  currentPlanRenewsAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  ownerUser: Prisma.UserCreateNestedOneWithoutWorkspacesInput
-  projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
-}
-
-export type WorkspaceUncheckedCreateWithoutBillingWebhookEventsInput = {
-  id?: string
-  name: string
-  ownerUserId: string
-  currentPlanId?: string
-  razorpayCustomerId?: string | null
-  razorpaySubscriptionId?: string | null
-  subscriptionStatus?: string
-  currentPlanStartedAt?: Date | string | null
-  currentPlanRenewsAt?: Date | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
-}
-
-export type WorkspaceCreateOrConnectWithoutBillingWebhookEventsInput = {
-  where: Prisma.WorkspaceWhereUniqueInput
-  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutBillingWebhookEventsInput, Prisma.WorkspaceUncheckedCreateWithoutBillingWebhookEventsInput>
-}
-
-export type WorkspaceUpsertWithoutBillingWebhookEventsInput = {
-  update: Prisma.XOR<Prisma.WorkspaceUpdateWithoutBillingWebhookEventsInput, Prisma.WorkspaceUncheckedUpdateWithoutBillingWebhookEventsInput>
-  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutBillingWebhookEventsInput, Prisma.WorkspaceUncheckedCreateWithoutBillingWebhookEventsInput>
-  where?: Prisma.WorkspaceWhereInput
-}
-
-export type WorkspaceUpdateToOneWithWhereWithoutBillingWebhookEventsInput = {
-  where?: Prisma.WorkspaceWhereInput
-  data: Prisma.XOR<Prisma.WorkspaceUpdateWithoutBillingWebhookEventsInput, Prisma.WorkspaceUncheckedUpdateWithoutBillingWebhookEventsInput>
-}
-
-export type WorkspaceUpdateWithoutBillingWebhookEventsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  currentPlanId?: Prisma.StringFieldUpdateOperationsInput | string
-  razorpayCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  razorpaySubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  currentPlanStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  currentPlanRenewsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  ownerUser?: Prisma.UserUpdateOneRequiredWithoutWorkspacesNestedInput
-  projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
-}
-
-export type WorkspaceUncheckedUpdateWithoutBillingWebhookEventsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  ownerUserId?: Prisma.StringFieldUpdateOperationsInput | string
-  currentPlanId?: Prisma.StringFieldUpdateOperationsInput | string
-  razorpayCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  razorpaySubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  currentPlanStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  currentPlanRenewsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateManyOwnerUserInput = {
   id?: string
   name: string
-  currentPlanId?: string
-  razorpayCustomerId?: string | null
-  razorpaySubscriptionId?: string | null
-  subscriptionStatus?: string
-  currentPlanStartedAt?: Date | string | null
-  currentPlanRenewsAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -787,42 +498,22 @@ export type WorkspaceCreateManyOwnerUserInput = {
 export type WorkspaceUpdateWithoutOwnerUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  currentPlanId?: Prisma.StringFieldUpdateOperationsInput | string
-  razorpayCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  razorpaySubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  currentPlanStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  currentPlanRenewsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
-  billingWebhookEvents?: Prisma.BillingWebhookEventUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutOwnerUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  currentPlanId?: Prisma.StringFieldUpdateOperationsInput | string
-  razorpayCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  razorpaySubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  currentPlanStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  currentPlanRenewsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
-  billingWebhookEvents?: Prisma.BillingWebhookEventUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateManyWithoutOwnerUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  currentPlanId?: Prisma.StringFieldUpdateOperationsInput | string
-  razorpayCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  razorpaySubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
-  currentPlanStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  currentPlanRenewsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -834,12 +525,10 @@ export type WorkspaceUncheckedUpdateManyWithoutOwnerUserInput = {
 
 export type WorkspaceCountOutputType = {
   projects: number
-  billingWebhookEvents: number
 }
 
 export type WorkspaceCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   projects?: boolean | WorkspaceCountOutputTypeCountProjectsArgs
-  billingWebhookEvents?: boolean | WorkspaceCountOutputTypeCountBillingWebhookEventsArgs
 }
 
 /**
@@ -859,29 +548,15 @@ export type WorkspaceCountOutputTypeCountProjectsArgs<ExtArgs extends runtime.Ty
   where?: Prisma.ProjectWhereInput
 }
 
-/**
- * WorkspaceCountOutputType without action
- */
-export type WorkspaceCountOutputTypeCountBillingWebhookEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.BillingWebhookEventWhereInput
-}
-
 
 export type WorkspaceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
   ownerUserId?: boolean
-  currentPlanId?: boolean
-  razorpayCustomerId?: boolean
-  razorpaySubscriptionId?: boolean
-  subscriptionStatus?: boolean
-  currentPlanStartedAt?: boolean
-  currentPlanRenewsAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownerUser?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   projects?: boolean | Prisma.Workspace$projectsArgs<ExtArgs>
-  billingWebhookEvents?: boolean | Prisma.Workspace$billingWebhookEventsArgs<ExtArgs>
   _count?: boolean | Prisma.WorkspaceCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["workspace"]>
 
@@ -889,12 +564,6 @@ export type WorkspaceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   id?: boolean
   name?: boolean
   ownerUserId?: boolean
-  currentPlanId?: boolean
-  razorpayCustomerId?: boolean
-  razorpaySubscriptionId?: boolean
-  subscriptionStatus?: boolean
-  currentPlanStartedAt?: boolean
-  currentPlanRenewsAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownerUser?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -904,12 +573,6 @@ export type WorkspaceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   id?: boolean
   name?: boolean
   ownerUserId?: boolean
-  currentPlanId?: boolean
-  razorpayCustomerId?: boolean
-  razorpaySubscriptionId?: boolean
-  subscriptionStatus?: boolean
-  currentPlanStartedAt?: boolean
-  currentPlanRenewsAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownerUser?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -919,21 +582,14 @@ export type WorkspaceSelectScalar = {
   id?: boolean
   name?: boolean
   ownerUserId?: boolean
-  currentPlanId?: boolean
-  razorpayCustomerId?: boolean
-  razorpaySubscriptionId?: boolean
-  subscriptionStatus?: boolean
-  currentPlanStartedAt?: boolean
-  currentPlanRenewsAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type WorkspaceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "ownerUserId" | "currentPlanId" | "razorpayCustomerId" | "razorpaySubscriptionId" | "subscriptionStatus" | "currentPlanStartedAt" | "currentPlanRenewsAt" | "createdAt" | "updatedAt", ExtArgs["result"]["workspace"]>
+export type WorkspaceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "ownerUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["workspace"]>
 export type WorkspaceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ownerUser?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   projects?: boolean | Prisma.Workspace$projectsArgs<ExtArgs>
-  billingWebhookEvents?: boolean | Prisma.Workspace$billingWebhookEventsArgs<ExtArgs>
   _count?: boolean | Prisma.WorkspaceCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type WorkspaceIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -948,18 +604,11 @@ export type $WorkspacePayload<ExtArgs extends runtime.Types.Extensions.InternalA
   objects: {
     ownerUser: Prisma.$UserPayload<ExtArgs>
     projects: Prisma.$ProjectPayload<ExtArgs>[]
-    billingWebhookEvents: Prisma.$BillingWebhookEventPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
     ownerUserId: string
-    currentPlanId: string
-    razorpayCustomerId: string | null
-    razorpaySubscriptionId: string | null
-    subscriptionStatus: string
-    currentPlanStartedAt: Date | null
-    currentPlanRenewsAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["workspace"]>
@@ -1358,7 +1007,6 @@ export interface Prisma__WorkspaceClient<T, Null = never, ExtArgs extends runtim
   readonly [Symbol.toStringTag]: "PrismaPromise"
   ownerUser<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   projects<T extends Prisma.Workspace$projectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$projectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  billingWebhookEvents<T extends Prisma.Workspace$billingWebhookEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$billingWebhookEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BillingWebhookEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1391,12 +1039,6 @@ export interface WorkspaceFieldRefs {
   readonly id: Prisma.FieldRef<"Workspace", 'String'>
   readonly name: Prisma.FieldRef<"Workspace", 'String'>
   readonly ownerUserId: Prisma.FieldRef<"Workspace", 'String'>
-  readonly currentPlanId: Prisma.FieldRef<"Workspace", 'String'>
-  readonly razorpayCustomerId: Prisma.FieldRef<"Workspace", 'String'>
-  readonly razorpaySubscriptionId: Prisma.FieldRef<"Workspace", 'String'>
-  readonly subscriptionStatus: Prisma.FieldRef<"Workspace", 'String'>
-  readonly currentPlanStartedAt: Prisma.FieldRef<"Workspace", 'DateTime'>
-  readonly currentPlanRenewsAt: Prisma.FieldRef<"Workspace", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Workspace", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Workspace", 'DateTime'>
 }
@@ -1821,30 +1463,6 @@ export type Workspace$projectsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.ProjectScalarFieldEnum | Prisma.ProjectScalarFieldEnum[]
-}
-
-/**
- * Workspace.billingWebhookEvents
- */
-export type Workspace$billingWebhookEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the BillingWebhookEvent
-   */
-  select?: Prisma.BillingWebhookEventSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the BillingWebhookEvent
-   */
-  omit?: Prisma.BillingWebhookEventOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.BillingWebhookEventInclude<ExtArgs> | null
-  where?: Prisma.BillingWebhookEventWhereInput
-  orderBy?: Prisma.BillingWebhookEventOrderByWithRelationInput | Prisma.BillingWebhookEventOrderByWithRelationInput[]
-  cursor?: Prisma.BillingWebhookEventWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.BillingWebhookEventScalarFieldEnum | Prisma.BillingWebhookEventScalarFieldEnum[]
 }
 
 /**

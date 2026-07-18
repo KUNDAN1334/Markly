@@ -3,10 +3,9 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { BillingModal } from '@/components/billing/BillingModal';
 import { UploadZone } from '@/components/documents/UploadZone';
-import { Project, Workspace } from '@/types';
-import { Plus, X, FolderOpen, Clock, Trash2, FileText, Sun, Moon, CreditCard } from 'lucide-react';
+import { Project } from '@/types';
+import { Plus, X, FolderOpen, Clock, Trash2, FileText, Sun, Moon } from 'lucide-react';
 
 function ThemeToggle() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
@@ -321,18 +320,8 @@ export default function HomePage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState('');
-  const [userEmail, setUserEmail] = useState('');
-  const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [showNewProject, setShowNewProject] = useState(false);
   const [uploadingProject, setUploadingProject] = useState<Project | null>(null);
-  const [showBilling, setShowBilling] = useState(false);
-
-  async function loadWorkspace() {
-    const workspaceRes = await fetch('/api/workspaces/current');
-    if (!workspaceRes.ok) return;
-    const workspaceData = await workspaceRes.json();
-    setWorkspace(workspaceData);
-  }
 
   useEffect(() => {
     const saved = localStorage.getItem('markly-theme');
@@ -347,9 +336,6 @@ export default function HomePage() {
 
       const session = await sessionRes.json();
       setUserName(session.name || session.email || 'Workspace');
-      setUserEmail(session.email || '');
-
-      await loadWorkspace();
 
       const projectsRes = await fetch('/api/projects');
       if (!projectsRes.ok) {
@@ -375,12 +361,10 @@ export default function HomePage() {
     setProjects((prev) => [project, ...prev]);
     setShowNewProject(false);
     setUploadingProject(project);
-    await loadWorkspace();
   }
 
   async function handleUploaded(documentId: string) {
     setUploadingProject(null);
-    await loadWorkspace();
     router.push(`/editor/${documentId}`);
   }
 
@@ -388,7 +372,6 @@ export default function HomePage() {
     if (!confirm('Delete this project and all its documents?')) return;
     await fetch(`/api/projects/${id}`, { method: 'DELETE' });
     setProjects((prev) => prev.filter((project) => project.id !== id));
-    await loadWorkspace();
   }
 
   return (
@@ -422,27 +405,6 @@ export default function HomePage() {
           </Link>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {workspace && (
-              <button
-                onClick={() => setShowBilling(true)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  background: 'var(--bg-2)',
-                  color: 'var(--text)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 10,
-                  padding: '8px 12px',
-                  fontSize: 12,
-                  cursor: 'pointer',
-                  fontFamily: "'Instrument Sans', sans-serif",
-                }}
-              >
-                <CreditCard size={13} />
-                {workspace.currentPlan.name}
-              </button>
-            )}
             {userName && (
               <span style={{ fontSize: 12, color: 'var(--text-2)', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {userName}
@@ -566,29 +528,7 @@ export default function HomePage() {
                 <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 24, letterSpacing: '-.02em', color: 'var(--text)' }}>
                   Your workspaces
                 </h2>
-                {workspace && (
-                  <p style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 6 }}>
-                    {workspace.currentPlan.name} plan - {workspace.subscriptionStatus.replace('_', ' ')}
-                  </p>
-                )}
               </div>
-              {workspace && (
-                <button
-                  onClick={() => setShowBilling(true)}
-                  style={{
-                    background: 'transparent',
-                    color: 'var(--text-2)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 10,
-                    padding: '8px 12px',
-                    fontSize: 12,
-                    cursor: 'pointer',
-                    fontFamily: "'Instrument Sans', sans-serif",
-                  }}
-                >
-                  Manage billing
-                </button>
-              )}
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
@@ -640,13 +580,6 @@ export default function HomePage() {
 
       {showNewProject && <NewProjectModal onClose={() => setShowNewProject(false)} onCreate={handleProjectCreated} />}
       {uploadingProject && <UploadModal project={uploadingProject} onClose={() => setUploadingProject(null)} onUploaded={handleUploaded} />}
-      <BillingModal
-        open={showBilling}
-        onClose={() => setShowBilling(false)}
-        workspace={workspace}
-        currentUser={{ name: userName, email: userEmail }}
-        onWorkspaceRefresh={loadWorkspace}
-      />
     </div>
   );
 }

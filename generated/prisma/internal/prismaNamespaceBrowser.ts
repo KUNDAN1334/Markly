@@ -57,8 +57,7 @@ export const ModelName = {
   Document: 'Document',
   Annotation: 'Annotation',
   Comment: 'Comment',
-  ShareLink: 'ShareLink',
-  BillingWebhookEvent: 'BillingWebhookEvent'
+  ShareLink: 'ShareLink'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -94,12 +93,6 @@ export const WorkspaceScalarFieldEnum = {
   id: 'id',
   name: 'name',
   ownerUserId: 'ownerUserId',
-  currentPlanId: 'currentPlanId',
-  razorpayCustomerId: 'razorpayCustomerId',
-  razorpaySubscriptionId: 'razorpaySubscriptionId',
-  subscriptionStatus: 'subscriptionStatus',
-  currentPlanStartedAt: 'currentPlanStartedAt',
-  currentPlanRenewsAt: 'currentPlanRenewsAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -178,19 +171,6 @@ export const ShareLinkScalarFieldEnum = {
 } as const
 
 export type ShareLinkScalarFieldEnum = (typeof ShareLinkScalarFieldEnum)[keyof typeof ShareLinkScalarFieldEnum]
-
-
-export const BillingWebhookEventScalarFieldEnum = {
-  id: 'id',
-  workspaceId: 'workspaceId',
-  razorpayEventId: 'razorpayEventId',
-  razorpayEntityId: 'razorpayEntityId',
-  event: 'event',
-  payload: 'payload',
-  createdAt: 'createdAt'
-} as const
-
-export type BillingWebhookEventScalarFieldEnum = (typeof BillingWebhookEventScalarFieldEnum)[keyof typeof BillingWebhookEventScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -269,7 +269,7 @@ useEffect(() => {
 
 <div className="mockup-wrap anim d4" style={{marginTop:56}} ref={mockupRef}>
   <style>{`
-    @font-face{font-family:'Virgil';src:url('https://excalidraw.com/Virgil.woff2') format('woff2');font-display:swap;}
+    @font-face{font-family:'Virgil';src:url('/fonts/Virgil.woff2') format('woff2');font-display:swap;}
     .mkly-canvas{position:relative;overflow:hidden;flex:1;align-self:stretch;}
     .mkly-world{position:absolute;inset:0;transform-origin:0 0;will-change:transform;}
     .mkly-pdf{position:absolute;background:white;box-shadow:0 4px 16px rgba(0,0,0,.08);border-radius:3px;padding:26px 26px 34px;width:290px;}

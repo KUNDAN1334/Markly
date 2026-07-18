@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { EditorState, Tool, Annotation } from '@/types';
+import { DEFAULT_FONT_ID } from '@/lib/fonts';
 
 interface EditorStore extends EditorState {
   // Tool actions
@@ -13,6 +14,7 @@ interface EditorStore extends EditorState {
   setFillColor: (color: string) => void;
   setStrokeWidth: (width: number) => void;
   setFontSize: (size: number) => void;
+  setFontFamily: (fontFamily: string) => void;
   setOpacity: (opacity: number) => void;
 
   // Viewport actions
@@ -43,6 +45,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   fillColor: 'transparent',
   strokeWidth: 2,
   fontSize: 18,
+  fontFamily: DEFAULT_FONT_ID,
   opacity: 1,
   zoom: 1,
   currentPage: 1,
@@ -68,6 +71,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   setFillColor: (color) => set({ fillColor: color }),
   setStrokeWidth: (width) => set({ strokeWidth: width }),
   setFontSize: (size) => set({ fontSize: size }),
+  setFontFamily: (fontFamily) => set({ fontFamily }),
   setOpacity: (opacity) => set({ opacity }),
 
   // Viewport actions

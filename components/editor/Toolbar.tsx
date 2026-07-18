@@ -2,6 +2,7 @@
 
 import { useEditorStore } from '@/lib/store';
 import { AnnotationStyle, Tool } from '@/types';
+import { FONT_OPTIONS } from '@/lib/fonts';
 import {
   MousePointer2, Square, Circle, Minus, ArrowRight,
   Highlighter, Pen, Type, ZoomIn, ZoomOut, Save,
@@ -37,6 +38,7 @@ export function Toolbar({ onSave, onExport, onShare, isSaving, isDirty, onUpdate
     strokeColor, setStrokeColor,
     strokeWidth, setStrokeWidth,
     fontSize, setFontSize,
+    fontFamily, setFontFamily,
     opacity, setOpacity,
     zoom, zoomIn, zoomOut, setZoom,
     currentPage, totalPages, setCurrentPage,
@@ -56,6 +58,11 @@ export function Toolbar({ onSave, onExport, onShare, isSaving, isDirty, onUpdate
   function updateFontSize(size: number) {
     setFontSize(size);
     onUpdateSelectedStyle?.({ fontSize: size });
+  }
+
+  function updateFontFamily(family: string) {
+    setFontFamily(family);
+    onUpdateSelectedStyle?.({ fontFamily: family });
   }
 
   function updateOpacity(nextOpacity: number) {
@@ -146,9 +153,29 @@ export function Toolbar({ onSave, onExport, onShare, isSaving, isDirty, onUpdate
 
       {divider}
 
-      {/* FONT SIZE - only for text tool */}
+      {/* FONT FAMILY + SIZE - only for text tool */}
       {activeTool === 'text' && (
         <>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '0 10px' }}>
+            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-3)' }}>Font</span>
+            <select
+              value={fontFamily}
+              onChange={(e) => updateFontFamily(e.target.value)}
+              title="Font family"
+              style={{
+                background: 'var(--bg-2)', border: '1px solid var(--border)',
+                borderRadius: 6, padding: '3px 6px', fontSize: 12, color: 'var(--text)',
+                fontFamily: FONT_OPTIONS.find((f) => f.id === fontFamily)?.cssStack,
+                cursor: 'pointer', maxWidth: 150,
+              }}
+            >
+              {FONT_OPTIONS.map((font) => (
+                <option key={font.id} value={font.id} style={{ fontFamily: font.cssStack }}>
+                  {font.label}
+                </option>
+              ))}
+            </select>
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '0 10px' }}>
             <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--text-3)' }}>Size</span>
             <select

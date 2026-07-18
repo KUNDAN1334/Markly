@@ -43,6 +43,7 @@ export type CommentMinAggregateOutputType = {
   authorName: string | null
   pageNumber: number | null
   resolved: boolean | null
+  isInternal: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -56,6 +57,7 @@ export type CommentMaxAggregateOutputType = {
   authorName: string | null
   pageNumber: number | null
   resolved: boolean | null
+  isInternal: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -69,6 +71,7 @@ export type CommentCountAggregateOutputType = {
   authorName: number
   pageNumber: number
   resolved: number
+  isInternal: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -92,6 +95,7 @@ export type CommentMinAggregateInputType = {
   authorName?: true
   pageNumber?: true
   resolved?: true
+  isInternal?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -105,6 +109,7 @@ export type CommentMaxAggregateInputType = {
   authorName?: true
   pageNumber?: true
   resolved?: true
+  isInternal?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -118,6 +123,7 @@ export type CommentCountAggregateInputType = {
   authorName?: true
   pageNumber?: true
   resolved?: true
+  isInternal?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -218,6 +224,7 @@ export type CommentGroupByOutputType = {
   authorName: string | null
   pageNumber: number
   resolved: boolean
+  isInternal: boolean
   createdAt: Date
   updatedAt: Date
   _count: CommentCountAggregateOutputType | null
@@ -254,6 +261,7 @@ export type CommentWhereInput = {
   authorName?: Prisma.StringNullableFilter<"Comment"> | string | null
   pageNumber?: Prisma.IntFilter<"Comment"> | number
   resolved?: Prisma.BoolFilter<"Comment"> | boolean
+  isInternal?: Prisma.BoolFilter<"Comment"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Comment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Comment"> | Date | string
   document?: Prisma.XOR<Prisma.DocumentScalarRelationFilter, Prisma.DocumentWhereInput>
@@ -270,6 +278,7 @@ export type CommentOrderByWithRelationInput = {
   authorName?: Prisma.SortOrderInput | Prisma.SortOrder
   pageNumber?: Prisma.SortOrder
   resolved?: Prisma.SortOrder
+  isInternal?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   document?: Prisma.DocumentOrderByWithRelationInput
@@ -289,6 +298,7 @@ export type CommentWhereUniqueInput = Prisma.AtLeast<{
   authorName?: Prisma.StringNullableFilter<"Comment"> | string | null
   pageNumber?: Prisma.IntFilter<"Comment"> | number
   resolved?: Prisma.BoolFilter<"Comment"> | boolean
+  isInternal?: Prisma.BoolFilter<"Comment"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Comment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Comment"> | Date | string
   document?: Prisma.XOR<Prisma.DocumentScalarRelationFilter, Prisma.DocumentWhereInput>
@@ -305,6 +315,7 @@ export type CommentOrderByWithAggregationInput = {
   authorName?: Prisma.SortOrderInput | Prisma.SortOrder
   pageNumber?: Prisma.SortOrder
   resolved?: Prisma.SortOrder
+  isInternal?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.CommentCountOrderByAggregateInput
@@ -326,6 +337,7 @@ export type CommentScalarWhereWithAggregatesInput = {
   authorName?: Prisma.StringNullableWithAggregatesFilter<"Comment"> | string | null
   pageNumber?: Prisma.IntWithAggregatesFilter<"Comment"> | number
   resolved?: Prisma.BoolWithAggregatesFilter<"Comment"> | boolean
+  isInternal?: Prisma.BoolWithAggregatesFilter<"Comment"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Comment"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Comment"> | Date | string
 }
@@ -336,6 +348,7 @@ export type CommentCreateInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  isInternal?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   document: Prisma.DocumentCreateNestedOneWithoutCommentsInput
@@ -352,6 +365,7 @@ export type CommentUncheckedCreateInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  isInternal?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -362,6 +376,7 @@ export type CommentUpdateInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isInternal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   document?: Prisma.DocumentUpdateOneRequiredWithoutCommentsNestedInput
@@ -378,6 +393,7 @@ export type CommentUncheckedUpdateInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isInternal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -391,6 +407,7 @@ export type CommentCreateManyInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  isInternal?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -401,6 +418,7 @@ export type CommentUpdateManyMutationInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isInternal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -414,6 +432,7 @@ export type CommentUncheckedUpdateManyInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isInternal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -437,6 +456,7 @@ export type CommentCountOrderByAggregateInput = {
   authorName?: Prisma.SortOrder
   pageNumber?: Prisma.SortOrder
   resolved?: Prisma.SortOrder
+  isInternal?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -454,6 +474,7 @@ export type CommentMaxOrderByAggregateInput = {
   authorName?: Prisma.SortOrder
   pageNumber?: Prisma.SortOrder
   resolved?: Prisma.SortOrder
+  isInternal?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -467,6 +488,7 @@ export type CommentMinOrderByAggregateInput = {
   authorName?: Prisma.SortOrder
   pageNumber?: Prisma.SortOrder
   resolved?: Prisma.SortOrder
+  isInternal?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -607,6 +629,7 @@ export type CommentCreateWithoutAuthorUserInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  isInternal?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   document: Prisma.DocumentCreateNestedOneWithoutCommentsInput
@@ -621,6 +644,7 @@ export type CommentUncheckedCreateWithoutAuthorUserInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  isInternal?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -663,6 +687,7 @@ export type CommentScalarWhereInput = {
   authorName?: Prisma.StringNullableFilter<"Comment"> | string | null
   pageNumber?: Prisma.IntFilter<"Comment"> | number
   resolved?: Prisma.BoolFilter<"Comment"> | boolean
+  isInternal?: Prisma.BoolFilter<"Comment"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Comment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Comment"> | Date | string
 }
@@ -673,6 +698,7 @@ export type CommentCreateWithoutDocumentInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  isInternal?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   annotation?: Prisma.AnnotationCreateNestedOneWithoutCommentsInput
@@ -687,6 +713,7 @@ export type CommentUncheckedCreateWithoutDocumentInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  isInternal?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -723,6 +750,7 @@ export type CommentCreateWithoutAnnotationInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  isInternal?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   document: Prisma.DocumentCreateNestedOneWithoutCommentsInput
@@ -737,6 +765,7 @@ export type CommentUncheckedCreateWithoutAnnotationInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  isInternal?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -775,6 +804,7 @@ export type CommentCreateManyAuthorUserInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  isInternal?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -785,6 +815,7 @@ export type CommentUpdateWithoutAuthorUserInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isInternal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   document?: Prisma.DocumentUpdateOneRequiredWithoutCommentsNestedInput
@@ -799,6 +830,7 @@ export type CommentUncheckedUpdateWithoutAuthorUserInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isInternal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -811,6 +843,7 @@ export type CommentUncheckedUpdateManyWithoutAuthorUserInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isInternal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -823,6 +856,7 @@ export type CommentCreateManyDocumentInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  isInternal?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -833,6 +867,7 @@ export type CommentUpdateWithoutDocumentInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isInternal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   annotation?: Prisma.AnnotationUpdateOneWithoutCommentsNestedInput
@@ -847,6 +882,7 @@ export type CommentUncheckedUpdateWithoutDocumentInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isInternal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -859,6 +895,7 @@ export type CommentUncheckedUpdateManyWithoutDocumentInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isInternal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -871,6 +908,7 @@ export type CommentCreateManyAnnotationInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  isInternal?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -881,6 +919,7 @@ export type CommentUpdateWithoutAnnotationInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isInternal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   document?: Prisma.DocumentUpdateOneRequiredWithoutCommentsNestedInput
@@ -895,6 +934,7 @@ export type CommentUncheckedUpdateWithoutAnnotationInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isInternal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -907,6 +947,7 @@ export type CommentUncheckedUpdateManyWithoutAnnotationInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isInternal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -922,6 +963,7 @@ export type CommentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   authorName?: boolean
   pageNumber?: boolean
   resolved?: boolean
+  isInternal?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   document?: boolean | Prisma.DocumentDefaultArgs<ExtArgs>
@@ -938,6 +980,7 @@ export type CommentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   authorName?: boolean
   pageNumber?: boolean
   resolved?: boolean
+  isInternal?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   document?: boolean | Prisma.DocumentDefaultArgs<ExtArgs>
@@ -954,6 +997,7 @@ export type CommentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   authorName?: boolean
   pageNumber?: boolean
   resolved?: boolean
+  isInternal?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   document?: boolean | Prisma.DocumentDefaultArgs<ExtArgs>
@@ -970,11 +1014,12 @@ export type CommentSelectScalar = {
   authorName?: boolean
   pageNumber?: boolean
   resolved?: boolean
+  isInternal?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type CommentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "content" | "documentId" | "annotationId" | "authorUserId" | "authorName" | "pageNumber" | "resolved" | "createdAt" | "updatedAt", ExtArgs["result"]["comment"]>
+export type CommentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "content" | "documentId" | "annotationId" | "authorUserId" | "authorName" | "pageNumber" | "resolved" | "isInternal" | "createdAt" | "updatedAt", ExtArgs["result"]["comment"]>
 export type CommentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   document?: boolean | Prisma.DocumentDefaultArgs<ExtArgs>
   annotation?: boolean | Prisma.Comment$annotationArgs<ExtArgs>
@@ -1007,6 +1052,7 @@ export type $CommentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     authorName: string | null
     pageNumber: number
     resolved: boolean
+    isInternal: boolean
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["comment"]>
@@ -1443,6 +1489,7 @@ export interface CommentFieldRefs {
   readonly authorName: Prisma.FieldRef<"Comment", 'String'>
   readonly pageNumber: Prisma.FieldRef<"Comment", 'Int'>
   readonly resolved: Prisma.FieldRef<"Comment", 'Boolean'>
+  readonly isInternal: Prisma.FieldRef<"Comment", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Comment", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Comment", 'DateTime'>
 }

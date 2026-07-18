@@ -5,8 +5,11 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BillingModal } from '@/components/billing/BillingModal';
 import { UploadZone } from '@/components/documents/UploadZone';
+import { WorkspaceSwitcher } from '@/components/workspace/WorkspaceSwitcher';
+import { MembersModal } from '@/components/workspace/MembersModal';
+import { roleCanEdit, roleCanManageWorkspace } from '@/lib/rbac-ui';
 import { Project, Workspace } from '@/types';
-import { Plus, X, FolderOpen, Clock, Trash2, FileText, Sun, Moon, CreditCard } from 'lucide-react';
+import { Plus, X, FolderOpen, Clock, Trash2, FileText, Sun, Moon, CreditCard, Users } from 'lucide-react';
 
 function ThemeToggle() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
@@ -168,11 +171,13 @@ function UploadModal({ project, onClose, onUploaded }: { project: Project; onClo
   );
 }
 
-function ProjectCard({ project, onUpload, onDelete, onOpenDoc }: {
+function ProjectCard({ project, onUpload, onDelete, onOpenDoc, canEdit, canDelete }: {
   project: Project;
   onUpload: () => void;
   onDelete: () => void;
   onOpenDoc: (id: string) => void;
+  canEdit: boolean;
+  canDelete: boolean;
 }) {
   const [hovered, setHovered] = useState(false);
 
@@ -205,6 +210,7 @@ function ProjectCard({ project, onUpload, onDelete, onOpenDoc }: {
           }}>
             <FolderOpen size={15} style={{ color: hovered ? 'var(--accent-fg)' : 'var(--text-3)' }} />
           </div>
+          {canDelete && (
           <button
             onClick={onDelete}
             title="Delete project"
@@ -233,6 +239,7 @@ function ProjectCard({ project, onUpload, onDelete, onOpenDoc }: {
           >
             <Trash2 size={13} />
           </button>
+          )}
         </div>
         <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: 16, letterSpacing: '-.01em', color: 'var(--text)', marginBottom: 4 }}>
           {project.name}
@@ -281,6 +288,7 @@ function ProjectCard({ project, onUpload, onDelete, onOpenDoc }: {
         )}
       </div>
 
+      {canEdit && (
       <div className="px-3 pb-3">
         <button
           onClick={onUpload}
@@ -312,6 +320,7 @@ function ProjectCard({ project, onUpload, onDelete, onOpenDoc }: {
           <Plus size={12} /> Upload PDF/DOCX
         </button>
       </div>
+      )}
     </div>
   );
 }
@@ -326,12 +335,29 @@ export default function HomePage() {
   const [showNewProject, setShowNewProject] = useState(false);
   const [uploadingProject, setUploadingProject] = useState<Project | null>(null);
   const [showBilling, setShowBilling] = useState(false);
+  const [showMembers, setShowMembers] = useState(false);
+
+  // Soft role gating — the API enforces these rules regardless.
+  const myRole = workspace?.myRole;
+  const canEditWorkspace = roleCanEdit(myRole);
+  const canManageWorkspace = roleCanManageWorkspace(myRole);
 
   async function loadWorkspace() {
     const workspaceRes = await fetch('/api/workspaces/current');
     if (!workspaceRes.ok) return;
     const workspaceData = await workspaceRes.json();
     setWorkspace(workspaceData);
+  }
+
+  async function loadProjects() {
+    const projectsRes = await fetch('/api/projects');
+    if (projectsRes.ok) setProjects(await projectsRes.json());
+  }
+
+  async function handleWorkspaceSwitched() {
+    setLoading(true);
+    await Promise.all([loadWorkspace(), loadProjects()]);
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -423,6 +449,35 @@ export default function HomePage() {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {workspace && (
+              <WorkspaceSwitcher
+                currentWorkspaceId={workspace.id}
+                currentWorkspaceName={workspace.name}
+                onSwitched={handleWorkspaceSwitched}
+              />
+            )}
+            {workspace && (
+              <button
+                onClick={() => setShowMembers(true)}
+                title="Workspace members"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  background: 'var(--bg-2)',
+                  color: 'var(--text)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 10,
+                  padding: '8px 12px',
+                  fontSize: 12,
+                  cursor: 'pointer',
+                  fontFamily: "'Instrument Sans', sans-serif",
+                }}
+              >
+                <Users size={13} />
+                {workspace.memberCount || 1}
+              </button>
+            )}
+            {workspace && canManageWorkspace && (
               <button
                 onClick={() => setShowBilling(true)}
                 style={{
@@ -466,6 +521,7 @@ export default function HomePage() {
             </button>
           </div>
 
+          {canEditWorkspace && (
           <button
             onClick={() => setShowNewProject(true)}
             style={{
@@ -488,6 +544,7 @@ export default function HomePage() {
           >
             <Plus size={14} /> New Project
           </button>
+          )}
         </div>
       </nav>
 
@@ -513,6 +570,7 @@ export default function HomePage() {
             <p style={{ fontSize: 15, color: 'var(--text-2)', maxWidth: 380, margin: '0 auto 32px', lineHeight: 1.6 }}>
               Annotate PDFs and DOCX files with Excalidraw-style tools. Share with a link - no login required.
             </p>
+            {canEditWorkspace && (
             <button
               onClick={() => setShowNewProject(true)}
               style={{
@@ -532,6 +590,7 @@ export default function HomePage() {
             >
               <Plus size={15} /> Create your first project
             </button>
+            )}
           </div>
         )}
 
@@ -564,15 +623,16 @@ export default function HomePage() {
                   </span>
                 </div>
                 <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 24, letterSpacing: '-.02em', color: 'var(--text)' }}>
-                  Your workspaces
+                  {workspace?.name || 'Your workspace'}
                 </h2>
                 {workspace && (
                   <p style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 6 }}>
                     {workspace.currentPlan.name} plan - {workspace.subscriptionStatus.replace('_', ' ')}
+                    {myRole ? ` - your role: ${myRole.charAt(0) + myRole.slice(1).toLowerCase()}` : ''}
                   </p>
                 )}
               </div>
-              {workspace && (
+              {workspace && canManageWorkspace && (
                 <button
                   onClick={() => setShowBilling(true)}
                   style={{
@@ -599,10 +659,13 @@ export default function HomePage() {
                     onUpload={() => setUploadingProject(project)}
                     onDelete={() => handleDeleteProject(project.id)}
                     onOpenDoc={(id) => router.push(`/editor/${id}`)}
+                    canEdit={canEditWorkspace}
+                    canDelete={canManageWorkspace}
                   />
                 </div>
               ))}
 
+              {canEditWorkspace && (
               <button
                 onClick={() => setShowNewProject(true)}
                 style={{
@@ -633,6 +696,7 @@ export default function HomePage() {
                 </div>
                 <span style={{ fontSize: 13, color: 'var(--text-3)', fontFamily: "'Instrument Sans', sans-serif" }}>New project</span>
               </button>
+              )}
             </div>
           </div>
         )}
@@ -640,6 +704,14 @@ export default function HomePage() {
 
       {showNewProject && <NewProjectModal onClose={() => setShowNewProject(false)} onCreate={handleProjectCreated} />}
       {uploadingProject && <UploadModal project={uploadingProject} onClose={() => setUploadingProject(null)} onUploaded={handleUploaded} />}
+      {showMembers && workspace && (
+        <MembersModal
+          workspaceId={workspace.id}
+          workspaceName={workspace.name}
+          myRole={myRole || 'VIEWER'}
+          onClose={() => setShowMembers(false)}
+        />
+      )}
       <BillingModal
         open={showBilling}
         onClose={() => setShowBilling(false)}

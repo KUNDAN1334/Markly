@@ -30,9 +30,23 @@ interface ToolbarProps {
   isSaving: boolean;
   isDirty: boolean;
   onUpdateSelectedStyle?: (style: Partial<AnnotationStyle>) => void;
+  /** Hides editing tools + save (VIEWER/COMMENTER roles). */
+  readOnly?: boolean;
+  canShare?: boolean;
+  canExport?: boolean;
 }
 
-export function Toolbar({ onSave, onExport, onShare, isSaving, isDirty, onUpdateSelectedStyle }: ToolbarProps) {
+export function Toolbar({
+  onSave,
+  onExport,
+  onShare,
+  isSaving,
+  isDirty,
+  onUpdateSelectedStyle,
+  readOnly = false,
+  canShare = true,
+  canExport = true,
+}: ToolbarProps) {
   const {
     activeTool, setActiveTool,
     strokeColor, setStrokeColor,
@@ -79,7 +93,8 @@ export function Toolbar({ onSave, onExport, onShare, isSaving, isDirty, onUpdate
       flexShrink: 0, overflowX: 'auto', position: 'relative', zIndex: 10,
     }}>
 
-      {/* TOOLS */}
+      {/* TOOLS + STYLE CONTROLS (hidden in read-only mode) */}
+      {!readOnly && (<>
       <div style={{ display: 'flex', alignItems: 'center', gap: 2, paddingRight: 8 }}>
         {TOOLS.map((tool) => (
           <button
@@ -226,6 +241,7 @@ export function Toolbar({ onSave, onExport, onShare, isSaving, isDirty, onUpdate
       </div>
 
       {divider}
+      </>)}
 
       {/* PAGE NAV */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '0 8px' }}>
@@ -265,8 +281,8 @@ export function Toolbar({ onSave, onExport, onShare, isSaving, isDirty, onUpdate
 
       {/* ACTIONS */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        
 
+        {!readOnly && (
         <button
           onClick={onSave} disabled={isSaving || !isDirty}
           style={{
@@ -281,7 +297,9 @@ export function Toolbar({ onSave, onExport, onShare, isSaving, isDirty, onUpdate
           <Save size={12} />
           {isSaving ? 'Saving...' : isDirty ? 'Save*' : 'Saved'}
         </button>
+        )}
 
+        {canShare && (
         <button
           onClick={onShare}
           style={{
@@ -296,7 +314,9 @@ export function Toolbar({ onSave, onExport, onShare, isSaving, isDirty, onUpdate
         >
           <Share2 size={12} /> Share
         </button>
+        )}
 
+        {canExport && (
         <button
           onClick={onExport}
           style={{
@@ -311,6 +331,7 @@ export function Toolbar({ onSave, onExport, onShare, isSaving, isDirty, onUpdate
         >
           <Download size={12} /> Export PDF
         </button>
+        )}
       </div>
     </div>
   );

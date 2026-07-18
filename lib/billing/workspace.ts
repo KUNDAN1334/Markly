@@ -18,6 +18,14 @@ export async function ensureWorkspaceForUser(user: User) {
     });
   }
 
+  // Owner is always a member with the OWNER role (explicit row keeps
+  // member listings and role queries uniform).
+  await prisma.workspaceMembership.upsert({
+    where: { userId_workspaceId: { userId: user.id, workspaceId: workspace.id } },
+    update: { role: 'OWNER' },
+    create: { userId: user.id, workspaceId: workspace.id, role: 'OWNER' },
+  });
+
   await prisma.project.updateMany({
     where: {
       ownerId: user.id,
@@ -26,6 +34,23 @@ export async function ensureWorkspaceForUser(user: User) {
     data: {
       workspaceId: workspace.id,
     },
+  });
+
+  // Backfill workspace ownership onto legacy documents and share links.
+  await prisma.document.updateMany({
+    where: {
+      workspaceId: null,
+      project: { workspaceId: workspace.id },
+    },
+    data: { workspaceId: workspace.id },
+  });
+
+  await prisma.shareLink.updateMany({
+    where: {
+      workspaceId: null,
+      project: { workspaceId: workspace.id },
+    },
+    data: { workspaceId: workspace.id },
   });
 
   return workspace;

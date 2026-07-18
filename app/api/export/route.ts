@@ -107,11 +107,18 @@ export async function GET(req: NextRequest) {
     if (token) {
       headers.set('x-share-token', token);
     }
+    const password = searchParams.get('password');
+    if (password) {
+      headers.set('x-share-password', password);
+    }
 
+    // Share links export at VIEW-level link access; workspace members need
+    // the EDITOR role (COMMENTER/VIEWER cannot export).
     const access = await authorizeDocumentAccess(
       new Request(req.url, { headers }),
       documentId,
-      'VIEW'
+      'VIEW',
+      'EDITOR'
     );
     if (!access.ok) return access.response;
 

@@ -43,6 +43,7 @@ export type DocumentMinAggregateOutputType = {
   path: string | null
   isVisible: boolean | null
   projectId: string | null
+  workspaceId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -56,6 +57,7 @@ export type DocumentMaxAggregateOutputType = {
   path: string | null
   isVisible: boolean | null
   projectId: string | null
+  workspaceId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -69,6 +71,7 @@ export type DocumentCountAggregateOutputType = {
   path: number
   isVisible: number
   projectId: number
+  workspaceId: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -92,6 +95,7 @@ export type DocumentMinAggregateInputType = {
   path?: true
   isVisible?: true
   projectId?: true
+  workspaceId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -105,6 +109,7 @@ export type DocumentMaxAggregateInputType = {
   path?: true
   isVisible?: true
   projectId?: true
+  workspaceId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -118,6 +123,7 @@ export type DocumentCountAggregateInputType = {
   path?: true
   isVisible?: true
   projectId?: true
+  workspaceId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -218,6 +224,7 @@ export type DocumentGroupByOutputType = {
   path: string
   isVisible: boolean
   projectId: string
+  workspaceId: string | null
   createdAt: Date
   updatedAt: Date
   _count: DocumentCountAggregateOutputType | null
@@ -254,9 +261,11 @@ export type DocumentWhereInput = {
   path?: Prisma.StringFilter<"Document"> | string
   isVisible?: Prisma.BoolFilter<"Document"> | boolean
   projectId?: Prisma.StringFilter<"Document"> | string
+  workspaceId?: Prisma.StringNullableFilter<"Document"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Document"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Document"> | Date | string
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
+  workspace?: Prisma.XOR<Prisma.WorkspaceNullableScalarRelationFilter, Prisma.WorkspaceWhereInput> | null
   annotations?: Prisma.AnnotationListRelationFilter
   comments?: Prisma.CommentListRelationFilter
   shareLinks?: Prisma.ShareLinkListRelationFilter
@@ -271,9 +280,11 @@ export type DocumentOrderByWithRelationInput = {
   path?: Prisma.SortOrder
   isVisible?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   project?: Prisma.ProjectOrderByWithRelationInput
+  workspace?: Prisma.WorkspaceOrderByWithRelationInput
   annotations?: Prisma.AnnotationOrderByRelationAggregateInput
   comments?: Prisma.CommentOrderByRelationAggregateInput
   shareLinks?: Prisma.ShareLinkOrderByRelationAggregateInput
@@ -291,9 +302,11 @@ export type DocumentWhereUniqueInput = Prisma.AtLeast<{
   path?: Prisma.StringFilter<"Document"> | string
   isVisible?: Prisma.BoolFilter<"Document"> | boolean
   projectId?: Prisma.StringFilter<"Document"> | string
+  workspaceId?: Prisma.StringNullableFilter<"Document"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Document"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Document"> | Date | string
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
+  workspace?: Prisma.XOR<Prisma.WorkspaceNullableScalarRelationFilter, Prisma.WorkspaceWhereInput> | null
   annotations?: Prisma.AnnotationListRelationFilter
   comments?: Prisma.CommentListRelationFilter
   shareLinks?: Prisma.ShareLinkListRelationFilter
@@ -308,6 +321,7 @@ export type DocumentOrderByWithAggregationInput = {
   path?: Prisma.SortOrder
   isVisible?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.DocumentCountOrderByAggregateInput
@@ -329,6 +343,7 @@ export type DocumentScalarWhereWithAggregatesInput = {
   path?: Prisma.StringWithAggregatesFilter<"Document"> | string
   isVisible?: Prisma.BoolWithAggregatesFilter<"Document"> | boolean
   projectId?: Prisma.StringWithAggregatesFilter<"Document"> | string
+  workspaceId?: Prisma.StringNullableWithAggregatesFilter<"Document"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Document"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Document"> | Date | string
 }
@@ -344,6 +359,7 @@ export type DocumentCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   project: Prisma.ProjectCreateNestedOneWithoutDocumentsInput
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutDocumentsInput
   annotations?: Prisma.AnnotationCreateNestedManyWithoutDocumentInput
   comments?: Prisma.CommentCreateNestedManyWithoutDocumentInput
   shareLinks?: Prisma.ShareLinkCreateNestedManyWithoutDocumentInput
@@ -358,6 +374,7 @@ export type DocumentUncheckedCreateInput = {
   path: string
   isVisible?: boolean
   projectId: string
+  workspaceId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   annotations?: Prisma.AnnotationUncheckedCreateNestedManyWithoutDocumentInput
@@ -376,6 +393,7 @@ export type DocumentUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.ProjectUpdateOneRequiredWithoutDocumentsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneWithoutDocumentsNestedInput
   annotations?: Prisma.AnnotationUpdateManyWithoutDocumentNestedInput
   comments?: Prisma.CommentUpdateManyWithoutDocumentNestedInput
   shareLinks?: Prisma.ShareLinkUpdateManyWithoutDocumentNestedInput
@@ -390,6 +408,7 @@ export type DocumentUncheckedUpdateInput = {
   path?: Prisma.StringFieldUpdateOperationsInput | string
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   annotations?: Prisma.AnnotationUncheckedUpdateManyWithoutDocumentNestedInput
@@ -406,6 +425,7 @@ export type DocumentCreateManyInput = {
   path: string
   isVisible?: boolean
   projectId: string
+  workspaceId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -431,6 +451,7 @@ export type DocumentUncheckedUpdateManyInput = {
   path?: Prisma.StringFieldUpdateOperationsInput | string
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -454,6 +475,7 @@ export type DocumentCountOrderByAggregateInput = {
   path?: Prisma.SortOrder
   isVisible?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -471,6 +493,7 @@ export type DocumentMaxOrderByAggregateInput = {
   path?: Prisma.SortOrder
   isVisible?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -484,6 +507,7 @@ export type DocumentMinOrderByAggregateInput = {
   path?: Prisma.SortOrder
   isVisible?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
+  workspaceId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -500,6 +524,48 @@ export type DocumentScalarRelationFilter = {
 export type DocumentNullableScalarRelationFilter = {
   is?: Prisma.DocumentWhereInput | null
   isNot?: Prisma.DocumentWhereInput | null
+}
+
+export type DocumentCreateNestedManyWithoutWorkspaceInput = {
+  create?: Prisma.XOR<Prisma.DocumentCreateWithoutWorkspaceInput, Prisma.DocumentUncheckedCreateWithoutWorkspaceInput> | Prisma.DocumentCreateWithoutWorkspaceInput[] | Prisma.DocumentUncheckedCreateWithoutWorkspaceInput[]
+  connectOrCreate?: Prisma.DocumentCreateOrConnectWithoutWorkspaceInput | Prisma.DocumentCreateOrConnectWithoutWorkspaceInput[]
+  createMany?: Prisma.DocumentCreateManyWorkspaceInputEnvelope
+  connect?: Prisma.DocumentWhereUniqueInput | Prisma.DocumentWhereUniqueInput[]
+}
+
+export type DocumentUncheckedCreateNestedManyWithoutWorkspaceInput = {
+  create?: Prisma.XOR<Prisma.DocumentCreateWithoutWorkspaceInput, Prisma.DocumentUncheckedCreateWithoutWorkspaceInput> | Prisma.DocumentCreateWithoutWorkspaceInput[] | Prisma.DocumentUncheckedCreateWithoutWorkspaceInput[]
+  connectOrCreate?: Prisma.DocumentCreateOrConnectWithoutWorkspaceInput | Prisma.DocumentCreateOrConnectWithoutWorkspaceInput[]
+  createMany?: Prisma.DocumentCreateManyWorkspaceInputEnvelope
+  connect?: Prisma.DocumentWhereUniqueInput | Prisma.DocumentWhereUniqueInput[]
+}
+
+export type DocumentUpdateManyWithoutWorkspaceNestedInput = {
+  create?: Prisma.XOR<Prisma.DocumentCreateWithoutWorkspaceInput, Prisma.DocumentUncheckedCreateWithoutWorkspaceInput> | Prisma.DocumentCreateWithoutWorkspaceInput[] | Prisma.DocumentUncheckedCreateWithoutWorkspaceInput[]
+  connectOrCreate?: Prisma.DocumentCreateOrConnectWithoutWorkspaceInput | Prisma.DocumentCreateOrConnectWithoutWorkspaceInput[]
+  upsert?: Prisma.DocumentUpsertWithWhereUniqueWithoutWorkspaceInput | Prisma.DocumentUpsertWithWhereUniqueWithoutWorkspaceInput[]
+  createMany?: Prisma.DocumentCreateManyWorkspaceInputEnvelope
+  set?: Prisma.DocumentWhereUniqueInput | Prisma.DocumentWhereUniqueInput[]
+  disconnect?: Prisma.DocumentWhereUniqueInput | Prisma.DocumentWhereUniqueInput[]
+  delete?: Prisma.DocumentWhereUniqueInput | Prisma.DocumentWhereUniqueInput[]
+  connect?: Prisma.DocumentWhereUniqueInput | Prisma.DocumentWhereUniqueInput[]
+  update?: Prisma.DocumentUpdateWithWhereUniqueWithoutWorkspaceInput | Prisma.DocumentUpdateWithWhereUniqueWithoutWorkspaceInput[]
+  updateMany?: Prisma.DocumentUpdateManyWithWhereWithoutWorkspaceInput | Prisma.DocumentUpdateManyWithWhereWithoutWorkspaceInput[]
+  deleteMany?: Prisma.DocumentScalarWhereInput | Prisma.DocumentScalarWhereInput[]
+}
+
+export type DocumentUncheckedUpdateManyWithoutWorkspaceNestedInput = {
+  create?: Prisma.XOR<Prisma.DocumentCreateWithoutWorkspaceInput, Prisma.DocumentUncheckedCreateWithoutWorkspaceInput> | Prisma.DocumentCreateWithoutWorkspaceInput[] | Prisma.DocumentUncheckedCreateWithoutWorkspaceInput[]
+  connectOrCreate?: Prisma.DocumentCreateOrConnectWithoutWorkspaceInput | Prisma.DocumentCreateOrConnectWithoutWorkspaceInput[]
+  upsert?: Prisma.DocumentUpsertWithWhereUniqueWithoutWorkspaceInput | Prisma.DocumentUpsertWithWhereUniqueWithoutWorkspaceInput[]
+  createMany?: Prisma.DocumentCreateManyWorkspaceInputEnvelope
+  set?: Prisma.DocumentWhereUniqueInput | Prisma.DocumentWhereUniqueInput[]
+  disconnect?: Prisma.DocumentWhereUniqueInput | Prisma.DocumentWhereUniqueInput[]
+  delete?: Prisma.DocumentWhereUniqueInput | Prisma.DocumentWhereUniqueInput[]
+  connect?: Prisma.DocumentWhereUniqueInput | Prisma.DocumentWhereUniqueInput[]
+  update?: Prisma.DocumentUpdateWithWhereUniqueWithoutWorkspaceInput | Prisma.DocumentUpdateWithWhereUniqueWithoutWorkspaceInput[]
+  updateMany?: Prisma.DocumentUpdateManyWithWhereWithoutWorkspaceInput | Prisma.DocumentUpdateManyWithWhereWithoutWorkspaceInput[]
+  deleteMany?: Prisma.DocumentScalarWhereInput | Prisma.DocumentScalarWhereInput[]
 }
 
 export type DocumentCreateNestedManyWithoutProjectInput = {
@@ -600,6 +666,81 @@ export type DocumentUpdateOneWithoutShareLinksNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.DocumentUpdateToOneWithWhereWithoutShareLinksInput, Prisma.DocumentUpdateWithoutShareLinksInput>, Prisma.DocumentUncheckedUpdateWithoutShareLinksInput>
 }
 
+export type DocumentCreateWithoutWorkspaceInput = {
+  id?: string
+  filename: string
+  originalName: string
+  mimeType: string
+  size: number
+  path: string
+  isVisible?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  project: Prisma.ProjectCreateNestedOneWithoutDocumentsInput
+  annotations?: Prisma.AnnotationCreateNestedManyWithoutDocumentInput
+  comments?: Prisma.CommentCreateNestedManyWithoutDocumentInput
+  shareLinks?: Prisma.ShareLinkCreateNestedManyWithoutDocumentInput
+}
+
+export type DocumentUncheckedCreateWithoutWorkspaceInput = {
+  id?: string
+  filename: string
+  originalName: string
+  mimeType: string
+  size: number
+  path: string
+  isVisible?: boolean
+  projectId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  annotations?: Prisma.AnnotationUncheckedCreateNestedManyWithoutDocumentInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutDocumentInput
+  shareLinks?: Prisma.ShareLinkUncheckedCreateNestedManyWithoutDocumentInput
+}
+
+export type DocumentCreateOrConnectWithoutWorkspaceInput = {
+  where: Prisma.DocumentWhereUniqueInput
+  create: Prisma.XOR<Prisma.DocumentCreateWithoutWorkspaceInput, Prisma.DocumentUncheckedCreateWithoutWorkspaceInput>
+}
+
+export type DocumentCreateManyWorkspaceInputEnvelope = {
+  data: Prisma.DocumentCreateManyWorkspaceInput | Prisma.DocumentCreateManyWorkspaceInput[]
+  skipDuplicates?: boolean
+}
+
+export type DocumentUpsertWithWhereUniqueWithoutWorkspaceInput = {
+  where: Prisma.DocumentWhereUniqueInput
+  update: Prisma.XOR<Prisma.DocumentUpdateWithoutWorkspaceInput, Prisma.DocumentUncheckedUpdateWithoutWorkspaceInput>
+  create: Prisma.XOR<Prisma.DocumentCreateWithoutWorkspaceInput, Prisma.DocumentUncheckedCreateWithoutWorkspaceInput>
+}
+
+export type DocumentUpdateWithWhereUniqueWithoutWorkspaceInput = {
+  where: Prisma.DocumentWhereUniqueInput
+  data: Prisma.XOR<Prisma.DocumentUpdateWithoutWorkspaceInput, Prisma.DocumentUncheckedUpdateWithoutWorkspaceInput>
+}
+
+export type DocumentUpdateManyWithWhereWithoutWorkspaceInput = {
+  where: Prisma.DocumentScalarWhereInput
+  data: Prisma.XOR<Prisma.DocumentUpdateManyMutationInput, Prisma.DocumentUncheckedUpdateManyWithoutWorkspaceInput>
+}
+
+export type DocumentScalarWhereInput = {
+  AND?: Prisma.DocumentScalarWhereInput | Prisma.DocumentScalarWhereInput[]
+  OR?: Prisma.DocumentScalarWhereInput[]
+  NOT?: Prisma.DocumentScalarWhereInput | Prisma.DocumentScalarWhereInput[]
+  id?: Prisma.StringFilter<"Document"> | string
+  filename?: Prisma.StringFilter<"Document"> | string
+  originalName?: Prisma.StringFilter<"Document"> | string
+  mimeType?: Prisma.StringFilter<"Document"> | string
+  size?: Prisma.IntFilter<"Document"> | number
+  path?: Prisma.StringFilter<"Document"> | string
+  isVisible?: Prisma.BoolFilter<"Document"> | boolean
+  projectId?: Prisma.StringFilter<"Document"> | string
+  workspaceId?: Prisma.StringNullableFilter<"Document"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Document"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Document"> | Date | string
+}
+
 export type DocumentCreateWithoutProjectInput = {
   id?: string
   filename: string
@@ -610,6 +751,7 @@ export type DocumentCreateWithoutProjectInput = {
   isVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutDocumentsInput
   annotations?: Prisma.AnnotationCreateNestedManyWithoutDocumentInput
   comments?: Prisma.CommentCreateNestedManyWithoutDocumentInput
   shareLinks?: Prisma.ShareLinkCreateNestedManyWithoutDocumentInput
@@ -623,6 +765,7 @@ export type DocumentUncheckedCreateWithoutProjectInput = {
   size: number
   path: string
   isVisible?: boolean
+  workspaceId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   annotations?: Prisma.AnnotationUncheckedCreateNestedManyWithoutDocumentInput
@@ -656,22 +799,6 @@ export type DocumentUpdateManyWithWhereWithoutProjectInput = {
   data: Prisma.XOR<Prisma.DocumentUpdateManyMutationInput, Prisma.DocumentUncheckedUpdateManyWithoutProjectInput>
 }
 
-export type DocumentScalarWhereInput = {
-  AND?: Prisma.DocumentScalarWhereInput | Prisma.DocumentScalarWhereInput[]
-  OR?: Prisma.DocumentScalarWhereInput[]
-  NOT?: Prisma.DocumentScalarWhereInput | Prisma.DocumentScalarWhereInput[]
-  id?: Prisma.StringFilter<"Document"> | string
-  filename?: Prisma.StringFilter<"Document"> | string
-  originalName?: Prisma.StringFilter<"Document"> | string
-  mimeType?: Prisma.StringFilter<"Document"> | string
-  size?: Prisma.IntFilter<"Document"> | number
-  path?: Prisma.StringFilter<"Document"> | string
-  isVisible?: Prisma.BoolFilter<"Document"> | boolean
-  projectId?: Prisma.StringFilter<"Document"> | string
-  createdAt?: Prisma.DateTimeFilter<"Document"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Document"> | Date | string
-}
-
 export type DocumentCreateWithoutAnnotationsInput = {
   id?: string
   filename: string
@@ -683,6 +810,7 @@ export type DocumentCreateWithoutAnnotationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   project: Prisma.ProjectCreateNestedOneWithoutDocumentsInput
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutDocumentsInput
   comments?: Prisma.CommentCreateNestedManyWithoutDocumentInput
   shareLinks?: Prisma.ShareLinkCreateNestedManyWithoutDocumentInput
 }
@@ -696,6 +824,7 @@ export type DocumentUncheckedCreateWithoutAnnotationsInput = {
   path: string
   isVisible?: boolean
   projectId: string
+  workspaceId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutDocumentInput
@@ -729,6 +858,7 @@ export type DocumentUpdateWithoutAnnotationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.ProjectUpdateOneRequiredWithoutDocumentsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneWithoutDocumentsNestedInput
   comments?: Prisma.CommentUpdateManyWithoutDocumentNestedInput
   shareLinks?: Prisma.ShareLinkUpdateManyWithoutDocumentNestedInput
 }
@@ -742,6 +872,7 @@ export type DocumentUncheckedUpdateWithoutAnnotationsInput = {
   path?: Prisma.StringFieldUpdateOperationsInput | string
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   comments?: Prisma.CommentUncheckedUpdateManyWithoutDocumentNestedInput
@@ -759,6 +890,7 @@ export type DocumentCreateWithoutCommentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   project: Prisma.ProjectCreateNestedOneWithoutDocumentsInput
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutDocumentsInput
   annotations?: Prisma.AnnotationCreateNestedManyWithoutDocumentInput
   shareLinks?: Prisma.ShareLinkCreateNestedManyWithoutDocumentInput
 }
@@ -772,6 +904,7 @@ export type DocumentUncheckedCreateWithoutCommentsInput = {
   path: string
   isVisible?: boolean
   projectId: string
+  workspaceId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   annotations?: Prisma.AnnotationUncheckedCreateNestedManyWithoutDocumentInput
@@ -805,6 +938,7 @@ export type DocumentUpdateWithoutCommentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.ProjectUpdateOneRequiredWithoutDocumentsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneWithoutDocumentsNestedInput
   annotations?: Prisma.AnnotationUpdateManyWithoutDocumentNestedInput
   shareLinks?: Prisma.ShareLinkUpdateManyWithoutDocumentNestedInput
 }
@@ -818,6 +952,7 @@ export type DocumentUncheckedUpdateWithoutCommentsInput = {
   path?: Prisma.StringFieldUpdateOperationsInput | string
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   annotations?: Prisma.AnnotationUncheckedUpdateManyWithoutDocumentNestedInput
@@ -835,6 +970,7 @@ export type DocumentCreateWithoutShareLinksInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   project: Prisma.ProjectCreateNestedOneWithoutDocumentsInput
+  workspace?: Prisma.WorkspaceCreateNestedOneWithoutDocumentsInput
   annotations?: Prisma.AnnotationCreateNestedManyWithoutDocumentInput
   comments?: Prisma.CommentCreateNestedManyWithoutDocumentInput
 }
@@ -848,6 +984,7 @@ export type DocumentUncheckedCreateWithoutShareLinksInput = {
   path: string
   isVisible?: boolean
   projectId: string
+  workspaceId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   annotations?: Prisma.AnnotationUncheckedCreateNestedManyWithoutDocumentInput
@@ -881,6 +1018,7 @@ export type DocumentUpdateWithoutShareLinksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.ProjectUpdateOneRequiredWithoutDocumentsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneWithoutDocumentsNestedInput
   annotations?: Prisma.AnnotationUpdateManyWithoutDocumentNestedInput
   comments?: Prisma.CommentUpdateManyWithoutDocumentNestedInput
 }
@@ -894,10 +1032,69 @@ export type DocumentUncheckedUpdateWithoutShareLinksInput = {
   path?: Prisma.StringFieldUpdateOperationsInput | string
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   annotations?: Prisma.AnnotationUncheckedUpdateManyWithoutDocumentNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutDocumentNestedInput
+}
+
+export type DocumentCreateManyWorkspaceInput = {
+  id?: string
+  filename: string
+  originalName: string
+  mimeType: string
+  size: number
+  path: string
+  isVisible?: boolean
+  projectId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type DocumentUpdateWithoutWorkspaceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  filename?: Prisma.StringFieldUpdateOperationsInput | string
+  originalName?: Prisma.StringFieldUpdateOperationsInput | string
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.IntFieldUpdateOperationsInput | number
+  path?: Prisma.StringFieldUpdateOperationsInput | string
+  isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  project?: Prisma.ProjectUpdateOneRequiredWithoutDocumentsNestedInput
+  annotations?: Prisma.AnnotationUpdateManyWithoutDocumentNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutDocumentNestedInput
+  shareLinks?: Prisma.ShareLinkUpdateManyWithoutDocumentNestedInput
+}
+
+export type DocumentUncheckedUpdateWithoutWorkspaceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  filename?: Prisma.StringFieldUpdateOperationsInput | string
+  originalName?: Prisma.StringFieldUpdateOperationsInput | string
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.IntFieldUpdateOperationsInput | number
+  path?: Prisma.StringFieldUpdateOperationsInput | string
+  isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  annotations?: Prisma.AnnotationUncheckedUpdateManyWithoutDocumentNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutDocumentNestedInput
+  shareLinks?: Prisma.ShareLinkUncheckedUpdateManyWithoutDocumentNestedInput
+}
+
+export type DocumentUncheckedUpdateManyWithoutWorkspaceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  filename?: Prisma.StringFieldUpdateOperationsInput | string
+  originalName?: Prisma.StringFieldUpdateOperationsInput | string
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.IntFieldUpdateOperationsInput | number
+  path?: Prisma.StringFieldUpdateOperationsInput | string
+  isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type DocumentCreateManyProjectInput = {
@@ -908,6 +1105,7 @@ export type DocumentCreateManyProjectInput = {
   size: number
   path: string
   isVisible?: boolean
+  workspaceId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -922,6 +1120,7 @@ export type DocumentUpdateWithoutProjectInput = {
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  workspace?: Prisma.WorkspaceUpdateOneWithoutDocumentsNestedInput
   annotations?: Prisma.AnnotationUpdateManyWithoutDocumentNestedInput
   comments?: Prisma.CommentUpdateManyWithoutDocumentNestedInput
   shareLinks?: Prisma.ShareLinkUpdateManyWithoutDocumentNestedInput
@@ -935,6 +1134,7 @@ export type DocumentUncheckedUpdateWithoutProjectInput = {
   size?: Prisma.IntFieldUpdateOperationsInput | number
   path?: Prisma.StringFieldUpdateOperationsInput | string
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   annotations?: Prisma.AnnotationUncheckedUpdateManyWithoutDocumentNestedInput
@@ -950,6 +1150,7 @@ export type DocumentUncheckedUpdateManyWithoutProjectInput = {
   size?: Prisma.IntFieldUpdateOperationsInput | number
   path?: Prisma.StringFieldUpdateOperationsInput | string
   isVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  workspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1012,9 +1213,11 @@ export type DocumentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   path?: boolean
   isVisible?: boolean
   projectId?: boolean
+  workspaceId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.Document$workspaceArgs<ExtArgs>
   annotations?: boolean | Prisma.Document$annotationsArgs<ExtArgs>
   comments?: boolean | Prisma.Document$commentsArgs<ExtArgs>
   shareLinks?: boolean | Prisma.Document$shareLinksArgs<ExtArgs>
@@ -1030,9 +1233,11 @@ export type DocumentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   path?: boolean
   isVisible?: boolean
   projectId?: boolean
+  workspaceId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.Document$workspaceArgs<ExtArgs>
 }, ExtArgs["result"]["document"]>
 
 export type DocumentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1044,9 +1249,11 @@ export type DocumentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   path?: boolean
   isVisible?: boolean
   projectId?: boolean
+  workspaceId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.Document$workspaceArgs<ExtArgs>
 }, ExtArgs["result"]["document"]>
 
 export type DocumentSelectScalar = {
@@ -1058,13 +1265,15 @@ export type DocumentSelectScalar = {
   path?: boolean
   isVisible?: boolean
   projectId?: boolean
+  workspaceId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type DocumentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "filename" | "originalName" | "mimeType" | "size" | "path" | "isVisible" | "projectId" | "createdAt" | "updatedAt", ExtArgs["result"]["document"]>
+export type DocumentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "filename" | "originalName" | "mimeType" | "size" | "path" | "isVisible" | "projectId" | "workspaceId" | "createdAt" | "updatedAt", ExtArgs["result"]["document"]>
 export type DocumentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.Document$workspaceArgs<ExtArgs>
   annotations?: boolean | Prisma.Document$annotationsArgs<ExtArgs>
   comments?: boolean | Prisma.Document$commentsArgs<ExtArgs>
   shareLinks?: boolean | Prisma.Document$shareLinksArgs<ExtArgs>
@@ -1072,15 +1281,18 @@ export type DocumentInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
 }
 export type DocumentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.Document$workspaceArgs<ExtArgs>
 }
 export type DocumentIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
+  workspace?: boolean | Prisma.Document$workspaceArgs<ExtArgs>
 }
 
 export type $DocumentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Document"
   objects: {
     project: Prisma.$ProjectPayload<ExtArgs>
+    workspace: Prisma.$WorkspacePayload<ExtArgs> | null
     annotations: Prisma.$AnnotationPayload<ExtArgs>[]
     comments: Prisma.$CommentPayload<ExtArgs>[]
     shareLinks: Prisma.$ShareLinkPayload<ExtArgs>[]
@@ -1094,6 +1306,7 @@ export type $DocumentPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     path: string
     isVisible: boolean
     projectId: string
+    workspaceId: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["document"]>
@@ -1491,6 +1704,7 @@ readonly fields: DocumentFieldRefs;
 export interface Prisma__DocumentClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   project<T extends Prisma.ProjectDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProjectDefaultArgs<ExtArgs>>): Prisma.Prisma__ProjectClient<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  workspace<T extends Prisma.Document$workspaceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Document$workspaceArgs<ExtArgs>>): Prisma.Prisma__WorkspaceClient<runtime.Types.Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   annotations<T extends Prisma.Document$annotationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Document$annotationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AnnotationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   comments<T extends Prisma.Document$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Document$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   shareLinks<T extends Prisma.Document$shareLinksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Document$shareLinksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShareLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -1531,6 +1745,7 @@ export interface DocumentFieldRefs {
   readonly path: Prisma.FieldRef<"Document", 'String'>
   readonly isVisible: Prisma.FieldRef<"Document", 'Boolean'>
   readonly projectId: Prisma.FieldRef<"Document", 'String'>
+  readonly workspaceId: Prisma.FieldRef<"Document", 'String'>
   readonly createdAt: Prisma.FieldRef<"Document", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Document", 'DateTime'>
 }
@@ -1931,6 +2146,25 @@ export type DocumentDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Limit how many Documents to delete.
    */
   limit?: number
+}
+
+/**
+ * Document.workspace
+ */
+export type Document$workspaceArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Workspace
+   */
+  select?: Prisma.WorkspaceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Workspace
+   */
+  omit?: Prisma.WorkspaceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WorkspaceInclude<ExtArgs> | null
+  where?: Prisma.WorkspaceWhereInput
 }
 
 /**

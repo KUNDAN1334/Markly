@@ -23,6 +23,10 @@ export async function GET(
     if (token) {
       headers.set('x-share-token', token);
     }
+    const password = searchParams.get('password');
+    if (password) {
+      headers.set('x-share-password', password);
+    }
 
     const access = await authorizeDocumentAccess(
       new Request(_req.url, { headers }),

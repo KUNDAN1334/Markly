@@ -9,6 +9,42 @@ export type AnnotationType =
 
 export type AccessType = 'VIEW' | 'COMMENT' | 'EDIT';
 
+export type WorkspaceRole = 'OWNER' | 'ADMIN' | 'EDITOR' | 'COMMENTER' | 'VIEWER';
+
+export interface WorkspaceSummary {
+  id: string;
+  name: string;
+  ownerUserId: string;
+  role: WorkspaceRole;
+  createdAt: string;
+}
+
+export interface WorkspaceMember {
+  id: string;
+  userId: string;
+  role: WorkspaceRole;
+  isOwner: boolean;
+  user: {
+    id: string;
+    name?: string | null;
+    email?: string | null;
+    imageUrl?: string | null;
+  };
+  createdAt: string;
+}
+
+export interface WorkspaceInvitation {
+  id: string;
+  workspaceId: string;
+  email: string;
+  role: WorkspaceRole;
+  token: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REVOKED';
+  expiresAt?: string | null;
+  createdAt: string;
+  inviteUrl?: string;
+}
+
 export interface AnnotationStyle {
   stroke: string;
   strokeWidth: number;
@@ -51,6 +87,7 @@ export interface Comment {
   authorName?: string;
   pageNumber: number;
   resolved: boolean;
+  isInternal?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -64,6 +101,8 @@ export interface Document {
   path: string;
   isVisible?: boolean;
   projectId: string;
+  workspaceId?: string | null;
+  myRole?: WorkspaceRole | null;
   annotations: Annotation[];
   comments: Comment[];
   shareLinks?: ShareLink[];
@@ -86,7 +125,9 @@ export interface ShareLink {
   token: string;
   projectId: string;
   documentId?: string;
+  workspaceId?: string | null;
   access: AccessType;
+  hasPassword?: boolean;
   createdAt: string;
   expiresAt?: string;
 }
@@ -130,6 +171,8 @@ export interface Workspace {
   razorpayCustomerId?: string | null;
   razorpaySubscriptionId?: string | null;
   currentPlan: PricingPlan;
+  myRole?: WorkspaceRole;
+  memberCount?: number;
   usage: {
     activeProjectsCount: number;
     activeDocumentsCount: number;

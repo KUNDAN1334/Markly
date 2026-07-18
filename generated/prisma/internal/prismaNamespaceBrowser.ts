@@ -53,6 +53,8 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   Workspace: 'Workspace',
+  WorkspaceMembership: 'WorkspaceMembership',
+  WorkspaceInvitation: 'WorkspaceInvitation',
   Project: 'Project',
   Document: 'Document',
   Annotation: 'Annotation',
@@ -107,6 +109,35 @@ export const WorkspaceScalarFieldEnum = {
 export type WorkspaceScalarFieldEnum = (typeof WorkspaceScalarFieldEnum)[keyof typeof WorkspaceScalarFieldEnum]
 
 
+export const WorkspaceMembershipScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  workspaceId: 'workspaceId',
+  role: 'role',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WorkspaceMembershipScalarFieldEnum = (typeof WorkspaceMembershipScalarFieldEnum)[keyof typeof WorkspaceMembershipScalarFieldEnum]
+
+
+export const WorkspaceInvitationScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  email: 'email',
+  role: 'role',
+  token: 'token',
+  status: 'status',
+  invitedByUserId: 'invitedByUserId',
+  expiresAt: 'expiresAt',
+  acceptedAt: 'acceptedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WorkspaceInvitationScalarFieldEnum = (typeof WorkspaceInvitationScalarFieldEnum)[keyof typeof WorkspaceInvitationScalarFieldEnum]
+
+
 export const ProjectScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -128,6 +159,7 @@ export const DocumentScalarFieldEnum = {
   path: 'path',
   isVisible: 'isVisible',
   projectId: 'projectId',
+  workspaceId: 'workspaceId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -159,6 +191,7 @@ export const CommentScalarFieldEnum = {
   authorName: 'authorName',
   pageNumber: 'pageNumber',
   resolved: 'resolved',
+  isInternal: 'isInternal',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -172,7 +205,9 @@ export const ShareLinkScalarFieldEnum = {
   projectId: 'projectId',
   documentId: 'documentId',
   createdByUserId: 'createdByUserId',
+  workspaceId: 'workspaceId',
   access: 'access',
+  passwordHash: 'passwordHash',
   createdAt: 'createdAt',
   expiresAt: 'expiresAt'
 } as const

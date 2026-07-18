@@ -233,6 +233,10 @@ export type WorkspaceWhereInput = {
   ownerUser?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   projects?: Prisma.ProjectListRelationFilter
   billingWebhookEvents?: Prisma.BillingWebhookEventListRelationFilter
+  memberships?: Prisma.WorkspaceMembershipListRelationFilter
+  invitations?: Prisma.WorkspaceInvitationListRelationFilter
+  documents?: Prisma.DocumentListRelationFilter
+  shareLinks?: Prisma.ShareLinkListRelationFilter
 }
 
 export type WorkspaceOrderByWithRelationInput = {
@@ -250,6 +254,10 @@ export type WorkspaceOrderByWithRelationInput = {
   ownerUser?: Prisma.UserOrderByWithRelationInput
   projects?: Prisma.ProjectOrderByRelationAggregateInput
   billingWebhookEvents?: Prisma.BillingWebhookEventOrderByRelationAggregateInput
+  memberships?: Prisma.WorkspaceMembershipOrderByRelationAggregateInput
+  invitations?: Prisma.WorkspaceInvitationOrderByRelationAggregateInput
+  documents?: Prisma.DocumentOrderByRelationAggregateInput
+  shareLinks?: Prisma.ShareLinkOrderByRelationAggregateInput
 }
 
 export type WorkspaceWhereUniqueInput = Prisma.AtLeast<{
@@ -270,6 +278,10 @@ export type WorkspaceWhereUniqueInput = Prisma.AtLeast<{
   ownerUser?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   projects?: Prisma.ProjectListRelationFilter
   billingWebhookEvents?: Prisma.BillingWebhookEventListRelationFilter
+  memberships?: Prisma.WorkspaceMembershipListRelationFilter
+  invitations?: Prisma.WorkspaceInvitationListRelationFilter
+  documents?: Prisma.DocumentListRelationFilter
+  shareLinks?: Prisma.ShareLinkListRelationFilter
 }, "id" | "razorpayCustomerId" | "razorpaySubscriptionId">
 
 export type WorkspaceOrderByWithAggregationInput = {
@@ -320,6 +332,10 @@ export type WorkspaceCreateInput = {
   ownerUser: Prisma.UserCreateNestedOneWithoutWorkspacesInput
   projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
   billingWebhookEvents?: Prisma.BillingWebhookEventCreateNestedManyWithoutWorkspaceInput
+  memberships?: Prisma.WorkspaceMembershipCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutWorkspaceInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutWorkspaceInput
+  shareLinks?: Prisma.ShareLinkCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateInput = {
@@ -336,6 +352,10 @@ export type WorkspaceUncheckedCreateInput = {
   updatedAt?: Date | string
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
   billingWebhookEvents?: Prisma.BillingWebhookEventUncheckedCreateNestedManyWithoutWorkspaceInput
+  memberships?: Prisma.WorkspaceMembershipUncheckedCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutWorkspaceInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutWorkspaceInput
+  shareLinks?: Prisma.ShareLinkUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUpdateInput = {
@@ -352,6 +372,10 @@ export type WorkspaceUpdateInput = {
   ownerUser?: Prisma.UserUpdateOneRequiredWithoutWorkspacesNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
   billingWebhookEvents?: Prisma.BillingWebhookEventUpdateManyWithoutWorkspaceNestedInput
+  memberships?: Prisma.WorkspaceMembershipUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUpdateManyWithoutWorkspaceNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutWorkspaceNestedInput
+  shareLinks?: Prisma.ShareLinkUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateInput = {
@@ -368,6 +392,10 @@ export type WorkspaceUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
   billingWebhookEvents?: Prisma.BillingWebhookEventUncheckedUpdateManyWithoutWorkspaceNestedInput
+  memberships?: Prisma.WorkspaceMembershipUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  shareLinks?: Prisma.ShareLinkUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateManyInput = {
@@ -463,6 +491,11 @@ export type WorkspaceMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
+export type WorkspaceScalarRelationFilter = {
+  is?: Prisma.WorkspaceWhereInput
+  isNot?: Prisma.WorkspaceWhereInput
+}
+
 export type WorkspaceNullableScalarRelationFilter = {
   is?: Prisma.WorkspaceWhereInput | null
   isNot?: Prisma.WorkspaceWhereInput | null
@@ -514,6 +547,34 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
 }
 
+export type WorkspaceCreateNestedOneWithoutMembershipsInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutMembershipsInput, Prisma.WorkspaceUncheckedCreateWithoutMembershipsInput>
+  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutMembershipsInput
+  connect?: Prisma.WorkspaceWhereUniqueInput
+}
+
+export type WorkspaceUpdateOneRequiredWithoutMembershipsNestedInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutMembershipsInput, Prisma.WorkspaceUncheckedCreateWithoutMembershipsInput>
+  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutMembershipsInput
+  upsert?: Prisma.WorkspaceUpsertWithoutMembershipsInput
+  connect?: Prisma.WorkspaceWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceUpdateToOneWithWhereWithoutMembershipsInput, Prisma.WorkspaceUpdateWithoutMembershipsInput>, Prisma.WorkspaceUncheckedUpdateWithoutMembershipsInput>
+}
+
+export type WorkspaceCreateNestedOneWithoutInvitationsInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutInvitationsInput, Prisma.WorkspaceUncheckedCreateWithoutInvitationsInput>
+  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutInvitationsInput
+  connect?: Prisma.WorkspaceWhereUniqueInput
+}
+
+export type WorkspaceUpdateOneRequiredWithoutInvitationsNestedInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutInvitationsInput, Prisma.WorkspaceUncheckedCreateWithoutInvitationsInput>
+  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutInvitationsInput
+  upsert?: Prisma.WorkspaceUpsertWithoutInvitationsInput
+  connect?: Prisma.WorkspaceWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceUpdateToOneWithWhereWithoutInvitationsInput, Prisma.WorkspaceUpdateWithoutInvitationsInput>, Prisma.WorkspaceUncheckedUpdateWithoutInvitationsInput>
+}
+
 export type WorkspaceCreateNestedOneWithoutProjectsInput = {
   create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutProjectsInput, Prisma.WorkspaceUncheckedCreateWithoutProjectsInput>
   connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutProjectsInput
@@ -528,6 +589,38 @@ export type WorkspaceUpdateOneWithoutProjectsNestedInput = {
   delete?: Prisma.WorkspaceWhereInput | boolean
   connect?: Prisma.WorkspaceWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceUpdateToOneWithWhereWithoutProjectsInput, Prisma.WorkspaceUpdateWithoutProjectsInput>, Prisma.WorkspaceUncheckedUpdateWithoutProjectsInput>
+}
+
+export type WorkspaceCreateNestedOneWithoutDocumentsInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutDocumentsInput, Prisma.WorkspaceUncheckedCreateWithoutDocumentsInput>
+  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutDocumentsInput
+  connect?: Prisma.WorkspaceWhereUniqueInput
+}
+
+export type WorkspaceUpdateOneWithoutDocumentsNestedInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutDocumentsInput, Prisma.WorkspaceUncheckedCreateWithoutDocumentsInput>
+  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutDocumentsInput
+  upsert?: Prisma.WorkspaceUpsertWithoutDocumentsInput
+  disconnect?: Prisma.WorkspaceWhereInput | boolean
+  delete?: Prisma.WorkspaceWhereInput | boolean
+  connect?: Prisma.WorkspaceWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceUpdateToOneWithWhereWithoutDocumentsInput, Prisma.WorkspaceUpdateWithoutDocumentsInput>, Prisma.WorkspaceUncheckedUpdateWithoutDocumentsInput>
+}
+
+export type WorkspaceCreateNestedOneWithoutShareLinksInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutShareLinksInput, Prisma.WorkspaceUncheckedCreateWithoutShareLinksInput>
+  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutShareLinksInput
+  connect?: Prisma.WorkspaceWhereUniqueInput
+}
+
+export type WorkspaceUpdateOneWithoutShareLinksNestedInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutShareLinksInput, Prisma.WorkspaceUncheckedCreateWithoutShareLinksInput>
+  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutShareLinksInput
+  upsert?: Prisma.WorkspaceUpsertWithoutShareLinksInput
+  disconnect?: Prisma.WorkspaceWhereInput | boolean
+  delete?: Prisma.WorkspaceWhereInput | boolean
+  connect?: Prisma.WorkspaceWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceUpdateToOneWithWhereWithoutShareLinksInput, Prisma.WorkspaceUpdateWithoutShareLinksInput>, Prisma.WorkspaceUncheckedUpdateWithoutShareLinksInput>
 }
 
 export type WorkspaceCreateNestedOneWithoutBillingWebhookEventsInput = {
@@ -559,6 +652,10 @@ export type WorkspaceCreateWithoutOwnerUserInput = {
   updatedAt?: Date | string
   projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
   billingWebhookEvents?: Prisma.BillingWebhookEventCreateNestedManyWithoutWorkspaceInput
+  memberships?: Prisma.WorkspaceMembershipCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutWorkspaceInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutWorkspaceInput
+  shareLinks?: Prisma.ShareLinkCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutOwnerUserInput = {
@@ -574,6 +671,10 @@ export type WorkspaceUncheckedCreateWithoutOwnerUserInput = {
   updatedAt?: Date | string
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
   billingWebhookEvents?: Prisma.BillingWebhookEventUncheckedCreateNestedManyWithoutWorkspaceInput
+  memberships?: Prisma.WorkspaceMembershipUncheckedCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutWorkspaceInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutWorkspaceInput
+  shareLinks?: Prisma.ShareLinkUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutOwnerUserInput = {
@@ -619,6 +720,190 @@ export type WorkspaceScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Workspace"> | Date | string
 }
 
+export type WorkspaceCreateWithoutMembershipsInput = {
+  id?: string
+  name: string
+  currentPlanId?: string
+  razorpayCustomerId?: string | null
+  razorpaySubscriptionId?: string | null
+  subscriptionStatus?: string
+  currentPlanStartedAt?: Date | string | null
+  currentPlanRenewsAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownerUser: Prisma.UserCreateNestedOneWithoutWorkspacesInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
+  billingWebhookEvents?: Prisma.BillingWebhookEventCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutWorkspaceInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutWorkspaceInput
+  shareLinks?: Prisma.ShareLinkCreateNestedManyWithoutWorkspaceInput
+}
+
+export type WorkspaceUncheckedCreateWithoutMembershipsInput = {
+  id?: string
+  name: string
+  ownerUserId: string
+  currentPlanId?: string
+  razorpayCustomerId?: string | null
+  razorpaySubscriptionId?: string | null
+  subscriptionStatus?: string
+  currentPlanStartedAt?: Date | string | null
+  currentPlanRenewsAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
+  billingWebhookEvents?: Prisma.BillingWebhookEventUncheckedCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutWorkspaceInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutWorkspaceInput
+  shareLinks?: Prisma.ShareLinkUncheckedCreateNestedManyWithoutWorkspaceInput
+}
+
+export type WorkspaceCreateOrConnectWithoutMembershipsInput = {
+  where: Prisma.WorkspaceWhereUniqueInput
+  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutMembershipsInput, Prisma.WorkspaceUncheckedCreateWithoutMembershipsInput>
+}
+
+export type WorkspaceUpsertWithoutMembershipsInput = {
+  update: Prisma.XOR<Prisma.WorkspaceUpdateWithoutMembershipsInput, Prisma.WorkspaceUncheckedUpdateWithoutMembershipsInput>
+  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutMembershipsInput, Prisma.WorkspaceUncheckedCreateWithoutMembershipsInput>
+  where?: Prisma.WorkspaceWhereInput
+}
+
+export type WorkspaceUpdateToOneWithWhereWithoutMembershipsInput = {
+  where?: Prisma.WorkspaceWhereInput
+  data: Prisma.XOR<Prisma.WorkspaceUpdateWithoutMembershipsInput, Prisma.WorkspaceUncheckedUpdateWithoutMembershipsInput>
+}
+
+export type WorkspaceUpdateWithoutMembershipsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  currentPlanId?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  currentPlanStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  currentPlanRenewsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownerUser?: Prisma.UserUpdateOneRequiredWithoutWorkspacesNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
+  billingWebhookEvents?: Prisma.BillingWebhookEventUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUpdateManyWithoutWorkspaceNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutWorkspaceNestedInput
+  shareLinks?: Prisma.ShareLinkUpdateManyWithoutWorkspaceNestedInput
+}
+
+export type WorkspaceUncheckedUpdateWithoutMembershipsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  currentPlanId?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  currentPlanStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  currentPlanRenewsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
+  billingWebhookEvents?: Prisma.BillingWebhookEventUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  shareLinks?: Prisma.ShareLinkUncheckedUpdateManyWithoutWorkspaceNestedInput
+}
+
+export type WorkspaceCreateWithoutInvitationsInput = {
+  id?: string
+  name: string
+  currentPlanId?: string
+  razorpayCustomerId?: string | null
+  razorpaySubscriptionId?: string | null
+  subscriptionStatus?: string
+  currentPlanStartedAt?: Date | string | null
+  currentPlanRenewsAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownerUser: Prisma.UserCreateNestedOneWithoutWorkspacesInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
+  billingWebhookEvents?: Prisma.BillingWebhookEventCreateNestedManyWithoutWorkspaceInput
+  memberships?: Prisma.WorkspaceMembershipCreateNestedManyWithoutWorkspaceInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutWorkspaceInput
+  shareLinks?: Prisma.ShareLinkCreateNestedManyWithoutWorkspaceInput
+}
+
+export type WorkspaceUncheckedCreateWithoutInvitationsInput = {
+  id?: string
+  name: string
+  ownerUserId: string
+  currentPlanId?: string
+  razorpayCustomerId?: string | null
+  razorpaySubscriptionId?: string | null
+  subscriptionStatus?: string
+  currentPlanStartedAt?: Date | string | null
+  currentPlanRenewsAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
+  billingWebhookEvents?: Prisma.BillingWebhookEventUncheckedCreateNestedManyWithoutWorkspaceInput
+  memberships?: Prisma.WorkspaceMembershipUncheckedCreateNestedManyWithoutWorkspaceInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutWorkspaceInput
+  shareLinks?: Prisma.ShareLinkUncheckedCreateNestedManyWithoutWorkspaceInput
+}
+
+export type WorkspaceCreateOrConnectWithoutInvitationsInput = {
+  where: Prisma.WorkspaceWhereUniqueInput
+  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutInvitationsInput, Prisma.WorkspaceUncheckedCreateWithoutInvitationsInput>
+}
+
+export type WorkspaceUpsertWithoutInvitationsInput = {
+  update: Prisma.XOR<Prisma.WorkspaceUpdateWithoutInvitationsInput, Prisma.WorkspaceUncheckedUpdateWithoutInvitationsInput>
+  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutInvitationsInput, Prisma.WorkspaceUncheckedCreateWithoutInvitationsInput>
+  where?: Prisma.WorkspaceWhereInput
+}
+
+export type WorkspaceUpdateToOneWithWhereWithoutInvitationsInput = {
+  where?: Prisma.WorkspaceWhereInput
+  data: Prisma.XOR<Prisma.WorkspaceUpdateWithoutInvitationsInput, Prisma.WorkspaceUncheckedUpdateWithoutInvitationsInput>
+}
+
+export type WorkspaceUpdateWithoutInvitationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  currentPlanId?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  currentPlanStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  currentPlanRenewsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownerUser?: Prisma.UserUpdateOneRequiredWithoutWorkspacesNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
+  billingWebhookEvents?: Prisma.BillingWebhookEventUpdateManyWithoutWorkspaceNestedInput
+  memberships?: Prisma.WorkspaceMembershipUpdateManyWithoutWorkspaceNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutWorkspaceNestedInput
+  shareLinks?: Prisma.ShareLinkUpdateManyWithoutWorkspaceNestedInput
+}
+
+export type WorkspaceUncheckedUpdateWithoutInvitationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  currentPlanId?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  currentPlanStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  currentPlanRenewsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
+  billingWebhookEvents?: Prisma.BillingWebhookEventUncheckedUpdateManyWithoutWorkspaceNestedInput
+  memberships?: Prisma.WorkspaceMembershipUncheckedUpdateManyWithoutWorkspaceNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  shareLinks?: Prisma.ShareLinkUncheckedUpdateManyWithoutWorkspaceNestedInput
+}
+
 export type WorkspaceCreateWithoutProjectsInput = {
   id?: string
   name: string
@@ -632,6 +917,10 @@ export type WorkspaceCreateWithoutProjectsInput = {
   updatedAt?: Date | string
   ownerUser: Prisma.UserCreateNestedOneWithoutWorkspacesInput
   billingWebhookEvents?: Prisma.BillingWebhookEventCreateNestedManyWithoutWorkspaceInput
+  memberships?: Prisma.WorkspaceMembershipCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutWorkspaceInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutWorkspaceInput
+  shareLinks?: Prisma.ShareLinkCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutProjectsInput = {
@@ -647,6 +936,10 @@ export type WorkspaceUncheckedCreateWithoutProjectsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   billingWebhookEvents?: Prisma.BillingWebhookEventUncheckedCreateNestedManyWithoutWorkspaceInput
+  memberships?: Prisma.WorkspaceMembershipUncheckedCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutWorkspaceInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutWorkspaceInput
+  shareLinks?: Prisma.ShareLinkUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutProjectsInput = {
@@ -678,6 +971,10 @@ export type WorkspaceUpdateWithoutProjectsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerUser?: Prisma.UserUpdateOneRequiredWithoutWorkspacesNestedInput
   billingWebhookEvents?: Prisma.BillingWebhookEventUpdateManyWithoutWorkspaceNestedInput
+  memberships?: Prisma.WorkspaceMembershipUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUpdateManyWithoutWorkspaceNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutWorkspaceNestedInput
+  shareLinks?: Prisma.ShareLinkUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutProjectsInput = {
@@ -693,6 +990,194 @@ export type WorkspaceUncheckedUpdateWithoutProjectsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   billingWebhookEvents?: Prisma.BillingWebhookEventUncheckedUpdateManyWithoutWorkspaceNestedInput
+  memberships?: Prisma.WorkspaceMembershipUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  shareLinks?: Prisma.ShareLinkUncheckedUpdateManyWithoutWorkspaceNestedInput
+}
+
+export type WorkspaceCreateWithoutDocumentsInput = {
+  id?: string
+  name: string
+  currentPlanId?: string
+  razorpayCustomerId?: string | null
+  razorpaySubscriptionId?: string | null
+  subscriptionStatus?: string
+  currentPlanStartedAt?: Date | string | null
+  currentPlanRenewsAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownerUser: Prisma.UserCreateNestedOneWithoutWorkspacesInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
+  billingWebhookEvents?: Prisma.BillingWebhookEventCreateNestedManyWithoutWorkspaceInput
+  memberships?: Prisma.WorkspaceMembershipCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutWorkspaceInput
+  shareLinks?: Prisma.ShareLinkCreateNestedManyWithoutWorkspaceInput
+}
+
+export type WorkspaceUncheckedCreateWithoutDocumentsInput = {
+  id?: string
+  name: string
+  ownerUserId: string
+  currentPlanId?: string
+  razorpayCustomerId?: string | null
+  razorpaySubscriptionId?: string | null
+  subscriptionStatus?: string
+  currentPlanStartedAt?: Date | string | null
+  currentPlanRenewsAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
+  billingWebhookEvents?: Prisma.BillingWebhookEventUncheckedCreateNestedManyWithoutWorkspaceInput
+  memberships?: Prisma.WorkspaceMembershipUncheckedCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutWorkspaceInput
+  shareLinks?: Prisma.ShareLinkUncheckedCreateNestedManyWithoutWorkspaceInput
+}
+
+export type WorkspaceCreateOrConnectWithoutDocumentsInput = {
+  where: Prisma.WorkspaceWhereUniqueInput
+  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutDocumentsInput, Prisma.WorkspaceUncheckedCreateWithoutDocumentsInput>
+}
+
+export type WorkspaceUpsertWithoutDocumentsInput = {
+  update: Prisma.XOR<Prisma.WorkspaceUpdateWithoutDocumentsInput, Prisma.WorkspaceUncheckedUpdateWithoutDocumentsInput>
+  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutDocumentsInput, Prisma.WorkspaceUncheckedCreateWithoutDocumentsInput>
+  where?: Prisma.WorkspaceWhereInput
+}
+
+export type WorkspaceUpdateToOneWithWhereWithoutDocumentsInput = {
+  where?: Prisma.WorkspaceWhereInput
+  data: Prisma.XOR<Prisma.WorkspaceUpdateWithoutDocumentsInput, Prisma.WorkspaceUncheckedUpdateWithoutDocumentsInput>
+}
+
+export type WorkspaceUpdateWithoutDocumentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  currentPlanId?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  currentPlanStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  currentPlanRenewsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownerUser?: Prisma.UserUpdateOneRequiredWithoutWorkspacesNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
+  billingWebhookEvents?: Prisma.BillingWebhookEventUpdateManyWithoutWorkspaceNestedInput
+  memberships?: Prisma.WorkspaceMembershipUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUpdateManyWithoutWorkspaceNestedInput
+  shareLinks?: Prisma.ShareLinkUpdateManyWithoutWorkspaceNestedInput
+}
+
+export type WorkspaceUncheckedUpdateWithoutDocumentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  currentPlanId?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  currentPlanStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  currentPlanRenewsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
+  billingWebhookEvents?: Prisma.BillingWebhookEventUncheckedUpdateManyWithoutWorkspaceNestedInput
+  memberships?: Prisma.WorkspaceMembershipUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
+  shareLinks?: Prisma.ShareLinkUncheckedUpdateManyWithoutWorkspaceNestedInput
+}
+
+export type WorkspaceCreateWithoutShareLinksInput = {
+  id?: string
+  name: string
+  currentPlanId?: string
+  razorpayCustomerId?: string | null
+  razorpaySubscriptionId?: string | null
+  subscriptionStatus?: string
+  currentPlanStartedAt?: Date | string | null
+  currentPlanRenewsAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownerUser: Prisma.UserCreateNestedOneWithoutWorkspacesInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
+  billingWebhookEvents?: Prisma.BillingWebhookEventCreateNestedManyWithoutWorkspaceInput
+  memberships?: Prisma.WorkspaceMembershipCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutWorkspaceInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutWorkspaceInput
+}
+
+export type WorkspaceUncheckedCreateWithoutShareLinksInput = {
+  id?: string
+  name: string
+  ownerUserId: string
+  currentPlanId?: string
+  razorpayCustomerId?: string | null
+  razorpaySubscriptionId?: string | null
+  subscriptionStatus?: string
+  currentPlanStartedAt?: Date | string | null
+  currentPlanRenewsAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
+  billingWebhookEvents?: Prisma.BillingWebhookEventUncheckedCreateNestedManyWithoutWorkspaceInput
+  memberships?: Prisma.WorkspaceMembershipUncheckedCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutWorkspaceInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutWorkspaceInput
+}
+
+export type WorkspaceCreateOrConnectWithoutShareLinksInput = {
+  where: Prisma.WorkspaceWhereUniqueInput
+  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutShareLinksInput, Prisma.WorkspaceUncheckedCreateWithoutShareLinksInput>
+}
+
+export type WorkspaceUpsertWithoutShareLinksInput = {
+  update: Prisma.XOR<Prisma.WorkspaceUpdateWithoutShareLinksInput, Prisma.WorkspaceUncheckedUpdateWithoutShareLinksInput>
+  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutShareLinksInput, Prisma.WorkspaceUncheckedCreateWithoutShareLinksInput>
+  where?: Prisma.WorkspaceWhereInput
+}
+
+export type WorkspaceUpdateToOneWithWhereWithoutShareLinksInput = {
+  where?: Prisma.WorkspaceWhereInput
+  data: Prisma.XOR<Prisma.WorkspaceUpdateWithoutShareLinksInput, Prisma.WorkspaceUncheckedUpdateWithoutShareLinksInput>
+}
+
+export type WorkspaceUpdateWithoutShareLinksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  currentPlanId?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  currentPlanStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  currentPlanRenewsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownerUser?: Prisma.UserUpdateOneRequiredWithoutWorkspacesNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
+  billingWebhookEvents?: Prisma.BillingWebhookEventUpdateManyWithoutWorkspaceNestedInput
+  memberships?: Prisma.WorkspaceMembershipUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUpdateManyWithoutWorkspaceNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutWorkspaceNestedInput
+}
+
+export type WorkspaceUncheckedUpdateWithoutShareLinksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  currentPlanId?: Prisma.StringFieldUpdateOperationsInput | string
+  razorpayCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  razorpaySubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  currentPlanStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  currentPlanRenewsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
+  billingWebhookEvents?: Prisma.BillingWebhookEventUncheckedUpdateManyWithoutWorkspaceNestedInput
+  memberships?: Prisma.WorkspaceMembershipUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateWithoutBillingWebhookEventsInput = {
@@ -708,6 +1193,10 @@ export type WorkspaceCreateWithoutBillingWebhookEventsInput = {
   updatedAt?: Date | string
   ownerUser: Prisma.UserCreateNestedOneWithoutWorkspacesInput
   projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
+  memberships?: Prisma.WorkspaceMembershipCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationCreateNestedManyWithoutWorkspaceInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutWorkspaceInput
+  shareLinks?: Prisma.ShareLinkCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutBillingWebhookEventsInput = {
@@ -723,6 +1212,10 @@ export type WorkspaceUncheckedCreateWithoutBillingWebhookEventsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
+  memberships?: Prisma.WorkspaceMembershipUncheckedCreateNestedManyWithoutWorkspaceInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedCreateNestedManyWithoutWorkspaceInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutWorkspaceInput
+  shareLinks?: Prisma.ShareLinkUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutBillingWebhookEventsInput = {
@@ -754,6 +1247,10 @@ export type WorkspaceUpdateWithoutBillingWebhookEventsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownerUser?: Prisma.UserUpdateOneRequiredWithoutWorkspacesNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
+  memberships?: Prisma.WorkspaceMembershipUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUpdateManyWithoutWorkspaceNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutWorkspaceNestedInput
+  shareLinks?: Prisma.ShareLinkUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutBillingWebhookEventsInput = {
@@ -769,6 +1266,10 @@ export type WorkspaceUncheckedUpdateWithoutBillingWebhookEventsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
+  memberships?: Prisma.WorkspaceMembershipUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  shareLinks?: Prisma.ShareLinkUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateManyOwnerUserInput = {
@@ -797,6 +1298,10 @@ export type WorkspaceUpdateWithoutOwnerUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
   billingWebhookEvents?: Prisma.BillingWebhookEventUpdateManyWithoutWorkspaceNestedInput
+  memberships?: Prisma.WorkspaceMembershipUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUpdateManyWithoutWorkspaceNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutWorkspaceNestedInput
+  shareLinks?: Prisma.ShareLinkUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutOwnerUserInput = {
@@ -812,6 +1317,10 @@ export type WorkspaceUncheckedUpdateWithoutOwnerUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
   billingWebhookEvents?: Prisma.BillingWebhookEventUncheckedUpdateManyWithoutWorkspaceNestedInput
+  memberships?: Prisma.WorkspaceMembershipUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invitations?: Prisma.WorkspaceInvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  shareLinks?: Prisma.ShareLinkUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateManyWithoutOwnerUserInput = {
@@ -835,11 +1344,19 @@ export type WorkspaceUncheckedUpdateManyWithoutOwnerUserInput = {
 export type WorkspaceCountOutputType = {
   projects: number
   billingWebhookEvents: number
+  memberships: number
+  invitations: number
+  documents: number
+  shareLinks: number
 }
 
 export type WorkspaceCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   projects?: boolean | WorkspaceCountOutputTypeCountProjectsArgs
   billingWebhookEvents?: boolean | WorkspaceCountOutputTypeCountBillingWebhookEventsArgs
+  memberships?: boolean | WorkspaceCountOutputTypeCountMembershipsArgs
+  invitations?: boolean | WorkspaceCountOutputTypeCountInvitationsArgs
+  documents?: boolean | WorkspaceCountOutputTypeCountDocumentsArgs
+  shareLinks?: boolean | WorkspaceCountOutputTypeCountShareLinksArgs
 }
 
 /**
@@ -866,6 +1383,34 @@ export type WorkspaceCountOutputTypeCountBillingWebhookEventsArgs<ExtArgs extend
   where?: Prisma.BillingWebhookEventWhereInput
 }
 
+/**
+ * WorkspaceCountOutputType without action
+ */
+export type WorkspaceCountOutputTypeCountMembershipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.WorkspaceMembershipWhereInput
+}
+
+/**
+ * WorkspaceCountOutputType without action
+ */
+export type WorkspaceCountOutputTypeCountInvitationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.WorkspaceInvitationWhereInput
+}
+
+/**
+ * WorkspaceCountOutputType without action
+ */
+export type WorkspaceCountOutputTypeCountDocumentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DocumentWhereInput
+}
+
+/**
+ * WorkspaceCountOutputType without action
+ */
+export type WorkspaceCountOutputTypeCountShareLinksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ShareLinkWhereInput
+}
+
 
 export type WorkspaceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -882,6 +1427,10 @@ export type WorkspaceSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   ownerUser?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   projects?: boolean | Prisma.Workspace$projectsArgs<ExtArgs>
   billingWebhookEvents?: boolean | Prisma.Workspace$billingWebhookEventsArgs<ExtArgs>
+  memberships?: boolean | Prisma.Workspace$membershipsArgs<ExtArgs>
+  invitations?: boolean | Prisma.Workspace$invitationsArgs<ExtArgs>
+  documents?: boolean | Prisma.Workspace$documentsArgs<ExtArgs>
+  shareLinks?: boolean | Prisma.Workspace$shareLinksArgs<ExtArgs>
   _count?: boolean | Prisma.WorkspaceCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["workspace"]>
 
@@ -934,6 +1483,10 @@ export type WorkspaceInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   ownerUser?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   projects?: boolean | Prisma.Workspace$projectsArgs<ExtArgs>
   billingWebhookEvents?: boolean | Prisma.Workspace$billingWebhookEventsArgs<ExtArgs>
+  memberships?: boolean | Prisma.Workspace$membershipsArgs<ExtArgs>
+  invitations?: boolean | Prisma.Workspace$invitationsArgs<ExtArgs>
+  documents?: boolean | Prisma.Workspace$documentsArgs<ExtArgs>
+  shareLinks?: boolean | Prisma.Workspace$shareLinksArgs<ExtArgs>
   _count?: boolean | Prisma.WorkspaceCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type WorkspaceIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -949,6 +1502,10 @@ export type $WorkspacePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     ownerUser: Prisma.$UserPayload<ExtArgs>
     projects: Prisma.$ProjectPayload<ExtArgs>[]
     billingWebhookEvents: Prisma.$BillingWebhookEventPayload<ExtArgs>[]
+    memberships: Prisma.$WorkspaceMembershipPayload<ExtArgs>[]
+    invitations: Prisma.$WorkspaceInvitationPayload<ExtArgs>[]
+    documents: Prisma.$DocumentPayload<ExtArgs>[]
+    shareLinks: Prisma.$ShareLinkPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1359,6 +1916,10 @@ export interface Prisma__WorkspaceClient<T, Null = never, ExtArgs extends runtim
   ownerUser<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   projects<T extends Prisma.Workspace$projectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$projectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   billingWebhookEvents<T extends Prisma.Workspace$billingWebhookEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$billingWebhookEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BillingWebhookEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  memberships<T extends Prisma.Workspace$membershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$membershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkspaceMembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  invitations<T extends Prisma.Workspace$invitationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$invitationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkspaceInvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  documents<T extends Prisma.Workspace$documentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  shareLinks<T extends Prisma.Workspace$shareLinksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$shareLinksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShareLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1845,6 +2406,102 @@ export type Workspace$billingWebhookEventsArgs<ExtArgs extends runtime.Types.Ext
   take?: number
   skip?: number
   distinct?: Prisma.BillingWebhookEventScalarFieldEnum | Prisma.BillingWebhookEventScalarFieldEnum[]
+}
+
+/**
+ * Workspace.memberships
+ */
+export type Workspace$membershipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WorkspaceMembership
+   */
+  select?: Prisma.WorkspaceMembershipSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the WorkspaceMembership
+   */
+  omit?: Prisma.WorkspaceMembershipOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WorkspaceMembershipInclude<ExtArgs> | null
+  where?: Prisma.WorkspaceMembershipWhereInput
+  orderBy?: Prisma.WorkspaceMembershipOrderByWithRelationInput | Prisma.WorkspaceMembershipOrderByWithRelationInput[]
+  cursor?: Prisma.WorkspaceMembershipWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.WorkspaceMembershipScalarFieldEnum | Prisma.WorkspaceMembershipScalarFieldEnum[]
+}
+
+/**
+ * Workspace.invitations
+ */
+export type Workspace$invitationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WorkspaceInvitation
+   */
+  select?: Prisma.WorkspaceInvitationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the WorkspaceInvitation
+   */
+  omit?: Prisma.WorkspaceInvitationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WorkspaceInvitationInclude<ExtArgs> | null
+  where?: Prisma.WorkspaceInvitationWhereInput
+  orderBy?: Prisma.WorkspaceInvitationOrderByWithRelationInput | Prisma.WorkspaceInvitationOrderByWithRelationInput[]
+  cursor?: Prisma.WorkspaceInvitationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.WorkspaceInvitationScalarFieldEnum | Prisma.WorkspaceInvitationScalarFieldEnum[]
+}
+
+/**
+ * Workspace.documents
+ */
+export type Workspace$documentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Document
+   */
+  select?: Prisma.DocumentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Document
+   */
+  omit?: Prisma.DocumentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DocumentInclude<ExtArgs> | null
+  where?: Prisma.DocumentWhereInput
+  orderBy?: Prisma.DocumentOrderByWithRelationInput | Prisma.DocumentOrderByWithRelationInput[]
+  cursor?: Prisma.DocumentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DocumentScalarFieldEnum | Prisma.DocumentScalarFieldEnum[]
+}
+
+/**
+ * Workspace.shareLinks
+ */
+export type Workspace$shareLinksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ShareLink
+   */
+  select?: Prisma.ShareLinkSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ShareLink
+   */
+  omit?: Prisma.ShareLinkOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ShareLinkInclude<ExtArgs> | null
+  where?: Prisma.ShareLinkWhereInput
+  orderBy?: Prisma.ShareLinkOrderByWithRelationInput | Prisma.ShareLinkOrderByWithRelationInput[]
+  cursor?: Prisma.ShareLinkWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ShareLinkScalarFieldEnum | Prisma.ShareLinkScalarFieldEnum[]
 }
 
 /**

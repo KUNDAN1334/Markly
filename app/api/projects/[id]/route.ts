@@ -1,20 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import {
-  forbiddenResponse,
-  requireAuthenticatedUser,
-  requireOwnedProject,
-  unauthorizedResponse,
-} from '@/lib/auth';
+import { authorizeProjectAccess } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const user = await requireAuthenticatedUser(req);
-    if (!user) return unauthorizedResponse();
+    const access = await authorizeProjectAccess(req, id, 'view');
+    if (!access.ok) return access.response;
 
-    const project = await prisma.project.findFirst({
-      where: { id, ownerId: user.id },
+    const project = await prisma.project.findUnique({
+      where: { id },
       include: {
         documents: {
           where: { isVisible: true },
@@ -28,7 +23,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       },
     });
     if (!project) return NextResponse.json({ error: 'Project not found' }, { status: 404 });
-    return NextResponse.json(project);
+    return NextResponse.json({ ...project, myRole: access.role });
   } catch (error) {
     console.error('GET /api/projects/[id] error:', error);
     return NextResponse.json({ error: 'Failed to fetch project' }, { status: 500 });
@@ -38,11 +33,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const user = await requireAuthenticatedUser(req);
-    if (!user) return unauthorizedResponse();
-
-    const project = await requireOwnedProject(req, id);
-    if (!project) return forbiddenResponse('Project not found');
+    const access = await authorizeProjectAccess(req, id, 'deleteProject');
+    if (!access.ok) return access.response;
 
     await prisma.project.delete({ where: { id } });
     return NextResponse.json({ success: true });

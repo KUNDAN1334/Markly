@@ -10,7 +10,9 @@ import { CommentsSidebar } from '@/components/comments/CommentsSidebar';
 import { ShareModal } from '@/components/sharing/ShareModal';
 import { useEditorStore } from '@/lib/store';
 import { debounce } from '@/lib/utils';
+import { roleCanComment, roleCanEdit, roleCanExport } from '@/lib/rbac-ui';
 import { Annotation, AnnotationStyle, Comment, Document as MarklyDoc, ShareLink, AccessType } from '@/types';
+import type { ShareLinkOptions } from '@/components/sharing/ShareModal';
 import { MessageSquare, Layers, ArrowLeft } from 'lucide-react';
 
 type SidebarTab = 'pages' | 'comments';
@@ -181,11 +183,11 @@ export default function EditorPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [annotations]);
 
-  async function handleAddComment(content: string, pageNumber: number, annotationId?: string) {
+  async function handleAddComment(content: string, pageNumber: number, annotationId?: string, isInternal?: boolean) {
     const res = await fetch('/api/comments', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content, documentId, annotationId, pageNumber }),
+      body: JSON.stringify({ content, documentId, annotationId, pageNumber, isInternal: Boolean(isInternal) }),
     });
     const comment = await res.json();
     setComments((prev) => [comment, ...prev]);
@@ -206,10 +208,15 @@ export default function EditorPage() {
     setComments((prev) => prev.filter((c) => c.id !== id));
   }
 
-  async function handleCreateShareLink(access: AccessType): Promise<ShareLink> {
+  async function handleCreateShareLink(access: AccessType, options?: ShareLinkOptions): Promise<ShareLink> {
     const res = await fetch('/api/share', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ documentId, access }),
+      body: JSON.stringify({
+        documentId,
+        access,
+        expiresAt: options?.expiresAt,
+        password: options?.password,
+      }),
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({ error: 'Failed to create share link' }));
@@ -257,6 +264,12 @@ export default function EditorPage() {
   const fileUrl = `/api/documents/file/${document.filename}?documentId=${document.id}`;
   const unresolvedComments = comments.filter((c) => !c.resolved).length;
 
+  // Soft (UI) role gating — hard enforcement happens in the API layer.
+  const myRole = document.myRole;
+  const canEditDoc = roleCanEdit(myRole);
+  const canExportDoc = roleCanExport(myRole);
+  const canCommentDoc = roleCanComment(myRole);
+
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-2)', overflow: 'hidden' }}>
 
@@ -288,6 +301,9 @@ export default function EditorPage() {
         isSaving={isSaving}
         isDirty={isDirty}
         onUpdateSelectedStyle={handleUpdateSelectedStyle}
+        readOnly={!canEditDoc}
+        canShare={canEditDoc}
+        canExport={canExportDoc}
       />
 
       {/* MAIN AREA */}
@@ -332,6 +348,8 @@ export default function EditorPage() {
                 onAdd={handleAddComment}
                 onResolve={handleResolveComment}
                 onDelete={handleDeleteComment}
+                readonly={!canCommentDoc}
+                allowInternal={canCommentDoc}
               />
             )}
           </div>
@@ -356,6 +374,7 @@ export default function EditorPage() {
                   height={canvasDimensions.height * zoom}
                   annotations={annotations}
                   onChange={handleAnnotationsChange}
+                  readonly={!canEditDoc}
                 />
               )}
             </div>

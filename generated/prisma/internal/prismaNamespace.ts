@@ -386,6 +386,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   User: 'User',
   Workspace: 'Workspace',
+  WorkspaceMembership: 'WorkspaceMembership',
+  WorkspaceInvitation: 'WorkspaceInvitation',
   Project: 'Project',
   Document: 'Document',
   Annotation: 'Annotation',
@@ -407,7 +409,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "workspace" | "project" | "document" | "annotation" | "comment" | "shareLink" | "billingWebhookEvent"
+    modelProps: "user" | "workspace" | "workspaceMembership" | "workspaceInvitation" | "project" | "document" | "annotation" | "comment" | "shareLink" | "billingWebhookEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -556,6 +558,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.WorkspaceCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.WorkspaceCountAggregateOutputType> | number
+        }
+      }
+    }
+    WorkspaceMembership: {
+      payload: Prisma.$WorkspaceMembershipPayload<ExtArgs>
+      fields: Prisma.WorkspaceMembershipFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.WorkspaceMembershipFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceMembershipPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.WorkspaceMembershipFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceMembershipPayload>
+        }
+        findFirst: {
+          args: Prisma.WorkspaceMembershipFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceMembershipPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.WorkspaceMembershipFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceMembershipPayload>
+        }
+        findMany: {
+          args: Prisma.WorkspaceMembershipFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceMembershipPayload>[]
+        }
+        create: {
+          args: Prisma.WorkspaceMembershipCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceMembershipPayload>
+        }
+        createMany: {
+          args: Prisma.WorkspaceMembershipCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.WorkspaceMembershipCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceMembershipPayload>[]
+        }
+        delete: {
+          args: Prisma.WorkspaceMembershipDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceMembershipPayload>
+        }
+        update: {
+          args: Prisma.WorkspaceMembershipUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceMembershipPayload>
+        }
+        deleteMany: {
+          args: Prisma.WorkspaceMembershipDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.WorkspaceMembershipUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.WorkspaceMembershipUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceMembershipPayload>[]
+        }
+        upsert: {
+          args: Prisma.WorkspaceMembershipUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceMembershipPayload>
+        }
+        aggregate: {
+          args: Prisma.WorkspaceMembershipAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateWorkspaceMembership>
+        }
+        groupBy: {
+          args: Prisma.WorkspaceMembershipGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkspaceMembershipGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.WorkspaceMembershipCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkspaceMembershipCountAggregateOutputType> | number
+        }
+      }
+    }
+    WorkspaceInvitation: {
+      payload: Prisma.$WorkspaceInvitationPayload<ExtArgs>
+      fields: Prisma.WorkspaceInvitationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.WorkspaceInvitationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceInvitationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.WorkspaceInvitationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceInvitationPayload>
+        }
+        findFirst: {
+          args: Prisma.WorkspaceInvitationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceInvitationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.WorkspaceInvitationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceInvitationPayload>
+        }
+        findMany: {
+          args: Prisma.WorkspaceInvitationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceInvitationPayload>[]
+        }
+        create: {
+          args: Prisma.WorkspaceInvitationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceInvitationPayload>
+        }
+        createMany: {
+          args: Prisma.WorkspaceInvitationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.WorkspaceInvitationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceInvitationPayload>[]
+        }
+        delete: {
+          args: Prisma.WorkspaceInvitationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceInvitationPayload>
+        }
+        update: {
+          args: Prisma.WorkspaceInvitationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceInvitationPayload>
+        }
+        deleteMany: {
+          args: Prisma.WorkspaceInvitationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.WorkspaceInvitationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.WorkspaceInvitationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceInvitationPayload>[]
+        }
+        upsert: {
+          args: Prisma.WorkspaceInvitationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceInvitationPayload>
+        }
+        aggregate: {
+          args: Prisma.WorkspaceInvitationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateWorkspaceInvitation>
+        }
+        groupBy: {
+          args: Prisma.WorkspaceInvitationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkspaceInvitationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.WorkspaceInvitationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkspaceInvitationCountAggregateOutputType> | number
         }
       }
     }
@@ -1072,6 +1222,35 @@ export const WorkspaceScalarFieldEnum = {
 export type WorkspaceScalarFieldEnum = (typeof WorkspaceScalarFieldEnum)[keyof typeof WorkspaceScalarFieldEnum]
 
 
+export const WorkspaceMembershipScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  workspaceId: 'workspaceId',
+  role: 'role',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WorkspaceMembershipScalarFieldEnum = (typeof WorkspaceMembershipScalarFieldEnum)[keyof typeof WorkspaceMembershipScalarFieldEnum]
+
+
+export const WorkspaceInvitationScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  email: 'email',
+  role: 'role',
+  token: 'token',
+  status: 'status',
+  invitedByUserId: 'invitedByUserId',
+  expiresAt: 'expiresAt',
+  acceptedAt: 'acceptedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WorkspaceInvitationScalarFieldEnum = (typeof WorkspaceInvitationScalarFieldEnum)[keyof typeof WorkspaceInvitationScalarFieldEnum]
+
+
 export const ProjectScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -1093,6 +1272,7 @@ export const DocumentScalarFieldEnum = {
   path: 'path',
   isVisible: 'isVisible',
   projectId: 'projectId',
+  workspaceId: 'workspaceId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1124,6 +1304,7 @@ export const CommentScalarFieldEnum = {
   authorName: 'authorName',
   pageNumber: 'pageNumber',
   resolved: 'resolved',
+  isInternal: 'isInternal',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1137,7 +1318,9 @@ export const ShareLinkScalarFieldEnum = {
   projectId: 'projectId',
   documentId: 'documentId',
   createdByUserId: 'createdByUserId',
+  workspaceId: 'workspaceId',
   access: 'access',
+  passwordHash: 'passwordHash',
   createdAt: 'createdAt',
   expiresAt: 'expiresAt'
 } as const
@@ -1392,6 +1575,8 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   workspace?: Prisma.WorkspaceOmit
+  workspaceMembership?: Prisma.WorkspaceMembershipOmit
+  workspaceInvitation?: Prisma.WorkspaceInvitationOmit
   project?: Prisma.ProjectOmit
   document?: Prisma.DocumentOmit
   annotation?: Prisma.AnnotationOmit

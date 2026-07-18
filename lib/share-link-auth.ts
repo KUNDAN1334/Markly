@@ -1,3 +1,4 @@
+import { createHash } from 'crypto';
 import { prisma } from '@/lib/prisma';
 import { AccessType } from '@/types';
 
@@ -9,14 +10,19 @@ const ACCESS_RANK: Record<AccessType, number> = {
 
 type ValidationResult =
   | { ok: true }
-  | { ok: false; status: number; error: string };
+  | { ok: false; status: number; error: string; code?: string };
+
+export function hashSharePassword(password: string): string {
+  return createHash('sha256').update(password).digest('hex');
+}
 
 export async function validateShareLinkAccess(params: {
   token: string;
   documentId: string;
   minimumAccess: AccessType;
+  password?: string | null;
 }): Promise<ValidationResult> {
-  const { token, documentId, minimumAccess } = params;
+  const { token, documentId, minimumAccess, password } = params;
 
   const shareLink = await prisma.shareLink.findUnique({
     where: { token },
@@ -25,6 +31,7 @@ export async function validateShareLinkAccess(params: {
       expiresAt: true,
       projectId: true,
       documentId: true,
+      passwordHash: true,
     },
   });
 
@@ -34,6 +41,17 @@ export async function validateShareLinkAccess(params: {
 
   if (shareLink.expiresAt && new Date(shareLink.expiresAt) < new Date()) {
     return { ok: false, status: 410, error: 'Link expired' };
+  }
+
+  if (shareLink.passwordHash) {
+    if (!password || hashSharePassword(password) !== shareLink.passwordHash) {
+      return {
+        ok: false,
+        status: 401,
+        error: 'This link is password protected',
+        code: 'SHARE_PASSWORD_REQUIRED',
+      };
+    }
   }
 
   if (ACCESS_RANK[shareLink.access as AccessType] < ACCESS_RANK[minimumAccess]) {

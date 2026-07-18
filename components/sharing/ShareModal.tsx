@@ -2,16 +2,28 @@
 
 import { useMemo, useState } from 'react';
 import { ShareLink, AccessType } from '@/types';
-import { X, Copy, Check, Link, Trash2, Plus, Eye, MessageSquare, Edit3 } from 'lucide-react';
+import { X, Copy, Check, Link, Trash2, Plus, Eye, MessageSquare, Edit3, Clock, Lock } from 'lucide-react';
+
+export interface ShareLinkOptions {
+  expiresAt?: string;
+  password?: string;
+}
 
 interface Props {
   shareLinks: ShareLink[];
   onClose: () => void;
-  onCreateLink: (access: AccessType) => Promise<ShareLink>;
+  onCreateLink: (access: AccessType, options?: ShareLinkOptions) => Promise<ShareLink>;
   onDeleteLink: (id: string) => Promise<void>;
   hiddenToken?: string;
   allowDelete?: boolean;
 }
+
+const EXPIRY_OPTIONS: { id: string; label: string; days: number | null }[] = [
+  { id: 'never', label: 'Never expires', days: null },
+  { id: '1d', label: '1 day', days: 1 },
+  { id: '7d', label: '7 days', days: 7 },
+  { id: '30d', label: '30 days', days: 30 },
+];
 
 const ACCESS_OPTIONS: { id: AccessType; label: string; desc: string; icon: React.ReactNode }[] = [
   { id: 'VIEW',    label: 'Can view',    desc: 'Read-only access',       icon: <Eye size={12} /> },
@@ -30,6 +42,8 @@ export function ShareModal({
   const [selectedAccess, setSelectedAccess] = useState<AccessType>('COMMENT');
   const [creating, setCreating] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [expiryId, setExpiryId] = useState('never');
+  const [password, setPassword] = useState('');
 
   const appUrl = typeof window !== 'undefined' ? window.location.origin : '';
 
@@ -50,7 +64,15 @@ export function ShareModal({
   async function handleCreate() {
     setCreating(true);
     try {
-      await onCreateLink(selectedAccess);
+      const expiry = EXPIRY_OPTIONS.find((o) => o.id === expiryId);
+      const expiresAt = expiry?.days
+        ? new Date(Date.now() + expiry.days * 24 * 60 * 60 * 1000).toISOString()
+        : undefined;
+      await onCreateLink(selectedAccess, {
+        expiresAt,
+        password: password.trim() || undefined,
+      });
+      setPassword('');
     } finally {
       setCreating(false);
     }
@@ -94,6 +116,17 @@ export function ShareModal({
             }}>
               {link.access}
             </span>
+            {link.expiresAt && (
+              <span title={`Expires ${new Date(link.expiresAt).toLocaleString()}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 9, color: 'var(--text-3)' }}>
+                <Clock size={9} />
+                {new Date(link.expiresAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              </span>
+            )}
+            {link.hasPassword && (
+              <span title="Password protected" style={{ display: 'inline-flex', alignItems: 'center', color: 'var(--text-3)' }}>
+                <Lock size={9} />
+              </span>
+            )}
           </div>
           <p
             style={{
@@ -198,6 +231,34 @@ export function ShareModal({
                   {opt.label}
                 </button>
               ))}
+            </div>
+            <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
+              <select
+                value={expiryId}
+                onChange={(e) => setExpiryId(e.target.value)}
+                title="Link expiry"
+                style={{
+                  flex: 1, background: 'var(--bg-card)', border: '1px solid var(--border)',
+                  borderRadius: 8, padding: '7px 8px', fontSize: 11, color: 'var(--text)',
+                  fontFamily: "'Instrument Sans', sans-serif", cursor: 'pointer',
+                }}
+              >
+                {EXPIRY_OPTIONS.map((opt) => (
+                  <option key={opt.id} value={opt.id}>{opt.label}</option>
+                ))}
+              </select>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password (optional)"
+                autoComplete="new-password"
+                style={{
+                  flex: 1.4, background: 'var(--bg-card)', border: '1px solid var(--border)',
+                  borderRadius: 8, padding: '7px 10px', fontSize: 11, color: 'var(--text)',
+                  fontFamily: "'Instrument Sans', sans-serif", outline: 'none',
+                }}
+              />
             </div>
             <button
               onClick={handleCreate}

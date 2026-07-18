@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { PDFViewer } from '@/components/editor/PDFViewer';
 import { AnnotationCanvas } from '@/components/editor/AnnotationCanvas';
@@ -10,7 +10,8 @@ import { ShareModal } from '@/components/sharing/ShareModal';
 import { useEditorStore } from '@/lib/store';
 import { debounce } from '@/lib/utils';
 import { Annotation, AnnotationStyle, Comment, Document as MarklyDoc, AccessType, ShareLink } from '@/types';
-import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight, MessageSquare, Eye, Edit3, Sun, Moon, Copy, Check } from 'lucide-react';
+import type { ShareLinkOptions } from '@/components/sharing/ShareModal';
+import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight, MessageSquare, Eye, Edit3, Sun, Moon, Copy, Check, Lock } from 'lucide-react';
 
 export default function ReviewPage() {
   const params = useParams();
@@ -30,8 +31,23 @@ export default function ReviewPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [needsPassword, setNeedsPassword] = useState(false);
+  const [password, setPassword] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   const { currentPage, totalPages, setTotalPages, zoom, zoomIn, zoomOut, setCurrentPage, isDirty, setIsDirty, pushHistory, selectedAnnotationIds } = useEditorStore();
+
+  const loadRef = useRef<((pwd?: string) => Promise<void>) | null>(null);
+  // Ref mirrors `password` so debounced/memoized callbacks never read a stale value.
+  const passwordRef = useRef('');
+
+  // Headers for share-authenticated API calls (password included when set).
+  const shareHeaders: Record<string, string> = {
+    'x-share-token': token,
+    ...(password ? { 'x-share-password': password } : {}),
+  };
+  const passwordQuery = password ? `&password=${encodeURIComponent(password)}` : '';
 
   useEffect(() => {
     const saved = localStorage.getItem('markly-theme') as 'light' | 'dark' | null;
@@ -39,11 +55,28 @@ export default function ReviewPage() {
     setTheme(t);
     window.document.documentElement.setAttribute('data-theme', t);
 
-    async function load() {
+    async function load(pwd?: string) {
       try {
-        const res = await fetch(`/api/share?token=${token}`);
-        if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Invalid link'); }
+        const url = pwd
+          ? `/api/share?token=${token}&password=${encodeURIComponent(pwd)}`
+          : `/api/share?token=${token}`;
+        const res = await fetch(url);
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          if (err.code === 'SHARE_PASSWORD_REQUIRED') {
+            setNeedsPassword(true);
+            if (pwd) setPasswordError('Incorrect password');
+            return;
+          }
+          throw new Error(err.error || 'Invalid link');
+        }
         const shareLink = await res.json();
+        setNeedsPassword(false);
+        setPasswordError(null);
+        if (pwd) {
+          setPassword(pwd);
+          passwordRef.current = pwd;
+        }
         setAccess(shareLink.access);
         setShareLinks(shareLink.document?.shareLinks || shareLink.project?.shareLinks || []);
         const doc = shareLink.document ?? shareLink.project?.documents?.[0] ?? null;
@@ -58,6 +91,7 @@ export default function ReviewPage() {
         setLoading(false);
       }
     }
+    loadRef.current = load;
     load();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
@@ -69,7 +103,11 @@ export default function ReviewPage() {
       try {
         const res = await fetch('/api/annotations', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-share-token': token },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-share-token': token,
+            ...(passwordRef.current ? { 'x-share-password': passwordRef.current } : {}),
+          },
           body: JSON.stringify({ documentId: docId, annotations: anns }),
         });
 
@@ -125,7 +163,7 @@ export default function ReviewPage() {
   async function handleAddComment(content: string, pageNumber: number, annotationId?: string) {
     if (!document || access === 'VIEW') return;
     const res = await fetch('/api/comments', {
-      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-share-token': token },
+      method: 'POST', headers: { 'Content-Type': 'application/json', ...shareHeaders },
       body: JSON.stringify({ content, documentId: document.id, annotationId, pageNumber }),
     });
     const comment = await res.json();
@@ -135,7 +173,7 @@ export default function ReviewPage() {
   async function handleResolveComment(id: string, resolved: boolean) {
     const res = await fetch(`/api/comments/${id}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'x-share-token': token },
+      headers: { 'Content-Type': 'application/json', ...shareHeaders },
       body: JSON.stringify({ resolved }),
     });
     if (!res.ok) {
@@ -149,19 +187,24 @@ export default function ReviewPage() {
   async function handleDeleteComment(id: string) {
     await fetch(`/api/comments/${id}`, {
       method: 'DELETE',
-      headers: { 'x-share-token': token },
+      headers: shareHeaders,
     });
     setComments((prev) => prev.filter((c) => c.id !== id));
   }
 
-  async function handleCreateShareLink(accessType: AccessType): Promise<ShareLink> {
+  async function handleCreateShareLink(accessType: AccessType, options?: ShareLinkOptions): Promise<ShareLink> {
     if (!document) {
       throw new Error('Document not loaded');
     }
 
     const res = await fetch('/api/share', {
-      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-share-token': token },
-      body: JSON.stringify({ documentId: document.id, access: accessType }),
+      method: 'POST', headers: { 'Content-Type': 'application/json', ...shareHeaders },
+      body: JSON.stringify({
+        documentId: document.id,
+        access: accessType,
+        expiresAt: options?.expiresAt,
+        password: options?.password,
+      }),
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({ error: 'Failed to create share link' }));
@@ -196,7 +239,7 @@ export default function ReviewPage() {
     try {
       const res = await fetch('/api/annotations', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-share-token': token },
+        headers: { 'Content-Type': 'application/json', ...shareHeaders },
         body: JSON.stringify({ documentId: document.id, annotations }),
       });
 
@@ -227,6 +270,48 @@ export default function ReviewPage() {
     );
   }
 
+  if (needsPassword && !document) {
+    return (
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', padding: 16 }}>
+        <div className="animate-fade-up" style={{ width: '100%', maxWidth: 380, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: 32, textAlign: 'center', boxShadow: 'var(--shadow-lg)' }}>
+          <div style={{ width: 44, height: 44, background: 'var(--bg-2)', border: '1px solid var(--border)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+            <Lock size={18} style={{ color: 'var(--text-2)' }} />
+          </div>
+          <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 22, color: 'var(--text)', marginBottom: 6 }}>Password required</h2>
+          <p style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 20 }}>This shared document is password protected.</p>
+          <input
+            type="password"
+            value={passwordInput}
+            onChange={(e) => setPasswordInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && passwordInput.trim()) {
+                setLoading(true);
+                loadRef.current?.(passwordInput.trim());
+              }
+            }}
+            placeholder="Enter password"
+            autoFocus
+            style={{ width: '100%', background: 'var(--bg-2)', border: '1px solid var(--border)', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: 'var(--text)', outline: 'none', fontFamily: "'Instrument Sans', sans-serif", marginBottom: 10 }}
+          />
+          <button
+            onClick={() => {
+              if (!passwordInput.trim()) return;
+              setLoading(true);
+              loadRef.current?.(passwordInput.trim());
+            }}
+            disabled={!passwordInput.trim()}
+            style={{ width: '100%', background: 'var(--accent)', color: 'var(--accent-fg)', border: 'none', borderRadius: 10, padding: '10px 0', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: "'Instrument Sans', sans-serif", opacity: passwordInput.trim() ? 1 : 0.45 }}
+          >
+            Unlock document →
+          </button>
+          {passwordError && (
+            <p style={{ fontSize: 11, color: '#b91c1c', marginTop: 10 }}>{passwordError}</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   if (error || !document) {
     return (
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)' }}>
@@ -238,7 +323,7 @@ export default function ReviewPage() {
     );
   }
 
-  const fileUrl = `/api/documents/file/${document.filename}?documentId=${document.id}&token=${token}`;
+  const fileUrl = `/api/documents/file/${document.filename}?documentId=${document.id}&token=${token}${passwordQuery}`;
   const canComment = access === 'COMMENT' || access === 'EDIT';
   const canEdit = access === 'EDIT';
   const unresolvedCount = comments.filter((c) => !c.resolved).length;
@@ -324,7 +409,7 @@ export default function ReviewPage() {
       {canEdit && (
         <Toolbar
           onSave={handleManualSave}
-          onExport={() => window.open(`/api/export?documentId=${document.id}&token=${token}`, '_blank')}
+          onExport={() => window.open(`/api/export?documentId=${document.id}&token=${token}${passwordQuery}`, '_blank')}
           onShare={() => setShowShare(true)}
           isSaving={isSaving}
           isDirty={isDirty}

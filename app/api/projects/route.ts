@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuthenticatedUser, unauthorizedResponse } from '@/lib/auth';
+import { forbiddenResponse, requireAuthenticatedUser, unauthorizedResponse } from '@/lib/auth';
 import { checkWorkspaceLimits, planErrorResponse } from '@/lib/billing/feature-gating';
 import { ensureWorkspaceForUser } from '@/lib/billing/workspace';
+import { getCurrentWorkspace } from '@/lib/workspace-access';
+import { hasPermission } from '@/lib/rbac';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
@@ -15,9 +17,11 @@ export async function GET(req: NextRequest) {
     if (!user) return unauthorizedResponse();
 
     await ensureWorkspaceForUser(user);
+    const { workspace } = await getCurrentWorkspace(req, user);
 
+    // Workspace-scoped: members see every project in the current workspace.
     const projects = await prisma.project.findMany({
-      where: { ownerId: user.id },
+      where: { workspaceId: workspace.id },
       include: {
         documents: {
           where: { isVisible: true },
@@ -40,7 +44,12 @@ export async function POST(req: NextRequest) {
   try {
     const user = await requireAuthenticatedUser(req);
     if (!user) return unauthorizedResponse();
-    const workspace = await ensureWorkspaceForUser(user);
+    await ensureWorkspaceForUser(user);
+    const { workspace, role } = await getCurrentWorkspace(req, user);
+
+    if (!hasPermission(role, 'createProject')) {
+      return forbiddenResponse('Your role does not allow creating projects');
+    }
 
     const body = await req.json();
     const { name } = createProjectSchema.parse(body);

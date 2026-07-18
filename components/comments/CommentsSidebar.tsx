@@ -2,23 +2,26 @@
 
 import { useState } from 'react';
 import { Comment } from '@/types';
-import { CheckCircle2, Trash2, Plus, MessageSquare, X } from 'lucide-react';
+import { CheckCircle2, Trash2, Plus, MessageSquare, X, Lock } from 'lucide-react';
 import { useEditorStore } from '@/lib/store';
 
 interface Props {
   comments: Comment[];
-  onAdd: (content: string, page: number, annotationId?: string) => Promise<void>;
+  onAdd: (content: string, page: number, annotationId?: string, isInternal?: boolean) => Promise<void>;
   onResolve: (id: string, resolved: boolean) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
   readonly?: boolean;
+  /** Workspace members can mark comments as team-only (hidden from share links). */
+  allowInternal?: boolean;
 }
 
-export function CommentsSidebar({ comments, onAdd, onResolve, onDelete, readonly }: Props) {
+export function CommentsSidebar({ comments, onAdd, onResolve, onDelete, readonly, allowInternal }: Props) {
   const { currentPage } = useEditorStore();
   const [newComment, setNewComment] = useState('');
   const [adding, setAdding] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
   const [showResolved, setShowResolved] = useState(false);
+  const [isInternal, setIsInternal] = useState(false);
 
   const visible = comments.filter((c) => showResolved || !c.resolved);
   const unresolvedCount = comments.filter((c) => !c.resolved).length;
@@ -27,9 +30,10 @@ export function CommentsSidebar({ comments, onAdd, onResolve, onDelete, readonly
     if (!newComment.trim()) return;
     setLoading('add');
     try {
-      await onAdd(newComment.trim(), currentPage);
+      await onAdd(newComment.trim(), currentPage, undefined, allowInternal ? isInternal : false);
       setNewComment('');
       setAdding(false);
+      setIsInternal(false);
     } finally {
       setLoading(null);
     }
@@ -91,8 +95,13 @@ export function CommentsSidebar({ comments, onAdd, onResolve, onDelete, readonly
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
-                <span style={{ fontSize: 9, color: 'var(--text-3)', fontFamily: "'DM Mono', monospace" }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 9, color: 'var(--text-3)', fontFamily: "'DM Mono', monospace" }}>
                   {new Date(comment.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  {comment.isInternal && (
+                    <span title="Team-only comment" style={{ display: 'inline-flex', alignItems: 'center', gap: 2, color: '#c2410c' }}>
+                      <Lock size={8} /> Team
+                    </span>
+                  )}
                 </span>
                 {comment.resolved ? (
                   <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 9, color: '#16a34a' }}>
@@ -165,6 +174,17 @@ export function CommentsSidebar({ comments, onAdd, onResolve, onDelete, readonly
                 onFocus={e => (e.target.style.borderColor = 'var(--border-strong)')}
                 onBlur={e => (e.target.style.borderColor = 'var(--border)')}
               />
+              {allowInternal && (
+                <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, color: 'var(--text-3)', cursor: 'pointer', fontFamily: "'Instrument Sans', sans-serif", userSelect: 'none' }}>
+                  <input
+                    type="checkbox"
+                    checked={isInternal}
+                    onChange={(e) => setIsInternal(e.target.checked)}
+                    style={{ accentColor: 'var(--accent)', cursor: 'pointer' }}
+                  />
+                  <Lock size={9} /> Team-only (hidden from shared links)
+                </label>
+              )}
               <div style={{ display: 'flex', gap: 5 }}>
                 <button
                   onClick={handleAdd}

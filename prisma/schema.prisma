@@ -8,17 +8,19 @@ datasource db {
 }
 
 model User {
-  id          String      @id @default(cuid())
-  firebaseUid String      @unique
-  email       String?
-  name        String?
-  imageUrl    String?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  projects    Project[]
-  workspaces  Workspace[]
-  comments    Comment[]
-  shareLinks  ShareLink[]
+  id              String                @id @default(cuid())
+  firebaseUid     String                @unique
+  email           String?
+  name            String?
+  imageUrl        String?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  projects        Project[]
+  workspaces      Workspace[]
+  comments        Comment[]
+  shareLinks      ShareLink[]
+  memberships     WorkspaceMembership[]
+  sentInvitations WorkspaceInvitation[]
 }
 
 model Workspace {
@@ -36,8 +38,48 @@ model Workspace {
   updatedAt              DateTime             @updatedAt
   projects               Project[]
   billingWebhookEvents   BillingWebhookEvent[]
+  memberships            WorkspaceMembership[]
+  invitations            WorkspaceInvitation[]
+  documents              Document[]
+  shareLinks             ShareLink[]
 
   @@index([ownerUserId])
+}
+
+// Role values: OWNER | ADMIN | EDITOR | COMMENTER | VIEWER
+// (string column to match existing convention, e.g. ShareLink.access)
+model WorkspaceMembership {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  role        String    @default("VIEWER")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([userId, workspaceId])
+  @@index([workspaceId])
+}
+
+// Status values: PENDING | ACCEPTED | REVOKED
+model WorkspaceInvitation {
+  id              String    @id @default(cuid())
+  workspaceId     String
+  workspace       Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  email           String
+  role            String    @default("VIEWER")
+  token           String    @unique @default(cuid())
+  status          String    @default("PENDING")
+  invitedByUserId String?
+  invitedByUser   User?     @relation(fields: [invitedByUserId], references: [id], onDelete: SetNull)
+  expiresAt       DateTime?
+  acceptedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([workspaceId, status])
+  @@index([email, status])
 }
 
 model Project {
@@ -66,6 +108,8 @@ model Document {
   isVisible    Boolean      @default(true)
   projectId    String
   project      Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  workspaceId  String?
+  workspace    Workspace?   @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
   annotations  Annotation[]
   comments     Comment[]
   shareLinks   ShareLink[]
@@ -73,6 +117,7 @@ model Document {
   updatedAt    DateTime     @updatedAt
 
   @@index([projectId, createdAt])
+  @@index([workspaceId])
 }
 
 model Annotation {
@@ -101,6 +146,8 @@ model Comment {
   authorName   String?
   pageNumber   Int
   resolved     Boolean     @default(false)
+  // Internal comments are only visible to workspace members (never via share links)
+  isInternal   Boolean     @default(false)
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
 }
@@ -114,9 +161,15 @@ model ShareLink {
   document        Document? @relation(fields: [documentId], references: [id], onDelete: Cascade)
   createdByUserId String?
   createdByUser   User?     @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+  workspaceId     String?
+  workspace       Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
   access          String    @default("VIEW")
+  // sha256 hash — link is public when null
+  passwordHash    String?
   createdAt       DateTime  @default(now())
   expiresAt       DateTime?
+
+  @@index([workspaceId])
 }
 
 model BillingWebhookEvent {

@@ -15,7 +15,11 @@ export async function GET(
       where: { id },
       include: {
         annotations: { orderBy: { createdAt: "asc" } },
-        comments: { orderBy: { createdAt: "desc" } },
+        comments: {
+          // Share-link users never receive internal (team-only) comments.
+          ...(access.actor === 'share' ? { where: { isInternal: false } } : {}),
+          orderBy: { createdAt: "desc" },
+        },
       },
     });
 
@@ -23,7 +27,11 @@ export async function GET(
       return NextResponse.json({ error: "Document not found" }, { status: 404 });
     }
 
-    return NextResponse.json(document);
+    return NextResponse.json({
+      ...document,
+      // Lets the editor UI apply soft (role-based) gating.
+      myRole: access.actor === 'member' ? access.role : null,
+    });
   } catch (error) {
     console.error("Error fetching document:", error);
     return NextResponse.json({ error: "Failed to fetch document" }, { status: 500 });

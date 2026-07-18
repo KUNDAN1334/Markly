@@ -4,6 +4,7 @@ import {
   requireAuthenticatedUser,
   unauthorizedResponse,
 } from '@/lib/auth';
+import { getWorkspaceRoleForProject, hasPermission } from '@/lib/rbac';
 import { prisma } from '@/lib/prisma';
 
 type RouteContext = {
@@ -21,9 +22,7 @@ export async function DELETE(req: Request, { params }: RouteContext) {
       select: {
         id: true,
         documentId: true,
-        project: {
-          select: { ownerId: true },
-        },
+        projectId: true,
       },
     });
 
@@ -31,8 +30,9 @@ export async function DELETE(req: Request, { params }: RouteContext) {
       return NextResponse.json({ error: 'Share link not found' }, { status: 404 });
     }
 
-    if (shareLink.project.ownerId !== user.id) {
-      return forbiddenResponse('Only the owner can delete share links');
+    const membership = await getWorkspaceRoleForProject(user.id, shareLink.projectId);
+    if (!membership || !hasPermission(membership.role, 'manageShareLinks')) {
+      return forbiddenResponse('Your role does not allow deleting share links');
     }
 
     await prisma.$transaction(async (tx) => {

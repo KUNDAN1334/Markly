@@ -17,7 +17,7 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
     const body = updateCommentSchema.parse(await req.json());
     const existingComment = await prisma.comment.findUnique({
       where: { id },
-      select: { documentId: true },
+      select: { documentId: true, isInternal: true },
     });
 
     if (!existingComment) {
@@ -26,6 +26,11 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
 
     const access = await authorizeDocumentAccess(req, existingComment.documentId, 'COMMENT');
     if (!access.ok) return access.response;
+
+    // Internal comments are invisible to share-link users.
+    if (access.actor === 'share' && existingComment.isInternal) {
+      return NextResponse.json({ error: 'Comment not found' }, { status: 404 });
+    }
 
     const comment = await prisma.comment.update({
       where: { id },
@@ -47,7 +52,7 @@ export async function DELETE(_req: NextRequest, { params }: RouteContext) {
     const { id } = await params;
     const existingComment = await prisma.comment.findUnique({
       where: { id },
-      select: { documentId: true },
+      select: { documentId: true, isInternal: true },
     });
 
     if (!existingComment) {
@@ -56,6 +61,10 @@ export async function DELETE(_req: NextRequest, { params }: RouteContext) {
 
     const access = await authorizeDocumentAccess(_req, existingComment.documentId, 'COMMENT');
     if (!access.ok) return access.response;
+
+    if (access.actor === 'share' && existingComment.isInternal) {
+      return NextResponse.json({ error: 'Comment not found' }, { status: 404 });
+    }
 
     await prisma.comment.delete({
       where: { id },

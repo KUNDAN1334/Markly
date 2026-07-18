@@ -22,6 +22,7 @@ export async function createDocumentBranch(sourceDocumentId: string) {
         size: source.size,
         path: source.path,
         projectId: source.projectId,
+        workspaceId: source.workspaceId,
         isVisible: false,
       },
     });
@@ -48,6 +49,7 @@ export async function createDocumentBranch(sourceDocumentId: string) {
           authorName: comment.authorName,
           pageNumber: comment.pageNumber,
           resolved: comment.resolved,
+          isInternal: comment.isInternal,
         })),
       });
     }

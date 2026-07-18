@@ -9,6 +9,7 @@ const commentSchema = z.object({
   documentId: z.string(),
   annotationId: z.string().optional(),
   pageNumber: z.number().int().min(1),
+  isInternal: z.boolean().optional().default(false),
 });
 
 export async function GET(req: NextRequest) {
@@ -20,7 +21,11 @@ export async function GET(req: NextRequest) {
   if (!access.ok) return access.response;
 
   const comments = await prisma.comment.findMany({
-    where: { documentId },
+    where: {
+      documentId,
+      // External (share link) users never see internal team comments.
+      ...(access.actor === 'share' ? { isInternal: false } : {}),
+    },
     orderBy: { createdAt: 'desc' },
   });
   return NextResponse.json(comments);
@@ -37,11 +42,11 @@ export async function POST(req: NextRequest) {
     let authorUserId: string | null = null;
     let authorName: string | null = null;
 
-    if (access.actor === 'owner') {
+    if (access.actor === 'member') {
       const user = await requireAuthenticatedUser(req);
       if (!user) return unauthorizedResponse();
       authorUserId = user.id;
-      authorName = user.name || user.email || 'Owner';
+      authorName = user.name || user.email || 'Member';
     } else {
       authorName = 'Shared reviewer';
     }
@@ -49,6 +54,8 @@ export async function POST(req: NextRequest) {
     const comment = await prisma.comment.create({
       data: {
         ...data,
+        // Only workspace members can post internal (team-only) comments.
+        isInternal: access.actor === 'member' ? data.isInternal : false,
         authorUserId,
         authorName,
       },

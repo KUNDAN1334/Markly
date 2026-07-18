@@ -153,6 +153,7 @@ export interface EditorState {
   fillColor: string;
   strokeWidth: number;
   fontSize: number;
+  fontFamily: string;
   opacity: number;
   zoom: number;
   currentPage: number;

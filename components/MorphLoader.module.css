@@ -1,0 +1,231 @@
+/* ===== Markly — full-screen logo-intro loader ===== */
+/* Replicates the reference clip:
+     1. A dot pops in the center and grows into a white disc.
+     2. The disc inverts into a ring with the logo glyph inside.
+     3. The ring dissolves; the glyph stays and slides left.
+     4. "Markly" reveals letter-by-letter beside it.
+     5. Hold — then the whole curtain wipes UPWARD to reveal the page.
+   Strict black & white.
+
+   Timeline: 2800ms total. Every element gets its own delayed animation on
+   the same clock; the overlay's wipe (ends at 2800ms) drives the unmount.
+   The wipe animates transform only (GPU-composited) — no layout/paint. */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0a0a;
+  overflow: hidden;
+  animation: wipeUp 2800ms both;
+  will-change: transform;
+}
+
+/* subtle film grain so the flat black reads premium, not empty */
+.overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Curtain holds, then slides up and off-screen — the reveal. */
+@keyframes wipeUp {
+  0%,
+  78% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.83, 0, 0.17, 1);
+  }
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+/* ---- Lockup: badge + wordmark as one centered row ---- */
+/* Starts shifted right by ~half the wordmark width so the badge sits dead
+   center during the intro, then slides to true center as the name reveals. */
+.lockup {
+  display: flex;
+  align-items: center;
+  gap: 0.38em;
+  font-size: clamp(2.4rem, 7vw, 4.2rem);
+  animation: lockupShift 550ms cubic-bezier(0.65, 0, 0.35, 1) 1050ms both;
+  will-change: transform;
+}
+
+@keyframes lockupShift {
+  0% {
+    transform: translateX(1.95em);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* ---- Badge: disc + ring + glyph stacked ---- */
+.badge {
+  position: relative;
+  width: 1.5em;
+  height: 1.5em;
+  flex: none;
+}
+
+/* White disc: pops in from a dot with overshoot, then dissolves outward
+   as the ring takes over. */
+.disc {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #fafafa;
+  animation: discLife 1000ms both;
+  will-change: transform, opacity;
+}
+
+@keyframes discLife {
+  0% {
+    opacity: 1;
+    transform: scale(0.08);
+    animation-timing-function: cubic-bezier(0.34, 1.4, 0.5, 1);
+  }
+  38% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.28);
+  }
+}
+
+/* Thin ring: appears as the disc inverts, then blooms away. */
+.ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 0.045em solid #fafafa;
+  animation: ringLife 950ms 450ms both;
+  will-change: transform, opacity;
+}
+
+@keyframes ringLife {
+  0% {
+    opacity: 0;
+    transform: scale(0.82);
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.7, 1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+/* Logo glyph: fades in dark against the white disc, then inverts to white
+   as the disc dissolves (color animates on the svg via currentColor). */
+.glyph {
+  position: absolute;
+  inset: 12%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0a0a0a;
+  animation: glyphIn 650ms cubic-bezier(0.22, 1, 0.36, 1) 380ms both;
+  will-change: transform, opacity;
+}
+
+.glyph svg {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes glyphIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.55);
+    color: #0a0a0a;
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1);
+    color: #0a0a0a;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    color: #fafafa;
+  }
+}
+
+/* ---- Wordmark: letters reveal left → right ---- */
+.word {
+  display: flex;
+  align-items: baseline;
+  font-family: 'Bricolage Grotesque', 'Instrument Sans', system-ui, sans-serif;
+  font-variation-settings: 'wght' 800, 'opsz' 96;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: #fafafa;
+  white-space: nowrap;
+}
+
+.letter {
+  display: inline-block;
+  animation: letterIn 340ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(1180ms + var(--i) * 55ms);
+  will-change: transform, opacity;
+}
+
+@keyframes letterIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-0.18em);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Respect users who prefer reduced motion: no pops/slides/wipe, just a
+   short, calm cross-fade of the finished lockup. */
+@media (prefers-reduced-motion: reduce) {
+  .overlay {
+    animation: overlayFade 900ms both;
+  }
+  .lockup,
+  .disc,
+  .ring,
+  .glyph,
+  .letter {
+    animation: none;
+  }
+  .disc,
+  .ring {
+    opacity: 0;
+  }
+  .glyph {
+    color: #fafafa;
+  }
+  @keyframes overlayFade {
+    0%, 55% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+}

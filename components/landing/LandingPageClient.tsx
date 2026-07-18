@@ -4,6 +4,7 @@ import type { CSSProperties, MouseEvent, ReactNode } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { PricingPlan } from '@/types';
+import MorphLoader from '@/components/MorphLoader';
 function useTheme() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   useEffect(() => {
@@ -730,9 +731,10 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
 
   return (
     <>
+      <MorphLoader />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
-        @font-face { font-family:'Virgil'; src:url('https://excalidraw.com/Virgil.woff2') format('woff2'); font-display:swap; }
+        @font-face { font-family:'Virgil'; src:url('/fonts/Virgil.woff2') format('woff2'); font-display:swap; }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 

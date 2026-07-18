@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useEditorStore } from '@/lib/store';
 import { Annotation, AnnotationGeometry, AnnotationStyle, AnnotationType } from '@/types';
+import { getFontCssStack, getFontOption } from '@/lib/fonts';
 import { v4 as uuidv4 } from 'uuid';
 
 interface AnnotationCanvasProps {
@@ -51,7 +52,7 @@ export function AnnotationCanvas({
   const textMeasureCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const {
     activeTool, strokeColor, fillColor, strokeWidth,
-    fontSize, opacity, zoom,
+    fontSize, fontFamily, opacity, zoom,
     selectedAnnotationIds, setSelectedAnnotationIds, clearSelection,
     setActiveTool,
   } = useEditorStore();
@@ -64,6 +65,7 @@ export function AnnotationCanvas({
     width: number;
     height: number;
     fontSize: number;
+    fontFamily: string;
     stroke: string;
     isExisting: boolean;
   } | null>(null);
@@ -81,7 +83,7 @@ export function AnnotationCanvas({
   } | null>(null);
   const textInputRef = useRef<HTMLTextAreaElement>(null);
 
-  function measureWrappedText(content: string, boxWidth: number, fontSizePx: number): TextMetrics {
+  function measureWrappedText(content: string, boxWidth: number, fontSizePx: number, fontFamilyId?: string): TextMetrics {
     const lines = content.split('\n');
     const wrappedLines: string[] = [];
     const safeBoxWidth = Math.max(boxWidth, fontSizePx * 2);
@@ -95,7 +97,7 @@ export function AnnotationCanvas({
 
     const measureContext = measureCanvas?.getContext('2d') || null;
     if (measureContext) {
-      measureContext.font = `${fontSizePx}px "Virgil", "Comic Sans MS", cursive`;
+      measureContext.font = `${fontSizePx}px ${getFontCssStack(fontFamilyId)}`;
     }
 
     const measureTextWidth = (value: string) =>
@@ -168,6 +170,7 @@ export function AnnotationCanvas({
         width: annotation.geometry.width || 200,
         height: annotation.geometry.height || 50,
         fontSize: annotation.style.fontSize || 18,
+        fontFamily: getFontOption(annotation.style.fontFamily).id,
         stroke: annotation.style.stroke || '#000000',
         isExisting: true,
       });
@@ -181,6 +184,7 @@ export function AnnotationCanvas({
         width: 200,
         height: 50,
         fontSize,
+        fontFamily,
         stroke: strokeColor,
         isExisting: false,
       });
@@ -192,7 +196,7 @@ export function AnnotationCanvas({
       textInputRef.current?.focus();
       textInputRef.current?.select();
     }, 50);
-  }, [clearSelection, setSelectedAnnotationIds]);
+  }, [clearSelection, setSelectedAnnotationIds, fontSize, fontFamily, strokeColor]);
 
   const getPageAnnotations = useCallback(
     () => annotations.filter((a) => a.pageNumber === pageNumber),
@@ -237,7 +241,7 @@ export function AnnotationCanvas({
     if (annotation.type === 'text') {
       const fontSizePx = annotation.style.fontSize || 18;
       const boxWidth = Math.max(geometry.width || 200, fontSizePx * 2);
-      const metrics = measureWrappedText(annotation.content || '', boxWidth, fontSizePx);
+      const metrics = measureWrappedText(annotation.content || '', boxWidth, fontSizePx, annotation.style.fontFamily);
       return {
         x: geometry.x || 0,
         y: geometry.y || 0,
@@ -357,6 +361,17 @@ export function AnnotationCanvas({
 
   useEffect(() => { render(); }, [render]);
 
+  // Canvas ctx.font never triggers a CSS @font-face download on its own, so
+  // explicitly load Virgil, then re-render so text isn't stuck on the fallback.
+  useEffect(() => {
+    if (typeof document === 'undefined' || !document.fonts) return;
+    let cancelled = false;
+    Promise.all([document.fonts.load('16px Virgil'), document.fonts.ready])
+      .catch(() => undefined)
+      .then(() => { if (!cancelled) render(); });
+    return () => { cancelled = true; };
+  }, [render]);
+
   useEffect(() => {
     if (!editingText || !textInputRef.current || typeof ResizeObserver === 'undefined') return;
 
@@ -441,8 +456,8 @@ export function AnnotationCanvas({
         if (ann.content) {
           const fs = (style.fontSize || 18) * zoom;
           const textBoxWidth = Math.max((ann.geometry.width || 200) * zoom, fs * 2);
-          const textMetrics = measureWrappedText(ann.content, textBoxWidth, fs);
-          ctx.font = `${fs}px "Virgil", "Comic Sans MS", cursive`;
+          const textMetrics = measureWrappedText(ann.content, textBoxWidth, fs, style.fontFamily);
+          ctx.font = `${fs}px ${getFontCssStack(style.fontFamily)}`;
           ctx.fillStyle = style.stroke || '#000';
           ctx.globalAlpha = style.opacity ?? 1;
           textMetrics.lines.forEach((line, i) => {
@@ -593,7 +608,7 @@ export function AnnotationCanvas({
       const scale = Math.max(0.5, Math.min(4, Math.max(widthRatio, heightRatio)));
       const nextFontSize = Math.max(10, Math.round(baseFontSize * scale));
       const nextWidth = Math.max(nextFontSize * 2, (initialGeometry.width || initialBounds.width) * scale);
-      const metrics = measureWrappedText(annotation.content || '', nextWidth, nextFontSize);
+      const metrics = measureWrappedText(annotation.content || '', nextWidth, nextFontSize, annotation.style.fontFamily);
       return {
         ...annotation,
         geometry: {
@@ -806,6 +821,7 @@ export function AnnotationCanvas({
       strokeWidth: currentAnnotation?.style.strokeWidth || strokeWidth,
       opacity: currentAnnotation?.style.opacity ?? opacity,
       fontSize: currentAnnotation?.style.fontSize || fontSize,
+      fontFamily: currentAnnotation?.style.fontFamily || editingText.fontFamily || fontFamily,
     };
     const nextTimestamp = new Date().toISOString();
     const lineCount = trimmedValue.split('\n').length;
@@ -906,7 +922,7 @@ export function AnnotationCanvas({
             borderRadius: 4,
             padding: '2px 6px',
             fontSize: editingText.fontSize * zoom,
-            fontFamily: "'Virgil', 'Comic Sans MS', cursive",
+            fontFamily: getFontCssStack(editingText.fontFamily),
             color: editingText.stroke,
             resize: 'both',
             outline: 'none',

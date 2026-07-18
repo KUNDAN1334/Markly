@@ -1,17 +1,99 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authorizeDocumentAccess } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { PDFDocument, PDFFont, rgb, StandardFonts } from 'pdf-lib';
+import fontkit from '@pdf-lib/fontkit';
+import { getFontOption } from '@/lib/fonts';
 import path from 'path';
 import fs from 'fs/promises';
 
 const STORAGE_BASE = process.env.STORAGE_PATH || './storage/documents';
+const FONTS_DIR = path.join(process.cwd(), 'public', 'fonts');
 
 function hexToRgb(hex: string) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? { r: parseInt(result[1], 16) / 255, g: parseInt(result[2], 16) / 255, b: parseInt(result[3], 16) / 255 }
     : { r: 0, g: 0, b: 0 };
+}
+
+/** Drop characters the font has no glyphs/encoding for, so drawText never throws. */
+function sanitizeForFont(text: string, font: PDFFont): string {
+  try {
+    font.widthOfTextAtSize(text, 10);
+    return text;
+  } catch {
+    return Array.from(text)
+      .filter((ch) => {
+        try {
+          font.widthOfTextAtSize(ch, 10);
+          return true;
+        } catch {
+          return false;
+        }
+      })
+      .join('');
+  }
+}
+
+/**
+ * Word-wrap text into lines that fit boxWidth — mirrors the editor canvas's
+ * measureWrappedText so the exported PDF matches what the user saw on screen.
+ */
+function wrapTextToWidth(content: string, boxWidth: number, fontSize: number, font: PDFFont): string[] {
+  const safeBoxWidth = Math.max(boxWidth, fontSize * 2);
+  const measure = (value: string) => font.widthOfTextAtSize(value, fontSize);
+  const wrappedLines: string[] = [];
+
+  const splitLongToken = (token: string) => {
+    let chunk = '';
+    for (const char of token) {
+      const nextChunk = chunk + char;
+      if (chunk && measure(nextChunk) > safeBoxWidth) {
+        wrappedLines.push(chunk);
+        chunk = char;
+      } else {
+        chunk = nextChunk;
+      }
+    }
+    if (chunk) wrappedLines.push(chunk);
+  };
+
+  for (const line of content.split('\n')) {
+    if (!line) {
+      wrappedLines.push('');
+      continue;
+    }
+
+    let currentLine = '';
+    const tokens = line.split(/(\s+)/).filter((token) => token.length > 0);
+
+    for (const token of tokens) {
+      const candidate = currentLine + token;
+      if (!currentLine || measure(candidate) <= safeBoxWidth) {
+        currentLine = candidate;
+        continue;
+      }
+
+      if (currentLine.trim()) {
+        wrappedLines.push(currentLine.trimEnd());
+        currentLine = token.trimStart();
+      } else {
+        currentLine = token;
+      }
+
+      if (measure(currentLine) > safeBoxWidth) {
+        splitLongToken(currentLine);
+        currentLine = '';
+      }
+    }
+
+    if (currentLine || line.trim() === '') {
+      wrappedLines.push(currentLine.trimEnd());
+    }
+  }
+
+  return wrappedLines.length > 0 ? wrappedLines : [''];
 }
 
 export async function GET(req: NextRequest) {
@@ -42,8 +124,39 @@ export async function GET(req: NextRequest) {
     const filePath = path.join(STORAGE_BASE, path.basename(doc.filename));
     const pdfBytes = await fs.readFile(filePath);
     const pdfDoc = await PDFDocument.load(pdfBytes);
+    pdfDoc.registerFontkit(fontkit);
     const pages = pdfDoc.getPages();
-    const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+    // Fonts are embedded lazily, once per family, keyed by font option id.
+    const STANDARD_FONTS = {
+      Helvetica: StandardFonts.Helvetica,
+      TimesRoman: StandardFonts.TimesRoman,
+      Courier: StandardFonts.Courier,
+    } as const;
+    const fontCache = new Map<string, PDFFont>();
+    const getPdfFont = async (fontFamilyId?: string | null): Promise<PDFFont> => {
+      const option = getFontOption(fontFamilyId);
+      const cached = fontCache.get(option.id);
+      if (cached) return cached;
+
+      let font: PDFFont;
+      if ('standard' in option.pdf) {
+        font = await pdfDoc.embedFont(STANDARD_FONTS[option.pdf.standard]);
+      } else {
+        try {
+          const fontBytes = await fs.readFile(path.join(FONTS_DIR, path.basename(option.pdf.file)));
+          // Embed the full font, not a subset: fontkit's CFF subsetter emits a
+          // bare font program that strict viewers (Acrobat, Edge) can reject,
+          // silently substituting a default font.
+          font = await pdfDoc.embedFont(fontBytes, { subset: false });
+        } catch (fontError) {
+          console.error(`Failed to embed font "${option.id}", falling back to Helvetica:`, fontError);
+          font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        }
+      }
+      fontCache.set(option.id, font);
+      return font;
+    };
 
     for (const annotation of doc.annotations) {
       const pageIndex = annotation.pageNumber - 1;
@@ -81,7 +194,22 @@ export async function GET(req: NextRequest) {
         case 'text':
           if (annotation.content) {
             const fontSize = (style.fontSize as number) || 16;
-            page.drawText(annotation.content, { x, y: height - (geo.y || 0) - fontSize, size: fontSize, font: helvetica, color, opacity });
+            const font = await getPdfFont(style.fontFamily as string | undefined);
+            const content = sanitizeForFont(annotation.content, font);
+            // Same box width and 1.3 line height the editor canvas renders with.
+            const boxWidth = Math.max(geo.width || 200, fontSize * 2);
+            const lines = wrapTextToWidth(content, boxWidth, fontSize, font);
+            lines.forEach((line, i) => {
+              if (!line) return;
+              page.drawText(line, {
+                x,
+                y: height - (geo.y || 0) - fontSize - i * fontSize * 1.3,
+                size: fontSize,
+                font,
+                color,
+                opacity,
+              });
+            });
           }
           break;
         case 'freehand': {
@@ -102,6 +230,7 @@ export async function GET(req: NextRequest) {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${exportName}"`,
         'Content-Length': exportedBytes.length.toString(),
+        'Cache-Control': 'no-store',
       },
     });
   } catch (error) {

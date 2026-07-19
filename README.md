@@ -99,46 +99,15 @@ Upload a PDF (or a DOCX, converted server-side), mark it up freehand, drop shape
 
 ### System overview
 
-```
-┌───────────────────────────────────────────────────────────┐
-│                          Browser                          │
-│  ┌────────────┐  ┌──────────────┐  ┌──────────────────┐   │
-│  │ PDF Viewer │  │  Annotation  │  │     Comments     │   │
-│  │  (pdf.js)  │  │    Canvas    │  │     Sidebar      │   │
-│  └─────┬──────┘  └──────┬───────┘  └────────┬─────────┘   │
-│        └────────────────┼───────────────────┘             │
-│                ┌────────▼────────┐                        │
-│                │  Zustand store  │  tools · history       │
-│                └────────┬────────┘                        │
-│                         │ React Query                     │
-└─────────────────────────┼─────────────────────────────────┘
-                          │ HTTPS
-┌─────────────────────────▼─────────────────────────────────┐
-│                Next.js App Router (API routes)            │
-│    /auth   /workspaces   /projects   /documents           │
-│    /annotations   /comments   /share   /export            │
-│                         │                                 │
-│      session cookie verify · share-link access check      │
-│                         │                                 │
-│                  ┌──────▼──────┐                          │
-│                  │ Prisma ORM  │                          │
-└──────────────────┴──────┬──────┴──────────────────────────┘
-                          │
-        ┌─────────────────┴──────────────────┐
-   ┌────▼─────┐                    ┌─────────▼─────────┐
-   │ Postgres │                    │  R2 / local disk  │
-   │  (Neon)  │                    │    (PDF bytes)    │
-   └──────────┘                    └───────────────────┘
-```
+<img width="654" height="805" alt="image" src="https://github.com/user-attachments/assets/eaf2b56f-562a-4292-92ca-a699bc785553" />
+
+
 
 ### Data model
 
-```
-User ──< Workspace ──< Project ──< Document ──< Annotation ──< Comment
-                          │             │
-                          └──────< ShareLink >──────┘
-                                access: VIEW | COMMENT | EDIT
-```
+<img width="865" height="139" alt="image" src="https://github.com/user-attachments/assets/767b1dce-5f01-4427-bc1f-c4e0906d9ab9" />
+
+
 
 Annotations store `geometry` and `style` as JSON columns, so new tool types don't require a migration. Documents carry an `isVisible` flag — share-back branches are created hidden until the owner accepts them.
 

@@ -4,10 +4,10 @@ import { prisma } from '@/lib/prisma';
 import { PDFDocument, PDFFont, rgb, StandardFonts } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import { getFontOption } from '@/lib/fonts';
+import { readStoredFile } from '@/lib/storage';
 import path from 'path';
 import fs from 'fs/promises';
 
-const STORAGE_BASE = process.env.STORAGE_PATH || './storage/documents';
 const FONTS_DIR = path.join(process.cwd(), 'public', 'fonts');
 
 function hexToRgb(hex: string) {
@@ -121,8 +121,7 @@ export async function GET(req: NextRequest) {
     });
     if (!doc) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-    const filePath = path.join(STORAGE_BASE, path.basename(doc.filename));
-    const pdfBytes = await fs.readFile(filePath);
+    const pdfBytes = await readStoredFile(doc.filename);
     const pdfDoc = await PDFDocument.load(pdfBytes);
     pdfDoc.registerFontkit(fontkit);
     const pages = pdfDoc.getPages();

@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
-import fs from 'fs/promises';
 import { authorizeDocumentAccess } from '@/lib/auth';
-
-const STORAGE_BASE = process.env.STORAGE_PATH || './storage/documents';
+import { readStoredFile } from '@/lib/storage';
 
 export async function GET(
   _req: NextRequest,
@@ -32,10 +30,11 @@ export async function GET(
     if (!access.ok) return access.response;
 
     const safe = path.basename(filename);
-    const filePath = path.join(STORAGE_BASE, safe);
-    const buffer = await fs.readFile(filePath);
+    const buffer = await readStoredFile(safe);
 
-    return new NextResponse(buffer, {
+    // Node's Buffer isn't a valid BodyInit under current @types/node; the
+    // underlying bytes are, so hand the Response a plain Uint8Array view.
+    return new NextResponse(new Uint8Array(buffer), {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `inline; filename="${safe}"`,

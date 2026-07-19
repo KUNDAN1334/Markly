@@ -50,7 +50,23 @@ function runLibreOfficeConvert(inputPath: string, outputDir: string) {
   });
 }
 
+/**
+ * DOCX conversion shells out to LibreOffice, which exists on a container/VM but
+ * not on serverless hosts. Deploys without a LibreOffice binary set
+ * DOCX_CONVERSION_ENABLED=false so uploads degrade to PDF-only with a clear
+ * message, instead of failing deep inside spawn().
+ */
+export const isDocxConversionEnabled =
+  process.env.DOCX_CONVERSION_ENABLED !== 'false';
+
+export const DOCX_DISABLED_MESSAGE =
+  'DOCX upload is unavailable on this deployment. Please export your document as a PDF and upload that instead.';
+
 export async function convertDocxToPdfBuffer(buffer: Buffer, originalName: string) {
+  if (!isDocxConversionEnabled) {
+    throw new Error(DOCX_DISABLED_MESSAGE);
+  }
+
   const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'markly-docx-'));
   const inputExt = getFileExtension(originalName) || '.docx';
   const inputPath = path.join(tempDir, `source${inputExt}`);

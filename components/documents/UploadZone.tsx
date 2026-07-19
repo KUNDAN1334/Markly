@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { Upload, FileText, X, AlertCircle } from 'lucide-react';
-import { getUploadSupportMessage, isSupportedUpload } from '@/lib/document-formats';
+import { getUploadSupportMessage, isPdfFile, isSupportedUpload } from '@/lib/document-formats';
 import { formatBytes } from '@/lib/utils';
 
 interface Props { projectId: string; onUploaded: (documentId: string) => void; }
@@ -21,17 +21,72 @@ export function UploadZone({ projectId, onUploaded }: Props) {
     setFile(f);
   }, []);
 
+  /**
+   * PDFs upload straight to object storage using a presigned URL, so the bytes
+   * never pass through our API (serverless request bodies are capped at 4.5MB).
+   * DOCX still goes through the server because it needs conversion there.
+   * If direct upload isn't configured (501), we fall back to the multipart path.
+   */
+  async function uploadDirect(f: File): Promise<string | null> {
+    const urlRes = await fetch('/api/documents/upload-url', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ projectId, name: f.name, size: f.size, type: f.type }),
+    });
+
+    if (urlRes.status === 501) return null; // not configured — caller falls back
+    if (!urlRes.ok) {
+      const e = await urlRes.json();
+      throw new Error(e.error || 'Upload failed');
+    }
+
+    const { uploadUrl, filename } = await urlRes.json();
+
+    const putRes = await fetch(uploadUrl, {
+      method: 'PUT',
+      body: f,
+      headers: { 'Content-Type': 'application/pdf' },
+    });
+    if (!putRes.ok) throw new Error('Upload to storage failed');
+
+    return filename;
+  }
+
+  async function uploadMultipart(f: File) {
+    const formData = new FormData();
+    formData.append('file', f);
+    formData.append('projectId', projectId);
+    const res = await fetch('/api/documents/upload', { method: 'POST', body: formData });
+    if (!res.ok) {
+      const e = await res.json();
+      throw new Error(e.error || 'Upload failed');
+    }
+    return res.json();
+  }
+
   async function handleUpload() {
     if (!file) return;
     setUploading(true);
     setError(null);
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('projectId', projectId);
     try {
-      const res = await fetch('/api/documents/upload', { method: 'POST', body: formData });
-      if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Upload failed'); }
-      const doc = await res.json();
+      const filename = isPdfFile(file) ? await uploadDirect(file) : null;
+
+      if (filename) {
+        const res = await fetch('/api/documents/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ projectId, filename, originalName: file.name }),
+        });
+        if (!res.ok) {
+          const e = await res.json();
+          throw new Error(e.error || 'Upload failed');
+        }
+        const doc = await res.json();
+        onUploaded(doc.id);
+        return;
+      }
+
+      const doc = await uploadMultipart(file);
       onUploaded(doc.id);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Upload failed');

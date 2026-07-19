@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
-import type { User } from '@/generated/prisma/models/User';
+import type { UserModel } from '@/generated/prisma/models/User';
 
-export async function ensureWorkspaceForUser(user: User) {
+export async function ensureWorkspaceForUser(user: UserModel) {
   let workspace = await prisma.workspace.findFirst({
     where: { ownerUserId: user.id },
     orderBy: { createdAt: 'asc' },

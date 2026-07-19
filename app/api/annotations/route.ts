@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authorizeDocumentAccess } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import type { Prisma } from '@/generated/prisma/client';
 import { z } from 'zod';
 
 const bulkSaveSchema = z.object({
@@ -52,8 +53,11 @@ export async function POST(req: NextRequest) {
           documentId,
           pageNumber: a.pageNumber,
           type: a.type,
-          geometry: a.geometry,
-          style: a.style,
+          // Zod's z.unknown() widens these to Record<string, unknown>, which
+          // Prisma's InputJsonValue rejects (unknown isn't a valid JSON value).
+          // Zod has already validated both are plain objects at runtime.
+          geometry: a.geometry as Prisma.InputJsonValue,
+          style: a.style as Prisma.InputJsonValue,
           content: a.content ?? null,
         })),
       });

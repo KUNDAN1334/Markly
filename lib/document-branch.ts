@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import type { Prisma } from '@/generated/prisma/client';
 
 export async function createDocumentBranch(sourceDocumentId: string) {
   return prisma.$transaction(async (tx) => {
@@ -32,8 +33,11 @@ export async function createDocumentBranch(sourceDocumentId: string) {
           documentId: branchedDocument.id,
           pageNumber: annotation.pageNumber,
           type: annotation.type,
-          geometry: annotation.geometry,
-          style: annotation.style,
+          // Reading a Json column yields JsonValue (which includes null); writing
+          // one requires InputJsonValue (which doesn't). These are copied from an
+          // existing row, so they're already valid JSON.
+          geometry: annotation.geometry as Prisma.InputJsonValue,
+          style: annotation.style as Prisma.InputJsonValue,
           content: annotation.content,
         })),
       });

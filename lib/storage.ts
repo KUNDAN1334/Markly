@@ -48,6 +48,13 @@ function getR2Client(): S3Client {
       accessKeyId: R2_ACCESS_KEY_ID!,
       secretAccessKey: R2_SECRET_ACCESS_KEY!,
     },
+    // AWS SDK v3 adds a CRC32 checksum to uploads by default. For presigned
+    // PUTs that bakes x-amz-sdk-checksum-algorithm into the signature and
+    // expects the client to send a matching x-amz-checksum-crc32 header — which
+    // a plain browser fetch() never does, so R2 rejects the request. R2 doesn't
+    // require these checksums, so only send them when a command explicitly asks.
+    requestChecksumCalculation: 'WHEN_REQUIRED',
+    responseChecksumValidation: 'WHEN_REQUIRED',
   });
   return cachedClient;
 }

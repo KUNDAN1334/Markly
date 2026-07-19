@@ -41,12 +41,16 @@ Total: **$0/month**, no trial clock.
    [
      {
        "AllowedOrigins": ["https://YOUR-APP.vercel.app", "http://localhost:3000"],
-       "AllowedMethods": ["PUT", "GET"],
-       "AllowedHeaders": ["Content-Type"],
+       "AllowedMethods": ["PUT", "GET", "HEAD"],
+       "AllowedHeaders": ["*"],
+       "ExposeHeaders": ["ETag"],
        "MaxAgeSeconds": 3600
      }
    ]
    ```
+
+   `AllowedHeaders` must be `["*"]`, not just `Content-Type`. Presigned PUTs carry
+   `x-amz-*` headers, and the preflight fails with 403 if they aren't allowed.
 
    Come back and add your real domain here after step 3.
 

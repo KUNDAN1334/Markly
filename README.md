@@ -1,5 +1,5 @@
 <p align="center">
- <img width="1803" height="902" alt="image" src="https://github.com/user-attachments/assets/512c4ff5-c4f2-49ab-8f17-7875c39f675c" alt="Markly — Excalidraw for Documents" width="100%" />
+ <img width="1306" height="893" alt="image" src="https://github.com/user-attachments/assets/c282eb48-d48c-40d3-887d-6971d65f55f7" />
 
 
 </p>

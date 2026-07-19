@@ -12,6 +12,9 @@
    The wipe animates transform only (GPU-composited) — no layout/paint. */
 
 .overlay {
+  /* Brand accent for the intro lockup (disc, ring, glyph, wordmark). */
+  --loader-accent: #43b3ae;
+
   position: fixed;
   inset: 0;
   z-index: 99999;
@@ -81,7 +84,7 @@
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: #fafafa;
+  background: var(--loader-accent);
   animation: discLife 1000ms both;
   will-change: transform, opacity;
 }
@@ -112,7 +115,7 @@
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 0.045em solid #fafafa;
+  border: 0.045em solid var(--loader-accent);
   animation: ringLife 950ms 450ms both;
   will-change: transform, opacity;
 }
@@ -170,7 +173,7 @@
   100% {
     opacity: 1;
     transform: scale(1);
-    color: #fafafa;
+    color: var(--loader-accent);
   }
 }
 
@@ -182,7 +185,7 @@
   font-variation-settings: 'wght' 800, 'opsz' 96;
   line-height: 1;
   letter-spacing: -0.02em;
-  color: #fafafa;
+  color: var(--loader-accent);
   white-space: nowrap;
 }
 
@@ -222,7 +225,7 @@
     opacity: 0;
   }
   .glyph {
-    color: #fafafa;
+    color: var(--loader-accent);
   }
   @keyframes overlayFade {
     0%, 55% { opacity: 1; }

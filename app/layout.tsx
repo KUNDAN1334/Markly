@@ -39,6 +39,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         `}</style>
       </head>
       <body suppressHydrationWarning>
+        {/* Apply the persisted theme before first paint to avoid a light/dark flash. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{document.documentElement.setAttribute('data-theme',localStorage.getItem('markly-theme')||'dark')}catch(e){}`,
+          }}
+        />
         <Providers>{children}</Providers>
       </body>
     </html>

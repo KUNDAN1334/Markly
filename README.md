@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="1777" height="907" alt="Markly editor" src="https://github.com/user-attachments/assets/8b9cee66-deb6-4aa8-a1df-e1a5b18f758e" />
+  <img width="1847" height="906" alt="image" src="https://github.com/user-attachments/assets/a348126c-4abc-4089-bb4e-29386a633d2d" />
 </p>
 
 <h1 align="center">Markly</h1>

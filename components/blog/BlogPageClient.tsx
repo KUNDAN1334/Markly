@@ -15,7 +15,7 @@ import {
 
 /* Images live in the README on GitHub — reused here so the post and the repo
    stay in sync without duplicating assets into /public. */
-const IMG_EDITOR = 'https://github.com/user-attachments/assets/8b9cee66-deb6-4aa8-a1df-e1a5b18f758e';
+const IMG_EDITOR = 'https://github.com/user-attachments/assets/a348126c-4abc-4089-bb4e-29386a633d2d';
 const IMG_ARCHITECTURE = 'https://github.com/user-attachments/assets/eaf2b56f-562a-4292-92ca-a699bc785553';
 const IMG_DATA_MODEL = 'https://github.com/user-attachments/assets/767b1dce-5f01-4427-bc1f-c4e0906d9ab9';
 

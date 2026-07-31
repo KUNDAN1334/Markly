@@ -39,10 +39,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         `}</style>
       </head>
       <body suppressHydrationWarning>
-        {/* Apply the persisted theme before first paint to avoid a light/dark flash. */}
+        {/*
+          Runs before first paint:
+          1. Applies the persisted theme so there's no light/dark flash.
+          2. Mirrors the "intro already played this session" flag onto <html>,
+             so the landing loader is hidden by CSS instead of rendering for a
+             frame and then unmounting on hydration.
+        */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{document.documentElement.setAttribute('data-theme',localStorage.getItem('markly-theme')||'dark')}catch(e){}`,
+            __html: `try{var d=document.documentElement;d.setAttribute('data-theme',localStorage.getItem('markly-theme')||'dark');if(sessionStorage.getItem('markly-intro-seen')==='1')d.setAttribute('data-intro','seen')}catch(e){}`,
           }}
         />
         <Providers>{children}</Providers>

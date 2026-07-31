@@ -27,6 +27,13 @@
   will-change: transform;
 }
 
+/* Intro already played this session — the pre-paint script in app/layout.tsx
+   sets data-intro before the body renders, so the curtain never flashes on a
+   repeat visit. React unmounts it right after on hydration. */
+html[data-intro='seen'] .overlay {
+  display: none;
+}
+
 /* subtle film grain so the flat black reads premium, not empty */
 .overlay::after {
   content: '';

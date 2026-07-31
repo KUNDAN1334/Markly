@@ -15,7 +15,13 @@ import styles from './MorphLoader.module.css';
  *   5. Hold — then the whole curtain wipes UPWARD to reveal the page.
  * Strict black & white.
  *
- * Plays fully on every visit AND every refresh (no "once per session" gate).
+ * Plays once per browser session. The first landing-page view in a tab gets
+ * the full intro; navigating away and back — or refreshing — skips it. The
+ * flag lives in `sessionStorage` under `markly-intro-seen`, and a pre-hydration
+ * script in app/layout.tsx mirrors it onto <html data-intro="seen"> so the
+ * curtain is hidden by CSS before first paint rather than flashing and then
+ * unmounting. Clearing the flag is as simple as opening a new tab.
+ *
  * The curtain lifts when the animation genuinely finishes, detected via the
  * Web Animations API `.finished` promise, which:
  *   - resolves at the true end of the CSS timeline (never cut short), and
@@ -26,6 +32,31 @@ import styles from './MorphLoader.module.css';
  */
 
 const WORD = 'Markly';
+
+export const INTRO_SEEN_KEY = 'markly-intro-seen';
+
+function introAlreadySeen() {
+  if (document.documentElement.getAttribute('data-intro') === 'seen') return true;
+  try {
+    return sessionStorage.getItem(INTRO_SEEN_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+/* Marked as soon as the intro starts, not when it ends — a refresh mid-intro
+   should not replay it either. Also mirrored onto <html> so a later
+   client-side navigation back to the landing page skips the curtain without
+   waiting for an effect to run. */
+function markIntroSeen() {
+  document.documentElement.setAttribute('data-intro', 'seen');
+  try {
+    sessionStorage.setItem(INTRO_SEEN_KEY, '1');
+  } catch {
+    /* private mode / storage disabled — the <html> attribute still covers
+       in-session navigation. */
+  }
+}
 
 // Comfortably longer than the CSS timeline (2800ms). Only ever used as a
 // fallback; the animation's own completion normally reveals the page first.
@@ -54,8 +85,21 @@ export default function MorphLoader() {
   const overlayRef = useRef<HTMLDivElement | null>(null);
   // Shared "complete once" callback for the animationend backup handler.
   const finishRef = useRef<() => void>(() => {});
+  // True once this mount has claimed the intro. Survives StrictMode's
+  // double-invoked effect, which would otherwise read back its own
+  // sessionStorage flag and cut the intro short in development.
+  const playingRef = useRef(false);
 
   useEffect(() => {
+    // Already played earlier in this session — unmount without locking scroll.
+    // The <html data-intro> attribute has kept it invisible up to this point.
+    if (!playingRef.current && introAlreadySeen()) {
+      setVisible(false);
+      return;
+    }
+    playingRef.current = true;
+    markIntroSeen();
+
     let done = false;
     const prevOverflow = document.body.style.overflow;
     // Lock scroll while the curtain is up.

@@ -30,7 +30,10 @@
 /* Intro already played this session — the pre-paint script in app/layout.tsx
    sets data-intro before the body renders, so the curtain never flashes on a
    repeat visit. React unmounts it right after on hydration. */
-html[data-intro='seen'] .overlay {
+/* :not([data-playing]) keeps this from hiding the overlay that is currently
+   playing — the effect sets data-intro='seen' the moment the intro starts,
+   and without the guard this rule would kill the animation instantly. */
+html[data-intro='seen'] .overlay:not([data-playing='true']) {
   display: none;
 }
 

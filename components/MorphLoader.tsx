@@ -98,6 +98,12 @@ export default function MorphLoader() {
       return;
     }
     playingRef.current = true;
+    // Flag the overlay as actively playing BEFORE marking the intro seen.
+    // markIntroSeen() sets <html data-intro="seen">, and the CSS hide rule
+    // (html[data-intro='seen'] .overlay) would otherwise display:none the
+    // overlay mid-animation — cancelling every animation and dropping the
+    // user straight onto the page.
+    overlayRef.current?.setAttribute('data-playing', 'true');
     markIntroSeen();
 
     let done = false;

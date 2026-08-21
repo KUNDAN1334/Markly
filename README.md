@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="1847" height="906" alt="image" src="https://github.com/user-attachments/assets/a348126c-4abc-4089-bb4e-29386a633d2d" />
+ <img width="1885" height="904" alt="image" src="https://github.com/user-attachments/assets/9d87d991-3dd4-4441-8a4c-e53eb806ea39" />
 </p>
 
 <h1 align="center">Markly</h1>

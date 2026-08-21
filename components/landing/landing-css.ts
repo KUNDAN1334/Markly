@@ -19,17 +19,21 @@ export const LANDING_CSS = `
   --shXl:0 40px 100px rgba(20,18,12,.16);
   --shadow-sm:var(--shSm); --shadow-md:var(--shMd); --shadow-lg:var(--shLg);
   --doc-accent:var(--gold); --doc-accent-soft:var(--goldSoft);
+  /* display face for the hero headline — clean, professional grotesque */
+  --font-display:'Inter Tight','Instrument Sans',system-ui,sans-serif;
 }
 
 [data-theme="dark"], [data-theme="dark"] .lpv2-root {
-  --bg:#121110; --bg-2:#1b1a17; --bg2:#1b1a17;
-  --card:#201e1b; --bg-card:#201e1b; --paper:#26241f;
-  --text:#f2f0ea; --text-2:#aca89e; --text2:#aca89e; --text-3:#6e6a60; --text3:#6e6a60;
-  --border:#2e2c27; --border-strong:#454138; --borderS:#454138;
-  --accent:#f2f0ea; --accent-fg:#141310; --accentFg:#141310;
-  --gold:#7cc4ae; --goldSoft:rgba(124,196,174,.16); --glow:rgba(124,196,174,.08);
+  --bg:#000000; --bg-2:#0a0a0a; --bg2:#0a0a0a;
+  --card:#0d0d0d; --bg-card:#0d0d0d; --paper:#141414;
+  --text:#f5f5f5; --text-2:#a6a6a6; --text2:#a6a6a6; --text-3:#6a6a6a; --text3:#6a6a6a;
+  --border:#1f1f1f; --border-strong:#333333; --borderS:#333333;
+  --accent:#f5f5f5; --accent-fg:#000000; --accentFg:#000000;
+  --gold:#7cc4ae; --goldSoft:rgba(124,196,174,.16);
+  /* no ambient tint on black — the orbs/section glows read as a green wash */
+  --glow:transparent;
   --red:#f06a5a; --green:#4fd48b; --yellow:#f4cd41;
-  --navBg:rgba(18,17,16,.72);
+  --navBg:rgba(0,0,0,.72);
   --shSm:0 1px 3px rgba(0,0,0,.3);
   --shMd:0 6px 24px rgba(0,0,0,.4);
   --shLg:0 24px 64px rgba(0,0,0,.5);
@@ -54,6 +58,9 @@ export const LANDING_CSS = `
 .lpv2-orb-1 { top: -180px; left: -120px; width: 640px; height: 640px; animation: drift1 26s ease-in-out infinite; }
 .lpv2-orb-2 { top: 340px; right: -200px; width: 720px; height: 720px; animation: drift2 32s ease-in-out infinite; }
 .lpv2-progress { position: fixed; top: 0; left: 0; height: 2px; width: 0%; background: var(--gold); z-index: 400; }
+/* dark mode = flat black surface: no radial glows, no drifting orbs */
+[data-theme="dark"] .lpv2-orb,
+[data-theme="dark"] .lp-how-stage-glow { display: none; }
 
 /* ── layout ────────────────────────────────────────────────────────────── */
 .lp-container { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
@@ -121,7 +128,8 @@ export const LANDING_CSS = `
   font-family: 'DM Mono', monospace; letter-spacing: .04em; box-shadow: var(--shSm);
 }
 .lp-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 3px var(--goldSoft); }
-.lp-h1 { font-family: 'DM Serif Display', serif; font-size: clamp(52px, 8vw, 96px); line-height: 1.02; letter-spacing: -.035em; color: var(--text); max-width: 900px; margin: 26px 0 0; font-weight: 400; }
+.lp-h1 { font-family: var(--font-display); font-size: clamp(48px, 7.4vw, 88px); line-height: 1.04; letter-spacing: -.038em; color: var(--text); max-width: 900px; margin: 26px 0 0; font-weight: 600; }
+.lp-h1 em { font-style: italic; font-weight: 500; }
 .lp-rise-mask { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: .08em; margin-bottom: -.08em; }
 .lp-rise { display: inline-block; animation: riseIn .9s cubic-bezier(.22,1,.36,1) both; }
 .lp-h1-accent { color: var(--gold); position: relative; }

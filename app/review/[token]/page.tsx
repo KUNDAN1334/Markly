@@ -285,23 +285,28 @@ export default function ReviewPage() {
             {theme === 'light' ? <Moon size={12} /> : <Sun size={12} />}
           </button>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-            <button onClick={zoomOut} style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid var(--border)', background: 'var(--bg-2)', cursor: 'pointer', color: 'var(--text-3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ZoomOut size={11} /></button>
-            <span style={{ fontSize: 10, color: 'var(--text-3)', fontFamily: "'DM Mono', monospace", width: 36, textAlign: 'center' }}>{Math.round(zoom * 100)}%</span>
-            <button onClick={zoomIn} style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid var(--border)', background: 'var(--bg-2)', cursor: 'pointer', color: 'var(--text-3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ZoomIn size={11} /></button>
-          </div>
+          {/* Zoom, page nav and share already live in the Toolbar when editing */}
+          {!canEdit && (
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                <button onClick={zoomOut} style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid var(--border)', background: 'var(--bg-2)', cursor: 'pointer', color: 'var(--text-3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ZoomOut size={11} /></button>
+                <span style={{ fontSize: 10, color: 'var(--text-3)', fontFamily: "'DM Mono', monospace", width: 36, textAlign: 'center' }}>{Math.round(zoom * 100)}%</span>
+                <button onClick={zoomIn} style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid var(--border)', background: 'var(--bg-2)', cursor: 'pointer', color: 'var(--text-3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ZoomIn size={11} /></button>
+              </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-            <button onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage <= 1}
-              style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid var(--border)', background: 'var(--bg-2)', cursor: 'pointer', color: 'var(--text-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: currentPage <= 1 ? .35 : 1 }}>
-              <ChevronLeft size={11} />
-            </button>
-            <span style={{ fontSize: 10, color: 'var(--text-3)', fontFamily: "'DM Mono', monospace", padding: '0 4px', whiteSpace: 'nowrap' }}>{currentPage}/{totalPages}</span>
-            <button onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage >= totalPages}
-              style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid var(--border)', background: 'var(--bg-2)', cursor: 'pointer', color: 'var(--text-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: currentPage >= totalPages ? .35 : 1 }}>
-              <ChevronRight size={11} />
-            </button>
-          </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                <button onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage <= 1}
+                  style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid var(--border)', background: 'var(--bg-2)', cursor: 'pointer', color: 'var(--text-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: currentPage <= 1 ? .35 : 1 }}>
+                  <ChevronLeft size={11} />
+                </button>
+                <span style={{ fontSize: 10, color: 'var(--text-3)', fontFamily: "'DM Mono', monospace", padding: '0 4px', whiteSpace: 'nowrap' }}>{currentPage}/{totalPages}</span>
+                <button onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage >= totalPages}
+                  style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid var(--border)', background: 'var(--bg-2)', cursor: 'pointer', color: 'var(--text-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: currentPage >= totalPages ? .35 : 1 }}>
+                  <ChevronRight size={11} />
+                </button>
+              </div>
+            </>
+          )}
 
           {canComment && (
             <button onClick={() => setShowComments(!showComments)} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '0 10px', height: 28, borderRadius: 7, border: `1px solid ${showComments ? 'var(--accent)' : 'var(--border)'}`, background: showComments ? 'var(--accent)' : 'var(--bg-2)', color: showComments ? 'var(--accent-fg)' : 'var(--text-2)', cursor: 'pointer', fontSize: 11, fontWeight: 500, fontFamily: "'Instrument Sans', sans-serif", transition: 'all .15s' }}>
@@ -315,9 +320,11 @@ export default function ReviewPage() {
             {copied ? 'Copied!' : 'Copy link'}
           </button>
 
-          <button onClick={() => setShowShare(true)} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '0 12px', height: 28, borderRadius: 7, border: 'none', background: 'var(--accent)', color: 'var(--accent-fg)', cursor: 'pointer', fontSize: 11, fontWeight: 500, fontFamily: "'Instrument Sans', sans-serif" }}>
-            Share back →
-          </button>
+          {!canEdit && (
+            <button onClick={() => setShowShare(true)} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '0 12px', height: 28, borderRadius: 7, border: 'none', background: 'var(--accent)', color: 'var(--accent-fg)', cursor: 'pointer', fontSize: 11, fontWeight: 500, fontFamily: "'Instrument Sans', sans-serif" }}>
+              Share back →
+            </button>
+          )}
         </div>
       </nav>
 

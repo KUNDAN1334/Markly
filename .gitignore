@@ -42,3 +42,8 @@ build.log
 next-env.d.ts
 storage/
 .env.local
+
+# marketing promo assets
+marketing/markly-promo.html
+marketing/markly-promo-music.wav
+marketing/markly-promo.mp4

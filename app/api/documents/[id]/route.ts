@@ -1,4 +1,5 @@
 import { authorizeDocumentAccess } from '@/lib/auth';
+import { withStatusEvents } from '@/lib/comment-status';
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -15,7 +16,7 @@ export async function GET(
       where: { id },
       include: {
         annotations: { orderBy: { createdAt: "asc" } },
-        comments: { orderBy: { createdAt: "desc" } },
+        comments: { orderBy: { createdAt: "desc" }, include: withStatusEvents },
       },
     });
 

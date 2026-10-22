@@ -48,6 +48,11 @@ export type Annotation = Prisma.AnnotationModel
  */
 export type Comment = Prisma.CommentModel
 /**
+ * Model CommentStatusEvent
+ * 
+ */
+export type CommentStatusEvent = Prisma.CommentStatusEventModel
+/**
  * Model ShareLink
  * 
  */

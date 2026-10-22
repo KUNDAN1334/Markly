@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authorizeDocumentAccess, requireAuthenticatedUser, unauthorizedResponse } from '@/lib/auth';
+import { withStatusEvents } from '@/lib/comment-status';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
@@ -21,6 +22,7 @@ export async function GET(req: NextRequest) {
   const comments = await prisma.comment.findMany({
     where: { documentId },
     orderBy: { createdAt: 'desc' },
+    include: withStatusEvents,
   });
   return NextResponse.json(comments);
 }
@@ -50,6 +52,7 @@ export async function POST(req: NextRequest) {
         authorUserId,
         authorName,
       },
+      include: withStatusEvents,
     });
     return NextResponse.json(comment, { status: 201 });
   } catch (error) {

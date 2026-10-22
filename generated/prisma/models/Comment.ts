@@ -43,6 +43,7 @@ export type CommentMinAggregateOutputType = {
   authorName: string | null
   pageNumber: number | null
   resolved: boolean | null
+  status: $Enums.CommentStatus | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -56,6 +57,7 @@ export type CommentMaxAggregateOutputType = {
   authorName: string | null
   pageNumber: number | null
   resolved: boolean | null
+  status: $Enums.CommentStatus | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -69,6 +71,7 @@ export type CommentCountAggregateOutputType = {
   authorName: number
   pageNumber: number
   resolved: number
+  status: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -92,6 +95,7 @@ export type CommentMinAggregateInputType = {
   authorName?: true
   pageNumber?: true
   resolved?: true
+  status?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -105,6 +109,7 @@ export type CommentMaxAggregateInputType = {
   authorName?: true
   pageNumber?: true
   resolved?: true
+  status?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -118,6 +123,7 @@ export type CommentCountAggregateInputType = {
   authorName?: true
   pageNumber?: true
   resolved?: true
+  status?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -218,6 +224,7 @@ export type CommentGroupByOutputType = {
   authorName: string | null
   pageNumber: number
   resolved: boolean
+  status: $Enums.CommentStatus
   createdAt: Date
   updatedAt: Date
   _count: CommentCountAggregateOutputType | null
@@ -254,11 +261,13 @@ export type CommentWhereInput = {
   authorName?: Prisma.StringNullableFilter<"Comment"> | string | null
   pageNumber?: Prisma.IntFilter<"Comment"> | number
   resolved?: Prisma.BoolFilter<"Comment"> | boolean
+  status?: Prisma.EnumCommentStatusFilter<"Comment"> | $Enums.CommentStatus
   createdAt?: Prisma.DateTimeFilter<"Comment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Comment"> | Date | string
   document?: Prisma.XOR<Prisma.DocumentScalarRelationFilter, Prisma.DocumentWhereInput>
   annotation?: Prisma.XOR<Prisma.AnnotationNullableScalarRelationFilter, Prisma.AnnotationWhereInput> | null
   authorUser?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  statusEvents?: Prisma.CommentStatusEventListRelationFilter
 }
 
 export type CommentOrderByWithRelationInput = {
@@ -270,11 +279,13 @@ export type CommentOrderByWithRelationInput = {
   authorName?: Prisma.SortOrderInput | Prisma.SortOrder
   pageNumber?: Prisma.SortOrder
   resolved?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   document?: Prisma.DocumentOrderByWithRelationInput
   annotation?: Prisma.AnnotationOrderByWithRelationInput
   authorUser?: Prisma.UserOrderByWithRelationInput
+  statusEvents?: Prisma.CommentStatusEventOrderByRelationAggregateInput
 }
 
 export type CommentWhereUniqueInput = Prisma.AtLeast<{
@@ -289,11 +300,13 @@ export type CommentWhereUniqueInput = Prisma.AtLeast<{
   authorName?: Prisma.StringNullableFilter<"Comment"> | string | null
   pageNumber?: Prisma.IntFilter<"Comment"> | number
   resolved?: Prisma.BoolFilter<"Comment"> | boolean
+  status?: Prisma.EnumCommentStatusFilter<"Comment"> | $Enums.CommentStatus
   createdAt?: Prisma.DateTimeFilter<"Comment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Comment"> | Date | string
   document?: Prisma.XOR<Prisma.DocumentScalarRelationFilter, Prisma.DocumentWhereInput>
   annotation?: Prisma.XOR<Prisma.AnnotationNullableScalarRelationFilter, Prisma.AnnotationWhereInput> | null
   authorUser?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  statusEvents?: Prisma.CommentStatusEventListRelationFilter
 }, "id">
 
 export type CommentOrderByWithAggregationInput = {
@@ -305,6 +318,7 @@ export type CommentOrderByWithAggregationInput = {
   authorName?: Prisma.SortOrderInput | Prisma.SortOrder
   pageNumber?: Prisma.SortOrder
   resolved?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.CommentCountOrderByAggregateInput
@@ -326,6 +340,7 @@ export type CommentScalarWhereWithAggregatesInput = {
   authorName?: Prisma.StringNullableWithAggregatesFilter<"Comment"> | string | null
   pageNumber?: Prisma.IntWithAggregatesFilter<"Comment"> | number
   resolved?: Prisma.BoolWithAggregatesFilter<"Comment"> | boolean
+  status?: Prisma.EnumCommentStatusWithAggregatesFilter<"Comment"> | $Enums.CommentStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Comment"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Comment"> | Date | string
 }
@@ -336,11 +351,13 @@ export type CommentCreateInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  status?: $Enums.CommentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   document: Prisma.DocumentCreateNestedOneWithoutCommentsInput
   annotation?: Prisma.AnnotationCreateNestedOneWithoutCommentsInput
   authorUser?: Prisma.UserCreateNestedOneWithoutCommentsInput
+  statusEvents?: Prisma.CommentStatusEventCreateNestedManyWithoutCommentInput
 }
 
 export type CommentUncheckedCreateInput = {
@@ -352,8 +369,10 @@ export type CommentUncheckedCreateInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  status?: $Enums.CommentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  statusEvents?: Prisma.CommentStatusEventUncheckedCreateNestedManyWithoutCommentInput
 }
 
 export type CommentUpdateInput = {
@@ -362,11 +381,13 @@ export type CommentUpdateInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumCommentStatusFieldUpdateOperationsInput | $Enums.CommentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   document?: Prisma.DocumentUpdateOneRequiredWithoutCommentsNestedInput
   annotation?: Prisma.AnnotationUpdateOneWithoutCommentsNestedInput
   authorUser?: Prisma.UserUpdateOneWithoutCommentsNestedInput
+  statusEvents?: Prisma.CommentStatusEventUpdateManyWithoutCommentNestedInput
 }
 
 export type CommentUncheckedUpdateInput = {
@@ -378,8 +399,10 @@ export type CommentUncheckedUpdateInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumCommentStatusFieldUpdateOperationsInput | $Enums.CommentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusEvents?: Prisma.CommentStatusEventUncheckedUpdateManyWithoutCommentNestedInput
 }
 
 export type CommentCreateManyInput = {
@@ -391,6 +414,7 @@ export type CommentCreateManyInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  status?: $Enums.CommentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -401,6 +425,7 @@ export type CommentUpdateManyMutationInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumCommentStatusFieldUpdateOperationsInput | $Enums.CommentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -414,6 +439,7 @@ export type CommentUncheckedUpdateManyInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumCommentStatusFieldUpdateOperationsInput | $Enums.CommentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -437,6 +463,7 @@ export type CommentCountOrderByAggregateInput = {
   authorName?: Prisma.SortOrder
   pageNumber?: Prisma.SortOrder
   resolved?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -454,6 +481,7 @@ export type CommentMaxOrderByAggregateInput = {
   authorName?: Prisma.SortOrder
   pageNumber?: Prisma.SortOrder
   resolved?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -467,12 +495,18 @@ export type CommentMinOrderByAggregateInput = {
   authorName?: Prisma.SortOrder
   pageNumber?: Prisma.SortOrder
   resolved?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type CommentSumOrderByAggregateInput = {
   pageNumber?: Prisma.SortOrder
+}
+
+export type CommentScalarRelationFilter = {
+  is?: Prisma.CommentWhereInput
+  isNot?: Prisma.CommentWhereInput
 }
 
 export type CommentCreateNestedManyWithoutAuthorUserInput = {
@@ -601,16 +635,36 @@ export type CommentUncheckedUpdateManyWithoutAnnotationNestedInput = {
   deleteMany?: Prisma.CommentScalarWhereInput | Prisma.CommentScalarWhereInput[]
 }
 
+export type EnumCommentStatusFieldUpdateOperationsInput = {
+  set?: $Enums.CommentStatus
+}
+
+export type CommentCreateNestedOneWithoutStatusEventsInput = {
+  create?: Prisma.XOR<Prisma.CommentCreateWithoutStatusEventsInput, Prisma.CommentUncheckedCreateWithoutStatusEventsInput>
+  connectOrCreate?: Prisma.CommentCreateOrConnectWithoutStatusEventsInput
+  connect?: Prisma.CommentWhereUniqueInput
+}
+
+export type CommentUpdateOneRequiredWithoutStatusEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.CommentCreateWithoutStatusEventsInput, Prisma.CommentUncheckedCreateWithoutStatusEventsInput>
+  connectOrCreate?: Prisma.CommentCreateOrConnectWithoutStatusEventsInput
+  upsert?: Prisma.CommentUpsertWithoutStatusEventsInput
+  connect?: Prisma.CommentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CommentUpdateToOneWithWhereWithoutStatusEventsInput, Prisma.CommentUpdateWithoutStatusEventsInput>, Prisma.CommentUncheckedUpdateWithoutStatusEventsInput>
+}
+
 export type CommentCreateWithoutAuthorUserInput = {
   id?: string
   content: string
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  status?: $Enums.CommentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   document: Prisma.DocumentCreateNestedOneWithoutCommentsInput
   annotation?: Prisma.AnnotationCreateNestedOneWithoutCommentsInput
+  statusEvents?: Prisma.CommentStatusEventCreateNestedManyWithoutCommentInput
 }
 
 export type CommentUncheckedCreateWithoutAuthorUserInput = {
@@ -621,8 +675,10 @@ export type CommentUncheckedCreateWithoutAuthorUserInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  status?: $Enums.CommentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  statusEvents?: Prisma.CommentStatusEventUncheckedCreateNestedManyWithoutCommentInput
 }
 
 export type CommentCreateOrConnectWithoutAuthorUserInput = {
@@ -663,6 +719,7 @@ export type CommentScalarWhereInput = {
   authorName?: Prisma.StringNullableFilter<"Comment"> | string | null
   pageNumber?: Prisma.IntFilter<"Comment"> | number
   resolved?: Prisma.BoolFilter<"Comment"> | boolean
+  status?: Prisma.EnumCommentStatusFilter<"Comment"> | $Enums.CommentStatus
   createdAt?: Prisma.DateTimeFilter<"Comment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Comment"> | Date | string
 }
@@ -673,10 +730,12 @@ export type CommentCreateWithoutDocumentInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  status?: $Enums.CommentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   annotation?: Prisma.AnnotationCreateNestedOneWithoutCommentsInput
   authorUser?: Prisma.UserCreateNestedOneWithoutCommentsInput
+  statusEvents?: Prisma.CommentStatusEventCreateNestedManyWithoutCommentInput
 }
 
 export type CommentUncheckedCreateWithoutDocumentInput = {
@@ -687,8 +746,10 @@ export type CommentUncheckedCreateWithoutDocumentInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  status?: $Enums.CommentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  statusEvents?: Prisma.CommentStatusEventUncheckedCreateNestedManyWithoutCommentInput
 }
 
 export type CommentCreateOrConnectWithoutDocumentInput = {
@@ -723,10 +784,12 @@ export type CommentCreateWithoutAnnotationInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  status?: $Enums.CommentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   document: Prisma.DocumentCreateNestedOneWithoutCommentsInput
   authorUser?: Prisma.UserCreateNestedOneWithoutCommentsInput
+  statusEvents?: Prisma.CommentStatusEventCreateNestedManyWithoutCommentInput
 }
 
 export type CommentUncheckedCreateWithoutAnnotationInput = {
@@ -737,8 +800,10 @@ export type CommentUncheckedCreateWithoutAnnotationInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  status?: $Enums.CommentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  statusEvents?: Prisma.CommentStatusEventUncheckedCreateNestedManyWithoutCommentInput
 }
 
 export type CommentCreateOrConnectWithoutAnnotationInput = {
@@ -767,6 +832,78 @@ export type CommentUpdateManyWithWhereWithoutAnnotationInput = {
   data: Prisma.XOR<Prisma.CommentUpdateManyMutationInput, Prisma.CommentUncheckedUpdateManyWithoutAnnotationInput>
 }
 
+export type CommentCreateWithoutStatusEventsInput = {
+  id?: string
+  content: string
+  authorName?: string | null
+  pageNumber: number
+  resolved?: boolean
+  status?: $Enums.CommentStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  document: Prisma.DocumentCreateNestedOneWithoutCommentsInput
+  annotation?: Prisma.AnnotationCreateNestedOneWithoutCommentsInput
+  authorUser?: Prisma.UserCreateNestedOneWithoutCommentsInput
+}
+
+export type CommentUncheckedCreateWithoutStatusEventsInput = {
+  id?: string
+  content: string
+  documentId: string
+  annotationId?: string | null
+  authorUserId?: string | null
+  authorName?: string | null
+  pageNumber: number
+  resolved?: boolean
+  status?: $Enums.CommentStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type CommentCreateOrConnectWithoutStatusEventsInput = {
+  where: Prisma.CommentWhereUniqueInput
+  create: Prisma.XOR<Prisma.CommentCreateWithoutStatusEventsInput, Prisma.CommentUncheckedCreateWithoutStatusEventsInput>
+}
+
+export type CommentUpsertWithoutStatusEventsInput = {
+  update: Prisma.XOR<Prisma.CommentUpdateWithoutStatusEventsInput, Prisma.CommentUncheckedUpdateWithoutStatusEventsInput>
+  create: Prisma.XOR<Prisma.CommentCreateWithoutStatusEventsInput, Prisma.CommentUncheckedCreateWithoutStatusEventsInput>
+  where?: Prisma.CommentWhereInput
+}
+
+export type CommentUpdateToOneWithWhereWithoutStatusEventsInput = {
+  where?: Prisma.CommentWhereInput
+  data: Prisma.XOR<Prisma.CommentUpdateWithoutStatusEventsInput, Prisma.CommentUncheckedUpdateWithoutStatusEventsInput>
+}
+
+export type CommentUpdateWithoutStatusEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumCommentStatusFieldUpdateOperationsInput | $Enums.CommentStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  document?: Prisma.DocumentUpdateOneRequiredWithoutCommentsNestedInput
+  annotation?: Prisma.AnnotationUpdateOneWithoutCommentsNestedInput
+  authorUser?: Prisma.UserUpdateOneWithoutCommentsNestedInput
+}
+
+export type CommentUncheckedUpdateWithoutStatusEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  documentId?: Prisma.StringFieldUpdateOperationsInput | string
+  annotationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  authorUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
+  resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumCommentStatusFieldUpdateOperationsInput | $Enums.CommentStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type CommentCreateManyAuthorUserInput = {
   id?: string
   content: string
@@ -775,6 +912,7 @@ export type CommentCreateManyAuthorUserInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  status?: $Enums.CommentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -785,10 +923,12 @@ export type CommentUpdateWithoutAuthorUserInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumCommentStatusFieldUpdateOperationsInput | $Enums.CommentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   document?: Prisma.DocumentUpdateOneRequiredWithoutCommentsNestedInput
   annotation?: Prisma.AnnotationUpdateOneWithoutCommentsNestedInput
+  statusEvents?: Prisma.CommentStatusEventUpdateManyWithoutCommentNestedInput
 }
 
 export type CommentUncheckedUpdateWithoutAuthorUserInput = {
@@ -799,8 +939,10 @@ export type CommentUncheckedUpdateWithoutAuthorUserInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumCommentStatusFieldUpdateOperationsInput | $Enums.CommentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusEvents?: Prisma.CommentStatusEventUncheckedUpdateManyWithoutCommentNestedInput
 }
 
 export type CommentUncheckedUpdateManyWithoutAuthorUserInput = {
@@ -811,6 +953,7 @@ export type CommentUncheckedUpdateManyWithoutAuthorUserInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumCommentStatusFieldUpdateOperationsInput | $Enums.CommentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -823,6 +966,7 @@ export type CommentCreateManyDocumentInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  status?: $Enums.CommentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -833,10 +977,12 @@ export type CommentUpdateWithoutDocumentInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumCommentStatusFieldUpdateOperationsInput | $Enums.CommentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   annotation?: Prisma.AnnotationUpdateOneWithoutCommentsNestedInput
   authorUser?: Prisma.UserUpdateOneWithoutCommentsNestedInput
+  statusEvents?: Prisma.CommentStatusEventUpdateManyWithoutCommentNestedInput
 }
 
 export type CommentUncheckedUpdateWithoutDocumentInput = {
@@ -847,8 +993,10 @@ export type CommentUncheckedUpdateWithoutDocumentInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumCommentStatusFieldUpdateOperationsInput | $Enums.CommentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusEvents?: Prisma.CommentStatusEventUncheckedUpdateManyWithoutCommentNestedInput
 }
 
 export type CommentUncheckedUpdateManyWithoutDocumentInput = {
@@ -859,6 +1007,7 @@ export type CommentUncheckedUpdateManyWithoutDocumentInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumCommentStatusFieldUpdateOperationsInput | $Enums.CommentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -871,6 +1020,7 @@ export type CommentCreateManyAnnotationInput = {
   authorName?: string | null
   pageNumber: number
   resolved?: boolean
+  status?: $Enums.CommentStatus
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -881,10 +1031,12 @@ export type CommentUpdateWithoutAnnotationInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumCommentStatusFieldUpdateOperationsInput | $Enums.CommentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   document?: Prisma.DocumentUpdateOneRequiredWithoutCommentsNestedInput
   authorUser?: Prisma.UserUpdateOneWithoutCommentsNestedInput
+  statusEvents?: Prisma.CommentStatusEventUpdateManyWithoutCommentNestedInput
 }
 
 export type CommentUncheckedUpdateWithoutAnnotationInput = {
@@ -895,8 +1047,10 @@ export type CommentUncheckedUpdateWithoutAnnotationInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumCommentStatusFieldUpdateOperationsInput | $Enums.CommentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusEvents?: Prisma.CommentStatusEventUncheckedUpdateManyWithoutCommentNestedInput
 }
 
 export type CommentUncheckedUpdateManyWithoutAnnotationInput = {
@@ -907,10 +1061,40 @@ export type CommentUncheckedUpdateManyWithoutAnnotationInput = {
   authorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pageNumber?: Prisma.IntFieldUpdateOperationsInput | number
   resolved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumCommentStatusFieldUpdateOperationsInput | $Enums.CommentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+
+/**
+ * Count Type CommentCountOutputType
+ */
+
+export type CommentCountOutputType = {
+  statusEvents: number
+}
+
+export type CommentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  statusEvents?: boolean | CommentCountOutputTypeCountStatusEventsArgs
+}
+
+/**
+ * CommentCountOutputType without action
+ */
+export type CommentCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CommentCountOutputType
+   */
+  select?: Prisma.CommentCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * CommentCountOutputType without action
+ */
+export type CommentCountOutputTypeCountStatusEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CommentStatusEventWhereInput
+}
 
 
 export type CommentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -922,11 +1106,14 @@ export type CommentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   authorName?: boolean
   pageNumber?: boolean
   resolved?: boolean
+  status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   document?: boolean | Prisma.DocumentDefaultArgs<ExtArgs>
   annotation?: boolean | Prisma.Comment$annotationArgs<ExtArgs>
   authorUser?: boolean | Prisma.Comment$authorUserArgs<ExtArgs>
+  statusEvents?: boolean | Prisma.Comment$statusEventsArgs<ExtArgs>
+  _count?: boolean | Prisma.CommentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["comment"]>
 
 export type CommentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -938,6 +1125,7 @@ export type CommentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   authorName?: boolean
   pageNumber?: boolean
   resolved?: boolean
+  status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   document?: boolean | Prisma.DocumentDefaultArgs<ExtArgs>
@@ -954,6 +1142,7 @@ export type CommentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   authorName?: boolean
   pageNumber?: boolean
   resolved?: boolean
+  status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   document?: boolean | Prisma.DocumentDefaultArgs<ExtArgs>
@@ -970,15 +1159,18 @@ export type CommentSelectScalar = {
   authorName?: boolean
   pageNumber?: boolean
   resolved?: boolean
+  status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type CommentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "content" | "documentId" | "annotationId" | "authorUserId" | "authorName" | "pageNumber" | "resolved" | "createdAt" | "updatedAt", ExtArgs["result"]["comment"]>
+export type CommentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "content" | "documentId" | "annotationId" | "authorUserId" | "authorName" | "pageNumber" | "resolved" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["comment"]>
 export type CommentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   document?: boolean | Prisma.DocumentDefaultArgs<ExtArgs>
   annotation?: boolean | Prisma.Comment$annotationArgs<ExtArgs>
   authorUser?: boolean | Prisma.Comment$authorUserArgs<ExtArgs>
+  statusEvents?: boolean | Prisma.Comment$statusEventsArgs<ExtArgs>
+  _count?: boolean | Prisma.CommentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CommentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   document?: boolean | Prisma.DocumentDefaultArgs<ExtArgs>
@@ -997,6 +1189,7 @@ export type $CommentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     document: Prisma.$DocumentPayload<ExtArgs>
     annotation: Prisma.$AnnotationPayload<ExtArgs> | null
     authorUser: Prisma.$UserPayload<ExtArgs> | null
+    statusEvents: Prisma.$CommentStatusEventPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1007,6 +1200,7 @@ export type $CommentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     authorName: string | null
     pageNumber: number
     resolved: boolean
+    status: $Enums.CommentStatus
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["comment"]>
@@ -1406,6 +1600,7 @@ export interface Prisma__CommentClient<T, Null = never, ExtArgs extends runtime.
   document<T extends Prisma.DocumentDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DocumentDefaultArgs<ExtArgs>>): Prisma.Prisma__DocumentClient<runtime.Types.Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   annotation<T extends Prisma.Comment$annotationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Comment$annotationArgs<ExtArgs>>): Prisma.Prisma__AnnotationClient<runtime.Types.Result.GetResult<Prisma.$AnnotationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   authorUser<T extends Prisma.Comment$authorUserArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Comment$authorUserArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  statusEvents<T extends Prisma.Comment$statusEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Comment$statusEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentStatusEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1443,6 +1638,7 @@ export interface CommentFieldRefs {
   readonly authorName: Prisma.FieldRef<"Comment", 'String'>
   readonly pageNumber: Prisma.FieldRef<"Comment", 'Int'>
   readonly resolved: Prisma.FieldRef<"Comment", 'Boolean'>
+  readonly status: Prisma.FieldRef<"Comment", 'CommentStatus'>
   readonly createdAt: Prisma.FieldRef<"Comment", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Comment", 'DateTime'>
 }
@@ -1881,6 +2077,30 @@ export type Comment$authorUserArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   include?: Prisma.UserInclude<ExtArgs> | null
   where?: Prisma.UserWhereInput
+}
+
+/**
+ * Comment.statusEvents
+ */
+export type Comment$statusEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CommentStatusEvent
+   */
+  select?: Prisma.CommentStatusEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CommentStatusEvent
+   */
+  omit?: Prisma.CommentStatusEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CommentStatusEventInclude<ExtArgs> | null
+  where?: Prisma.CommentStatusEventWhereInput
+  orderBy?: Prisma.CommentStatusEventOrderByWithRelationInput | Prisma.CommentStatusEventOrderByWithRelationInput[]
+  cursor?: Prisma.CommentStatusEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CommentStatusEventScalarFieldEnum | Prisma.CommentStatusEventScalarFieldEnum[]
 }
 
 /**

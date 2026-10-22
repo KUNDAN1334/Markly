@@ -47,3 +47,6 @@ storage/
 marketing/markly-promo.html
 marketing/markly-promo-music.wav
 marketing/markly-promo.mp4
+
+# personal learning notes (local only)
+/docs/

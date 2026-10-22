@@ -9,7 +9,7 @@ import { Toolbar } from '@/components/editor/Toolbar';
 import { ShareModal } from '@/components/sharing/ShareModal';
 import { useEditorStore } from '@/lib/store';
 import { debounce } from '@/lib/utils';
-import { Annotation, AnnotationStyle, Comment, Document as MarklyDoc, AccessType, ShareLink } from '@/types';
+import { Annotation, AnnotationStyle, Comment, CommentStatus, Document as MarklyDoc, AccessType, ShareLink } from '@/types';
 import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight, MessageSquare, Eye, Edit3, Sun, Moon, Copy, Check } from 'lucide-react';
 
 export default function ReviewPage() {
@@ -61,6 +61,31 @@ export default function ReviewPage() {
     load();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
+
+  const documentId = document?.id;
+
+  // Pick up the owner's fixes while the reviewer has the link open.
+  useEffect(() => {
+    if (!documentId) return;
+
+    async function refreshComments() {
+      if (window.document.hidden) return;
+      try {
+        const res = await fetch(`/api/comments?documentId=${documentId}`, { headers: { 'x-share-token': token } });
+        if (res.ok) setComments(await res.json());
+      } catch {
+        // Keep the current comments if a background refresh fails.
+      }
+    }
+
+    const intervalId = window.setInterval(refreshComments, 5000);
+    window.addEventListener('focus', refreshComments);
+
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener('focus', refreshComments);
+    };
+  }, [documentId, token]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const saveAnnotations = useCallback(
@@ -132,11 +157,11 @@ export default function ReviewPage() {
     setComments((prev) => [comment, ...prev]);
   }
 
-  async function handleResolveComment(id: string, resolved: boolean) {
+  async function handleCommentStatus(id: string, status: CommentStatus, note?: string) {
     const res = await fetch(`/api/comments/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'x-share-token': token },
-      body: JSON.stringify({ resolved }),
+      body: JSON.stringify({ status, note }),
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({ error: 'Failed to update comment' }));
@@ -241,7 +266,8 @@ export default function ReviewPage() {
   const fileUrl = `/api/documents/file/${document.filename}?documentId=${document.id}&token=${token}`;
   const canComment = access === 'COMMENT' || access === 'EDIT';
   const canEdit = access === 'EDIT';
-  const unresolvedCount = comments.filter((c) => !c.resolved).length;
+  const openCount = comments.filter((c) => c.status === 'OPEN').length;
+  const awaitingCheckCount = comments.filter((c) => c.status === 'FIXED').length;
 
   const accessConfig = {
     VIEW:    { label: 'View only',   icon: <Eye size={11} />,           color: 'var(--text-3)', bg: 'var(--bg-2)', border: 'var(--border)' },
@@ -311,7 +337,12 @@ export default function ReviewPage() {
           {canComment && (
             <button onClick={() => setShowComments(!showComments)} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '0 10px', height: 28, borderRadius: 7, border: `1px solid ${showComments ? 'var(--accent)' : 'var(--border)'}`, background: showComments ? 'var(--accent)' : 'var(--bg-2)', color: showComments ? 'var(--accent-fg)' : 'var(--text-2)', cursor: 'pointer', fontSize: 11, fontWeight: 500, fontFamily: "'Instrument Sans', sans-serif", transition: 'all .15s' }}>
               <MessageSquare size={11} />
-              Comments{unresolvedCount > 0 ? ` (${unresolvedCount})` : ''}
+              Comments{openCount > 0 ? ` (${openCount})` : ''}
+              {awaitingCheckCount > 0 && (
+                <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 6px', borderRadius: 99, background: 'var(--status-fixed-bg)', color: 'var(--status-fixed)', border: '1px solid var(--status-fixed-border)' }}>
+                  {awaitingCheckCount} to verify
+                </span>
+              )}
             </button>
           )}
 
@@ -366,12 +397,13 @@ export default function ReviewPage() {
         </div>
 
         {showComments && canComment && (
-          <div style={{ width: 260, background: 'var(--bg-card)', borderLeft: '1px solid var(--border)', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+          <div style={{ width: 290, background: 'var(--bg-card)', borderLeft: '1px solid var(--border)', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
             <CommentsSidebar
               comments={comments}
               onAdd={handleAddComment}
-              onResolve={handleResolveComment}
+              onStatusChange={handleCommentStatus}
               onDelete={handleDeleteComment}
+              actor="share"
               readonly={false}
             />
           </div>

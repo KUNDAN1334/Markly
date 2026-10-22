@@ -390,6 +390,7 @@ export const ModelName = {
   Document: 'Document',
   Annotation: 'Annotation',
   Comment: 'Comment',
+  CommentStatusEvent: 'CommentStatusEvent',
   ShareLink: 'ShareLink'
 } as const
 
@@ -406,7 +407,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "workspace" | "project" | "document" | "annotation" | "comment" | "shareLink"
+    modelProps: "user" | "workspace" | "project" | "document" | "annotation" | "comment" | "commentStatusEvent" | "shareLink"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -854,6 +855,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    CommentStatusEvent: {
+      payload: Prisma.$CommentStatusEventPayload<ExtArgs>
+      fields: Prisma.CommentStatusEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CommentStatusEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommentStatusEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CommentStatusEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommentStatusEventPayload>
+        }
+        findFirst: {
+          args: Prisma.CommentStatusEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommentStatusEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CommentStatusEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommentStatusEventPayload>
+        }
+        findMany: {
+          args: Prisma.CommentStatusEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommentStatusEventPayload>[]
+        }
+        create: {
+          args: Prisma.CommentStatusEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommentStatusEventPayload>
+        }
+        createMany: {
+          args: Prisma.CommentStatusEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CommentStatusEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommentStatusEventPayload>[]
+        }
+        delete: {
+          args: Prisma.CommentStatusEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommentStatusEventPayload>
+        }
+        update: {
+          args: Prisma.CommentStatusEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommentStatusEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.CommentStatusEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CommentStatusEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CommentStatusEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommentStatusEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.CommentStatusEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommentStatusEventPayload>
+        }
+        aggregate: {
+          args: Prisma.CommentStatusEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCommentStatusEvent>
+        }
+        groupBy: {
+          args: Prisma.CommentStatusEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CommentStatusEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CommentStatusEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CommentStatusEventCountAggregateOutputType> | number
+        }
+      }
+    }
     ShareLink: {
       payload: Prisma.$ShareLinkPayload<ExtArgs>
       fields: Prisma.ShareLinkFieldRefs
@@ -1043,11 +1118,26 @@ export const CommentScalarFieldEnum = {
   authorName: 'authorName',
   pageNumber: 'pageNumber',
   resolved: 'resolved',
+  status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type CommentScalarFieldEnum = (typeof CommentScalarFieldEnum)[keyof typeof CommentScalarFieldEnum]
+
+
+export const CommentStatusEventScalarFieldEnum = {
+  id: 'id',
+  commentId: 'commentId',
+  fromStatus: 'fromStatus',
+  toStatus: 'toStatus',
+  note: 'note',
+  actorUserId: 'actorUserId',
+  actorName: 'actorName',
+  createdAt: 'createdAt'
+} as const
+
+export type CommentStatusEventScalarFieldEnum = (typeof CommentStatusEventScalarFieldEnum)[keyof typeof CommentStatusEventScalarFieldEnum]
 
 
 export const ShareLinkScalarFieldEnum = {
@@ -1170,6 +1260,20 @@ export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'J
  * Reference to a field of type 'QueryMode'
  */
 export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
+ * Reference to a field of type 'CommentStatus'
+ */
+export type EnumCommentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CommentStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CommentStatus[]'
+ */
+export type ListEnumCommentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CommentStatus[]'>
     
 
 
@@ -1302,6 +1406,7 @@ export type GlobalOmitConfig = {
   document?: Prisma.DocumentOmit
   annotation?: Prisma.AnnotationOmit
   comment?: Prisma.CommentOmit
+  commentStatusEvent?: Prisma.CommentStatusEventOmit
   shareLink?: Prisma.ShareLinkOmit
 }
 

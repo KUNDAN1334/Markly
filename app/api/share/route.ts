@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withStatusEvents } from '@/lib/comment-status';
 import { createDocumentBranch } from '@/lib/document-branch';
 import {
   authorizeDocumentAccess,
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest) {
         document: {
           include: {
             annotations: { orderBy: { createdAt: 'asc' } },
-            comments: { orderBy: { createdAt: 'desc' } },
+            comments: { orderBy: { createdAt: 'desc' }, include: withStatusEvents },
           },
         },
         project: {
@@ -34,7 +35,7 @@ export async function GET(req: NextRequest) {
             documents: {
               include: {
                 annotations: { orderBy: { createdAt: 'asc' } },
-                comments: { orderBy: { createdAt: 'desc' } },
+                comments: { orderBy: { createdAt: 'desc' }, include: withStatusEvents },
               },
             },
           },

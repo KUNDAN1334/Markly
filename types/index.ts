@@ -42,6 +42,19 @@ export interface Annotation {
   updatedAt: string;
 }
 
+export type CommentStatus = 'OPEN' | 'FIXED' | 'VERIFIED';
+
+export interface CommentStatusEvent {
+  id: string;
+  commentId: string;
+  fromStatus: CommentStatus;
+  toStatus: CommentStatus;
+  note?: string;
+  actorUserId?: string;
+  actorName?: string;
+  createdAt: string;
+}
+
 export interface Comment {
   id: string;
   content: string;
@@ -51,6 +64,8 @@ export interface Comment {
   authorName?: string;
   pageNumber: number;
   resolved: boolean;
+  status: CommentStatus;
+  statusEvents?: CommentStatusEvent[];
   createdAt: string;
   updatedAt: string;
 }

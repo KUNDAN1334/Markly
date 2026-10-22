@@ -10,7 +10,7 @@ import { CommentsSidebar } from '@/components/comments/CommentsSidebar';
 import { ShareModal } from '@/components/sharing/ShareModal';
 import { useEditorStore } from '@/lib/store';
 import { debounce } from '@/lib/utils';
-import { Annotation, AnnotationStyle, Comment, Document as MarklyDoc, ShareLink, AccessType } from '@/types';
+import { Annotation, AnnotationStyle, Comment, CommentStatus, Document as MarklyDoc, ShareLink, AccessType } from '@/types';
 import { MessageSquare, Layers, ArrowLeft } from 'lucide-react';
 
 type SidebarTab = 'pages' | 'comments';
@@ -191,8 +191,8 @@ export default function EditorPage() {
     setComments((prev) => [comment, ...prev]);
   }
 
-  async function handleResolveComment(id: string, resolved: boolean) {
-    const res = await fetch(`/api/comments/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ resolved }) });
+  async function handleCommentStatus(id: string, status: CommentStatus, note?: string) {
+    const res = await fetch(`/api/comments/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status, note }) });
     if (!res.ok) {
       const err = await res.json().catch(() => ({ error: 'Failed to update comment' }));
       throw new Error(err.error || 'Failed to update comment');
@@ -255,7 +255,8 @@ export default function EditorPage() {
   }
 
   const fileUrl = `/api/documents/file/${document.filename}?documentId=${document.id}`;
-  const unresolvedComments = comments.filter((c) => !c.resolved).length;
+  // Items still waiting on the owner to fix.
+  const unresolvedComments = comments.filter((c) => c.status === 'OPEN').length;
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-2)', overflow: 'hidden' }}>
@@ -275,6 +276,14 @@ export default function EditorPage() {
         <span style={{ fontSize: 12, color: 'var(--text-2)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 300, fontFamily: "'Instrument Sans', sans-serif" }}>
           {document.originalName}
         </span>
+        {document.isVisible === false && (
+          <span
+            title="The copy behind an edit link. The reviewer's edits and comments live here, not on the original."
+            style={{ fontSize: 9, fontWeight: 700, letterSpacing: '.05em', padding: '1px 7px', borderRadius: 99, background: '#fff7ed', color: '#c2410c', border: '1px solid #fed7aa', flexShrink: 0, fontFamily: "'Instrument Sans', sans-serif" }}
+          >
+            SHARE-BACK COPY
+          </span>
+        )}
         {isDirty && (
           <span title="Unsaved changes" style={{ width: 6, height: 6, borderRadius: '50%', background: '#f59e0b', flexShrink: 0 }} />
         )}
@@ -294,7 +303,7 @@ export default function EditorPage() {
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
 
         {/* LEFT SIDEBAR */}
-        <div style={{ width: 180, background: 'var(--bg-card)', borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+        <div style={{ width: sidebarTab === 'comments' ? 290 : 180, background: 'var(--bg-card)', borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
           {/* Tabs */}
           <div style={{ display: 'flex', borderBottom: '1px solid var(--border)' }}>
             {([
@@ -330,8 +339,9 @@ export default function EditorPage() {
               <CommentsSidebar
                 comments={comments}
                 onAdd={handleAddComment}
-                onResolve={handleResolveComment}
+                onStatusChange={handleCommentStatus}
                 onDelete={handleDeleteComment}
+                actor="owner"
               />
             )}
           </div>
@@ -369,6 +379,11 @@ export default function EditorPage() {
           onClose={() => setShowShare(false)}
           onCreateLink={handleCreateShareLink}
           onDeleteLink={handleDeleteShareLink}
+          currentDocumentId={document.id}
+          onOpenInEditor={(id) => {
+            setShowShare(false);
+            router.push(`/editor/${id}`);
+          }}
         />
       )}
     </div>

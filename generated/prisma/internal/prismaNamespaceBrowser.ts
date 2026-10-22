@@ -57,6 +57,7 @@ export const ModelName = {
   Document: 'Document',
   Annotation: 'Annotation',
   Comment: 'Comment',
+  CommentStatusEvent: 'CommentStatusEvent',
   ShareLink: 'ShareLink'
 } as const
 
@@ -152,11 +153,26 @@ export const CommentScalarFieldEnum = {
   authorName: 'authorName',
   pageNumber: 'pageNumber',
   resolved: 'resolved',
+  status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type CommentScalarFieldEnum = (typeof CommentScalarFieldEnum)[keyof typeof CommentScalarFieldEnum]
+
+
+export const CommentStatusEventScalarFieldEnum = {
+  id: 'id',
+  commentId: 'commentId',
+  fromStatus: 'fromStatus',
+  toStatus: 'toStatus',
+  note: 'note',
+  actorUserId: 'actorUserId',
+  actorName: 'actorName',
+  createdAt: 'createdAt'
+} as const
+
+export type CommentStatusEventScalarFieldEnum = (typeof CommentStatusEventScalarFieldEnum)[keyof typeof CommentStatusEventScalarFieldEnum]
 
 
 export const ShareLinkScalarFieldEnum = {

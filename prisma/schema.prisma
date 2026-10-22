@@ -8,17 +8,18 @@ datasource db {
 }
 
 model User {
-  id          String      @id @default(cuid())
-  firebaseUid String      @unique
-  email       String?
-  name        String?
-  imageUrl    String?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  projects    Project[]
-  workspaces  Workspace[]
-  comments    Comment[]
-  shareLinks  ShareLink[]
+  id                  String               @id @default(cuid())
+  firebaseUid         String               @unique
+  email               String?
+  name                String?
+  imageUrl            String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  projects            Project[]
+  workspaces          Workspace[]
+  comments            Comment[]
+  commentStatusEvents CommentStatusEvent[]
+  shareLinks          ShareLink[]
 }
 
 model Workspace {
@@ -34,16 +35,16 @@ model Workspace {
 }
 
 model Project {
-  id         String      @id @default(cuid())
-  name       String
-  ownerId    String
-  owner      User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  id          String      @id @default(cuid())
+  name        String
+  ownerId     String
+  owner       User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   workspaceId String?
-  workspace  Workspace?  @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  documents  Document[]
-  shareLinks ShareLink[]
+  workspace   Workspace?  @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  documents   Document[]
+  shareLinks  ShareLink[]
 
   @@index([ownerId, updatedAt])
   @@index([workspaceId, updatedAt])
@@ -83,19 +84,45 @@ model Annotation {
 }
 
 model Comment {
-  id           String      @id @default(cuid())
+  id           String               @id @default(cuid())
   content      String
   documentId   String
-  document     Document    @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  document     Document             @relation(fields: [documentId], references: [id], onDelete: Cascade)
   annotationId String?
-  annotation   Annotation? @relation(fields: [annotationId], references: [id], onDelete: SetNull)
+  annotation   Annotation?          @relation(fields: [annotationId], references: [id], onDelete: SetNull)
   authorUserId String?
-  authorUser   User?       @relation(fields: [authorUserId], references: [id], onDelete: SetNull)
+  authorUser   User?                @relation(fields: [authorUserId], references: [id], onDelete: SetNull)
   authorName   String?
   pageNumber   Int
-  resolved     Boolean     @default(false)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  // Kept in sync with status (true only when VERIFIED) for older clients.
+  resolved     Boolean              @default(false)
+  status       CommentStatus        @default(OPEN)
+  statusEvents CommentStatusEvent[]
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+}
+
+// OPEN: flagged, waiting on the owner. FIXED: owner says it's addressed.
+// VERIFIED: the reviewer confirmed the fix.
+enum CommentStatus {
+  OPEN
+  FIXED
+  VERIFIED
+}
+
+model CommentStatusEvent {
+  id          String        @id @default(cuid())
+  commentId   String
+  comment     Comment       @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  fromStatus  CommentStatus
+  toStatus    CommentStatus
+  note        String?
+  actorUserId String?
+  actorUser   User?         @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+  actorName   String?
+  createdAt   DateTime      @default(now())
+
+  @@index([commentId, createdAt])
 }
 
 model ShareLink {

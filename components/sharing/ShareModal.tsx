@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { ShareLink, AccessType } from '@/types';
-import { X, Copy, Check, Link, Trash2, Plus, Eye, MessageSquare, Edit3 } from 'lucide-react';
+import { X, Copy, Check, Link, Trash2, Plus, Eye, MessageSquare, Edit3, ArrowUpRight } from 'lucide-react';
 
 interface Props {
   shareLinks: ShareLink[];
@@ -11,6 +11,10 @@ interface Props {
   onDeleteLink: (id: string) => Promise<void>;
   hiddenToken?: string;
   allowDelete?: boolean;
+  // Owner only. An EDIT link points at a hidden copy of the document, and the
+  // reviewer's comments land there, so the owner needs a way to open it to fix them.
+  onOpenInEditor?: (documentId: string) => void;
+  currentDocumentId?: string;
 }
 
 const ACCESS_OPTIONS: { id: AccessType; label: string; desc: string; icon: React.ReactNode }[] = [
@@ -26,6 +30,8 @@ export function ShareModal({
   onDeleteLink,
   hiddenToken,
   allowDelete = true,
+  onOpenInEditor,
+  currentDocumentId,
 }: Props) {
   const [selectedAccess, setSelectedAccess] = useState<AccessType>('COMMENT');
   const [creating, setCreating] = useState(false);
@@ -68,6 +74,7 @@ export function ShareModal({
 
   function renderLinkCard(link: ShareLink) {
     const opt = ACCESS_OPTIONS.find((o) => o.id === link.access);
+    const branchId = link.access === 'EDIT' && link.documentId !== currentDocumentId ? link.documentId : undefined;
 
     return (
       <div
@@ -108,6 +115,35 @@ export function ShareModal({
             /review/{link.token}
           </p>
         </div>
+        {onOpenInEditor && branchId && (
+          <button
+            onClick={() => onOpenInEditor(branchId)}
+            title="Open this link's copy to fix what the reviewer flagged"
+            style={{
+              height: 30,
+              padding: '0 10px',
+              borderRadius: 7,
+              border: '1px solid var(--border)',
+              background: 'transparent',
+              cursor: 'pointer',
+              color: 'var(--text-2)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              fontSize: 11,
+              fontWeight: 500,
+              fontFamily: "'Instrument Sans', sans-serif",
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+              transition: 'all .15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-2)'; e.currentTarget.style.color = 'var(--text)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-2)'; }}
+          >
+            Open in editor
+            <ArrowUpRight size={11} />
+          </button>
+        )}
         <button
           onClick={() => copy(link.token, link.id)}
           style={{

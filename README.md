@@ -56,6 +56,7 @@ Upload a PDF (or a DOCX, converted server-side), mark it up freehand, drop shape
 - **Zero-login review links** with `VIEW`, `COMMENT`, or `EDIT` access, optionally time-limited
 - **Share-back flow** — a reviewer's markup branches into a copy of the document and returns as a new link, so the original is never overwritten
 - **Threaded comments** anchored to a specific annotation or page, resolvable inline
+- **Fix verification** — each flagged comment moves open → fixed (the owner says what changed) → verified (the reviewer confirms on the same link), or goes back as "still broken", with a timestamped history and a "verified" progress bar on both sides
 - **Debounced autosave** with a live save indicator, plus manual `Ctrl+S`
 
 ### Documents and export
@@ -367,7 +368,7 @@ All endpoints return JSON; errors take the shape `{ error: string }`. Document-s
 |---|---|---|
 | `GET` | `/api/comments?documentId=` | All comments for a document |
 | `POST` | `/api/comments` | Create — `{ content, documentId, pageNumber, annotationId? }` |
-| `PATCH` | `/api/comments/:id` | Resolve / update |
+| `PATCH` | `/api/comments/:id` | Change status — `{ status: 'OPEN' \| 'FIXED' \| 'VERIFIED', note? }`. The owner marks fixed; only a share-link reviewer verifies. |
 | `DELETE` | `/api/comments/:id` | Delete |
 
 ### Sharing

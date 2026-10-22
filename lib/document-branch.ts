@@ -1,3 +1,5 @@
+import { randomUUID } from 'crypto';
+import { withStatusEvents } from '@/lib/comment-status';
 import { prisma } from '@/lib/prisma';
 import type { Prisma } from '@/generated/prisma/client';
 
@@ -7,7 +9,7 @@ export async function createDocumentBranch(sourceDocumentId: string) {
       where: { id: sourceDocumentId },
       include: {
         annotations: { orderBy: { createdAt: 'asc' } },
-        comments: { orderBy: { createdAt: 'asc' } },
+        comments: { orderBy: { createdAt: 'asc' }, include: withStatusEvents },
       },
     });
 
@@ -44,16 +46,38 @@ export async function createDocumentBranch(sourceDocumentId: string) {
     }
 
     if (source.comments.length > 0) {
+      // Ids are assigned up front so each comment's status history can follow it.
+      const branchedComments = source.comments.map((comment) => ({ id: randomUUID(), source: comment }));
+
       await tx.comment.createMany({
-        data: source.comments.map((comment) => ({
+        data: branchedComments.map(({ id, source: comment }) => ({
+          id,
           content: comment.content,
           documentId: branchedDocument.id,
           authorUserId: comment.authorUserId,
           authorName: comment.authorName,
           pageNumber: comment.pageNumber,
           resolved: comment.resolved,
+          status: comment.status,
+          createdAt: comment.createdAt,
         })),
       });
+
+      const statusEvents = branchedComments.flatMap(({ id, source: comment }) =>
+        comment.statusEvents.map((event) => ({
+          commentId: id,
+          fromStatus: event.fromStatus,
+          toStatus: event.toStatus,
+          note: event.note,
+          actorUserId: event.actorUserId,
+          actorName: event.actorName,
+          createdAt: event.createdAt,
+        }))
+      );
+
+      if (statusEvents.length > 0) {
+        await tx.commentStatusEvent.createMany({ data: statusEvents });
+      }
     }
 
     return branchedDocument;

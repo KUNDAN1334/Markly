@@ -201,6 +201,7 @@ export type UserWhereInput = {
   projects?: Prisma.ProjectListRelationFilter
   workspaces?: Prisma.WorkspaceListRelationFilter
   comments?: Prisma.CommentListRelationFilter
+  commentStatusEvents?: Prisma.CommentStatusEventListRelationFilter
   shareLinks?: Prisma.ShareLinkListRelationFilter
 }
 
@@ -215,6 +216,7 @@ export type UserOrderByWithRelationInput = {
   projects?: Prisma.ProjectOrderByRelationAggregateInput
   workspaces?: Prisma.WorkspaceOrderByRelationAggregateInput
   comments?: Prisma.CommentOrderByRelationAggregateInput
+  commentStatusEvents?: Prisma.CommentStatusEventOrderByRelationAggregateInput
   shareLinks?: Prisma.ShareLinkOrderByRelationAggregateInput
 }
 
@@ -232,6 +234,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   projects?: Prisma.ProjectListRelationFilter
   workspaces?: Prisma.WorkspaceListRelationFilter
   comments?: Prisma.CommentListRelationFilter
+  commentStatusEvents?: Prisma.CommentStatusEventListRelationFilter
   shareLinks?: Prisma.ShareLinkListRelationFilter
 }, "id" | "firebaseUid">
 
@@ -272,6 +275,7 @@ export type UserCreateInput = {
   projects?: Prisma.ProjectCreateNestedManyWithoutOwnerInput
   workspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorUserInput
+  commentStatusEvents?: Prisma.CommentStatusEventCreateNestedManyWithoutActorUserInput
   shareLinks?: Prisma.ShareLinkCreateNestedManyWithoutCreatedByUserInput
 }
 
@@ -286,6 +290,7 @@ export type UserUncheckedCreateInput = {
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOwnerInput
   workspaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorUserInput
+  commentStatusEvents?: Prisma.CommentStatusEventUncheckedCreateNestedManyWithoutActorUserInput
   shareLinks?: Prisma.ShareLinkUncheckedCreateNestedManyWithoutCreatedByUserInput
 }
 
@@ -300,6 +305,7 @@ export type UserUpdateInput = {
   projects?: Prisma.ProjectUpdateManyWithoutOwnerNestedInput
   workspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorUserNestedInput
+  commentStatusEvents?: Prisma.CommentStatusEventUpdateManyWithoutActorUserNestedInput
   shareLinks?: Prisma.ShareLinkUpdateManyWithoutCreatedByUserNestedInput
 }
 
@@ -314,6 +320,7 @@ export type UserUncheckedUpdateInput = {
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutOwnerNestedInput
   workspaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorUserNestedInput
+  commentStatusEvents?: Prisma.CommentStatusEventUncheckedUpdateManyWithoutActorUserNestedInput
   shareLinks?: Prisma.ShareLinkUncheckedUpdateManyWithoutCreatedByUserNestedInput
 }
 
@@ -443,6 +450,22 @@ export type UserUpdateOneWithoutCommentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCommentsInput, Prisma.UserUpdateWithoutCommentsInput>, Prisma.UserUncheckedUpdateWithoutCommentsInput>
 }
 
+export type UserCreateNestedOneWithoutCommentStatusEventsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCommentStatusEventsInput, Prisma.UserUncheckedCreateWithoutCommentStatusEventsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCommentStatusEventsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutCommentStatusEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCommentStatusEventsInput, Prisma.UserUncheckedCreateWithoutCommentStatusEventsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCommentStatusEventsInput
+  upsert?: Prisma.UserUpsertWithoutCommentStatusEventsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCommentStatusEventsInput, Prisma.UserUpdateWithoutCommentStatusEventsInput>, Prisma.UserUncheckedUpdateWithoutCommentStatusEventsInput>
+}
+
 export type UserCreateNestedOneWithoutShareLinksInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutShareLinksInput, Prisma.UserUncheckedCreateWithoutShareLinksInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutShareLinksInput
@@ -469,6 +492,7 @@ export type UserCreateWithoutWorkspacesInput = {
   updatedAt?: Date | string
   projects?: Prisma.ProjectCreateNestedManyWithoutOwnerInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorUserInput
+  commentStatusEvents?: Prisma.CommentStatusEventCreateNestedManyWithoutActorUserInput
   shareLinks?: Prisma.ShareLinkCreateNestedManyWithoutCreatedByUserInput
 }
 
@@ -482,6 +506,7 @@ export type UserUncheckedCreateWithoutWorkspacesInput = {
   updatedAt?: Date | string
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOwnerInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorUserInput
+  commentStatusEvents?: Prisma.CommentStatusEventUncheckedCreateNestedManyWithoutActorUserInput
   shareLinks?: Prisma.ShareLinkUncheckedCreateNestedManyWithoutCreatedByUserInput
 }
 
@@ -511,6 +536,7 @@ export type UserUpdateWithoutWorkspacesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projects?: Prisma.ProjectUpdateManyWithoutOwnerNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorUserNestedInput
+  commentStatusEvents?: Prisma.CommentStatusEventUpdateManyWithoutActorUserNestedInput
   shareLinks?: Prisma.ShareLinkUpdateManyWithoutCreatedByUserNestedInput
 }
 
@@ -524,6 +550,7 @@ export type UserUncheckedUpdateWithoutWorkspacesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutOwnerNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorUserNestedInput
+  commentStatusEvents?: Prisma.CommentStatusEventUncheckedUpdateManyWithoutActorUserNestedInput
   shareLinks?: Prisma.ShareLinkUncheckedUpdateManyWithoutCreatedByUserNestedInput
 }
 
@@ -537,6 +564,7 @@ export type UserCreateWithoutProjectsInput = {
   updatedAt?: Date | string
   workspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorUserInput
+  commentStatusEvents?: Prisma.CommentStatusEventCreateNestedManyWithoutActorUserInput
   shareLinks?: Prisma.ShareLinkCreateNestedManyWithoutCreatedByUserInput
 }
 
@@ -550,6 +578,7 @@ export type UserUncheckedCreateWithoutProjectsInput = {
   updatedAt?: Date | string
   workspaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorUserInput
+  commentStatusEvents?: Prisma.CommentStatusEventUncheckedCreateNestedManyWithoutActorUserInput
   shareLinks?: Prisma.ShareLinkUncheckedCreateNestedManyWithoutCreatedByUserInput
 }
 
@@ -579,6 +608,7 @@ export type UserUpdateWithoutProjectsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   workspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorUserNestedInput
+  commentStatusEvents?: Prisma.CommentStatusEventUpdateManyWithoutActorUserNestedInput
   shareLinks?: Prisma.ShareLinkUpdateManyWithoutCreatedByUserNestedInput
 }
 
@@ -592,6 +622,7 @@ export type UserUncheckedUpdateWithoutProjectsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   workspaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorUserNestedInput
+  commentStatusEvents?: Prisma.CommentStatusEventUncheckedUpdateManyWithoutActorUserNestedInput
   shareLinks?: Prisma.ShareLinkUncheckedUpdateManyWithoutCreatedByUserNestedInput
 }
 
@@ -605,6 +636,7 @@ export type UserCreateWithoutCommentsInput = {
   updatedAt?: Date | string
   projects?: Prisma.ProjectCreateNestedManyWithoutOwnerInput
   workspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerUserInput
+  commentStatusEvents?: Prisma.CommentStatusEventCreateNestedManyWithoutActorUserInput
   shareLinks?: Prisma.ShareLinkCreateNestedManyWithoutCreatedByUserInput
 }
 
@@ -618,6 +650,7 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   updatedAt?: Date | string
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOwnerInput
   workspaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerUserInput
+  commentStatusEvents?: Prisma.CommentStatusEventUncheckedCreateNestedManyWithoutActorUserInput
   shareLinks?: Prisma.ShareLinkUncheckedCreateNestedManyWithoutCreatedByUserInput
 }
 
@@ -647,6 +680,7 @@ export type UserUpdateWithoutCommentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projects?: Prisma.ProjectUpdateManyWithoutOwnerNestedInput
   workspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerUserNestedInput
+  commentStatusEvents?: Prisma.CommentStatusEventUpdateManyWithoutActorUserNestedInput
   shareLinks?: Prisma.ShareLinkUpdateManyWithoutCreatedByUserNestedInput
 }
 
@@ -660,6 +694,79 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutOwnerNestedInput
   workspaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerUserNestedInput
+  commentStatusEvents?: Prisma.CommentStatusEventUncheckedUpdateManyWithoutActorUserNestedInput
+  shareLinks?: Prisma.ShareLinkUncheckedUpdateManyWithoutCreatedByUserNestedInput
+}
+
+export type UserCreateWithoutCommentStatusEventsInput = {
+  id?: string
+  firebaseUid: string
+  email?: string | null
+  name?: string | null
+  imageUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  projects?: Prisma.ProjectCreateNestedManyWithoutOwnerInput
+  workspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorUserInput
+  shareLinks?: Prisma.ShareLinkCreateNestedManyWithoutCreatedByUserInput
+}
+
+export type UserUncheckedCreateWithoutCommentStatusEventsInput = {
+  id?: string
+  firebaseUid: string
+  email?: string | null
+  name?: string | null
+  imageUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOwnerInput
+  workspaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorUserInput
+  shareLinks?: Prisma.ShareLinkUncheckedCreateNestedManyWithoutCreatedByUserInput
+}
+
+export type UserCreateOrConnectWithoutCommentStatusEventsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCommentStatusEventsInput, Prisma.UserUncheckedCreateWithoutCommentStatusEventsInput>
+}
+
+export type UserUpsertWithoutCommentStatusEventsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCommentStatusEventsInput, Prisma.UserUncheckedUpdateWithoutCommentStatusEventsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCommentStatusEventsInput, Prisma.UserUncheckedCreateWithoutCommentStatusEventsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCommentStatusEventsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCommentStatusEventsInput, Prisma.UserUncheckedUpdateWithoutCommentStatusEventsInput>
+}
+
+export type UserUpdateWithoutCommentStatusEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firebaseUid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  projects?: Prisma.ProjectUpdateManyWithoutOwnerNestedInput
+  workspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorUserNestedInput
+  shareLinks?: Prisma.ShareLinkUpdateManyWithoutCreatedByUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCommentStatusEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firebaseUid?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutOwnerNestedInput
+  workspaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorUserNestedInput
   shareLinks?: Prisma.ShareLinkUncheckedUpdateManyWithoutCreatedByUserNestedInput
 }
 
@@ -674,6 +781,7 @@ export type UserCreateWithoutShareLinksInput = {
   projects?: Prisma.ProjectCreateNestedManyWithoutOwnerInput
   workspaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutAuthorUserInput
+  commentStatusEvents?: Prisma.CommentStatusEventCreateNestedManyWithoutActorUserInput
 }
 
 export type UserUncheckedCreateWithoutShareLinksInput = {
@@ -687,6 +795,7 @@ export type UserUncheckedCreateWithoutShareLinksInput = {
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutOwnerInput
   workspaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorUserInput
+  commentStatusEvents?: Prisma.CommentStatusEventUncheckedCreateNestedManyWithoutActorUserInput
 }
 
 export type UserCreateOrConnectWithoutShareLinksInput = {
@@ -716,6 +825,7 @@ export type UserUpdateWithoutShareLinksInput = {
   projects?: Prisma.ProjectUpdateManyWithoutOwnerNestedInput
   workspaces?: Prisma.WorkspaceUpdateManyWithoutOwnerUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutAuthorUserNestedInput
+  commentStatusEvents?: Prisma.CommentStatusEventUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutShareLinksInput = {
@@ -729,6 +839,7 @@ export type UserUncheckedUpdateWithoutShareLinksInput = {
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutOwnerNestedInput
   workspaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorUserNestedInput
+  commentStatusEvents?: Prisma.CommentStatusEventUncheckedUpdateManyWithoutActorUserNestedInput
 }
 
 
@@ -740,6 +851,7 @@ export type UserCountOutputType = {
   projects: number
   workspaces: number
   comments: number
+  commentStatusEvents: number
   shareLinks: number
 }
 
@@ -747,6 +859,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   projects?: boolean | UserCountOutputTypeCountProjectsArgs
   workspaces?: boolean | UserCountOutputTypeCountWorkspacesArgs
   comments?: boolean | UserCountOutputTypeCountCommentsArgs
+  commentStatusEvents?: boolean | UserCountOutputTypeCountCommentStatusEventsArgs
   shareLinks?: boolean | UserCountOutputTypeCountShareLinksArgs
 }
 
@@ -784,6 +897,13 @@ export type UserCountOutputTypeCountCommentsArgs<ExtArgs extends runtime.Types.E
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountCommentStatusEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CommentStatusEventWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountShareLinksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ShareLinkWhereInput
 }
@@ -800,6 +920,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   projects?: boolean | Prisma.User$projectsArgs<ExtArgs>
   workspaces?: boolean | Prisma.User$workspacesArgs<ExtArgs>
   comments?: boolean | Prisma.User$commentsArgs<ExtArgs>
+  commentStatusEvents?: boolean | Prisma.User$commentStatusEventsArgs<ExtArgs>
   shareLinks?: boolean | Prisma.User$shareLinksArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -839,6 +960,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   projects?: boolean | Prisma.User$projectsArgs<ExtArgs>
   workspaces?: boolean | Prisma.User$workspacesArgs<ExtArgs>
   comments?: boolean | Prisma.User$commentsArgs<ExtArgs>
+  commentStatusEvents?: boolean | Prisma.User$commentStatusEventsArgs<ExtArgs>
   shareLinks?: boolean | Prisma.User$shareLinksArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -851,6 +973,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     projects: Prisma.$ProjectPayload<ExtArgs>[]
     workspaces: Prisma.$WorkspacePayload<ExtArgs>[]
     comments: Prisma.$CommentPayload<ExtArgs>[]
+    commentStatusEvents: Prisma.$CommentStatusEventPayload<ExtArgs>[]
     shareLinks: Prisma.$ShareLinkPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1258,6 +1381,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   projects<T extends Prisma.User$projectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$projectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   workspaces<T extends Prisma.User$workspacesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$workspacesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   comments<T extends Prisma.User$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  commentStatusEvents<T extends Prisma.User$commentStatusEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$commentStatusEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentStatusEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   shareLinks<T extends Prisma.User$shareLinksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$shareLinksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShareLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1757,6 +1881,30 @@ export type User$commentsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.CommentScalarFieldEnum | Prisma.CommentScalarFieldEnum[]
+}
+
+/**
+ * User.commentStatusEvents
+ */
+export type User$commentStatusEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CommentStatusEvent
+   */
+  select?: Prisma.CommentStatusEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CommentStatusEvent
+   */
+  omit?: Prisma.CommentStatusEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CommentStatusEventInclude<ExtArgs> | null
+  where?: Prisma.CommentStatusEventWhereInput
+  orderBy?: Prisma.CommentStatusEventOrderByWithRelationInput | Prisma.CommentStatusEventOrderByWithRelationInput[]
+  cursor?: Prisma.CommentStatusEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CommentStatusEventScalarFieldEnum | Prisma.CommentStatusEventScalarFieldEnum[]
 }
 
 /**

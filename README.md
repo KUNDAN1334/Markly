@@ -32,7 +32,7 @@
 
 Markly is a self-hostable **PDF annotation and async document review platform**. Think Excalidraw, except the canvas isn't blank — your document is the base layer.
 
-Upload a PDF (or a DOCX, converted server-side), mark it up freehand, drop shapes and text anywhere, leave threaded comments, then hand someone a link. Reviewers don't need an account, don't need to install anything, and can send their markup back to you with one click. When you're done, export a flat PDF with every annotation baked into the bytes — fonts embedded, positions identical to what you saw on screen.
+Upload a PDF (or a DOCX, converted server-side), mark it up freehand, drop shapes and text anywhere, leave comments on any page, then hand someone a link. Reviewers don't need an account, don't need to install anything, and can send their markup back to you with one click. When you're done, export a flat PDF with every annotation baked into the bytes — fonts embedded, positions identical to what you saw on screen.
 
 **Who it's for:** designers collecting feedback on mockups, lawyers redlining contracts, architects marking up plans, product teams reviewing specs — anyone whose review loop currently lives in email attachments named `final_v3_REVISED.pdf`.
 
@@ -49,13 +49,13 @@ Upload a PDF (or a DOCX, converted server-side), mark it up freehand, drop shape
 - **Multiple fonts** — Virgil (Excalidraw's hand-drawn face), Helvetica, Times, Courier — chosen from a font picker and preserved through export
 - **Multi-page navigation** with a rendered thumbnail sidebar
 - **Zoom** that keeps annotations locked to their document coordinates
-- **Full undo/redo** across the session (`Ctrl+Z` / `Ctrl+Y`)
+- **Undo/redo** from the keyboard (`Ctrl+Z` / `Ctrl+Y`)
 
 ### Collaboration
 
 - **Zero-login review links** with `VIEW`, `COMMENT`, or `EDIT` access, optionally time-limited
 - **Share-back flow** — a reviewer's markup branches into a copy of the document and returns as a new link, so the original is never overwritten
-- **Threaded comments** anchored to a specific annotation or page, resolvable inline
+- **Page comments** — each comment is tied to the page it was written on and keeps its own status history
 - **Fix verification** — each flagged comment moves open → fixed (the owner says what changed) → verified (the reviewer confirms on the same link), or goes back as "still broken", with a timestamped history and a "verified" progress bar on both sides
 - **Debounced autosave** with a live save indicator, plus manual `Ctrl+S`
 
@@ -84,9 +84,9 @@ Upload a PDF (or a DOCX, converted server-side), mark it up freehand, drop shape
 | UI | React 19 + Tailwind CSS v4 | Minimal black-and-white design system via CSS variables |
 | Language | TypeScript 5 | Type safety across client, server, and DB |
 | Client state | Zustand | Small, synchronous editor store (tools, history, viewport) |
-| Server state | TanStack React Query | Caching, refetching, mutation lifecycle |
+| Server data | `fetch` + page-level React state | Debounced saves and a 5 s poll keep open tabs in sync without a realtime server |
 | PDF rendering | pdf.js (`pdfjs-dist` v5) | The reference PDF renderer |
-| Annotation canvas | HTML Canvas + Konva + Rough.js | Direct pixel control, hand-drawn stroke styling |
+| Annotation canvas | HTML Canvas 2D API | Direct pixel control; hit-testing, drag and resize are written by hand, and Virgil gives text the hand-drawn look |
 | PDF export | `pdf-lib` + `@pdf-lib/fontkit` | Byte-level PDF authoring with font embedding |
 | Auth | Firebase Auth + Firebase Admin | Client sign-in, server-side session cookie verification |
 | ORM | Prisma 7 | Typed queries, migrations, JSON columns |
@@ -110,14 +110,14 @@ Upload a PDF (or a DOCX, converted server-side), mark it up freehand, drop shape
 
 
 
-Annotations store `geometry` and `style` as JSON columns, so new tool types don't require a migration. Documents carry an `isVisible` flag — share-back branches are created hidden until the owner accepts them.
+Annotations store `geometry` and `style` as JSON columns, so new tool types don't require a migration. Documents carry an `isVisible` flag — the copy behind an `EDIT` link is hidden from the dashboard, and the owner opens it from the share modal.
 
 ### Two authorization paths
 
 Every document-scoped route resolves access through one of two paths:
 
 1. **Session cookie** — `markly_session`, an HTTP-only Firebase session cookie (5-day lifetime) verified server-side by Firebase Admin, then matched against document ownership.
-2. **Share token** — a `?token=` query param resolved to a `ShareLink`, checked for expiry and ranked access level (`VIEW` < `COMMENT` < `EDIT`) against what the route requires.
+2. **Share token** — sent in the `x-share-token` header (or as `?token=` on the PDF file and export URLs, which the browser opens directly and can't add headers to), resolved to a `ShareLink`, and checked for expiry and ranked access level (`VIEW` < `COMMENT` < `EDIT`) against what the route requires.
 
 This is what makes login-free review possible without introducing a second, weaker auth system.
 
@@ -233,13 +233,13 @@ Open <http://localhost:3000>.
 
 ## Usage Guide
 
-**1. Sign in.** Google or email via Firebase. A workspace is created on first sign-in, and any orphaned projects are adopted into it.
+**1. Sign in.** Google or GitHub via Firebase. A workspace is created on first sign-in, and any orphaned projects are adopted into it.
 
 **2. Create a project and upload.** Drag a PDF or DOCX onto the upload zone on the dashboard. DOCX is converted to PDF server-side; the original is preserved either way.
 
 **3. Annotate.** Pick a tool from the toolbar and draw. Text annotations are created by clicking anywhere and typing — set font, size, and color before or after. Changes autosave on a debounce, the header shows save state, and `Ctrl+S` forces a save.
 
-**4. Comment.** Open the sidebar to leave a comment on the current page, or attach one to a selected annotation. Resolve threads inline as they're addressed.
+**4. Comment.** Open the sidebar to leave a comment on the current page. When a reviewer flags something, mark it fixed with a note on what changed; the reviewer then verifies it or sends it back. Comments you wrote yourself can be resolved directly.
 
 **5. Share.** Use the share modal to mint a link with the access level you want. Reviewers open `/review/<token>` — no account, no install. `VIEW` is read-only, `COMMENT` adds the sidebar, `EDIT` gives the full toolbar.
 
@@ -286,7 +286,7 @@ markly/
 │       │   ├── file/[filename]/     # Stream document bytes
 │       │   └── [id]/                # Document metadata
 │       ├── annotations/             # Bulk replace + per-annotation ops
-│       ├── comments/                # Create, list, resolve, delete
+│       ├── comments/                # Create, list, change status, delete
 │       ├── share/                   # Create, resolve, revoke share links
 │       └── export/                  # Annotated PDF generation
 │
@@ -298,7 +298,7 @@ markly/
 │   ├── auth/AuthScreen.tsx
 │   ├── landing/LandingPageClient.tsx
 │   ├── MorphLoader.tsx              # Shared route/transition loader
-│   └── Providers.tsx                # React Query provider
+│   └── Providers.tsx                # React Query provider (wired in, not used by pages yet)
 │
 ├── lib/
 │   ├── auth.ts                      # Session verification + access authorization
@@ -324,7 +324,7 @@ markly/
 
 ## API Reference
 
-All endpoints return JSON; errors take the shape `{ error: string }`. Document-scoped routes accept either a session cookie or a `?token=` share token.
+All endpoints return JSON; errors take the shape `{ error: string }`. Document-scoped routes accept either the session cookie or a share token in the `x-share-token` header (`?token=` on the file and export URLs).
 
 ### Auth & workspace
 
@@ -377,7 +377,7 @@ All endpoints return JSON; errors take the shape `{ error: string }`. Document-s
 |---|---|---|
 | `GET` | `/api/share?token=` | Resolve a share link to its project and documents |
 | `GET` | `/api/share?projectId=` or `?documentId=` | List existing links |
-| `POST` | `/api/share` | Create — `{ projectId, documentId?, access, expiresAt? }` |
+| `POST` | `/api/share` | Create — `{ documentId, access, expiresAt? }`. An `EDIT` link points at a hidden copy of the document. |
 | `DELETE` | `/api/share/:id` | Revoke a link |
 
 ### Export

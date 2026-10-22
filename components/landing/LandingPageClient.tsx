@@ -74,14 +74,14 @@ const FEATURES: FeatureItem[] = [
     x: 42, y: 46, rotate: -3, z: 3, tintA: '#f2f7fc', tintB: '#e4edf9', accent: '#7c96c2',
   },
   {
-    t: 'Threaded comments',
-    d: 'Attach comments to annotations or pages. Resolve, reply, and track feedback inline.',
+    t: 'Verified comments',
+    d: 'Comment on any page. You mark it fixed; the reviewer verifies it or sends it back.',
     icon: featIcon(<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />),
     x: 58, y: 70, rotate: 4, z: 4, tintA: '#fdf3f3', tintB: '#f8e6e6', accent: '#d98a7f',
   },
   {
     t: 'Auto-save & undo/redo',
-    d: 'Debounced autosave with full history. Ctrl+Z / Ctrl+Y, just like Excalidraw.',
+    d: 'Debounced autosave, plus Ctrl+Z / Ctrl+Y undo, just like Excalidraw.',
     icon: featIcon(<><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" /></>),
     x: 73, y: 58, rotate: 11, z: 5, tintA: '#f8f5fc', tintB: '#efe6f8', accent: '#a888c9',
   },
@@ -117,7 +117,7 @@ type AccessMode = (typeof ACCESS_MODES)[number];
 
 const ACCESS_CAPTIONS: Record<AccessMode, string> = {
   VIEW: 'Reviewers can read and zoom — nothing else.',
-  COMMENT: 'Reviewers can leave threaded comments and reactions.',
+  COMMENT: 'Reviewers can comment on any page and verify your fixes.',
   EDIT: 'Reviewers can draw and annotate alongside you.',
 };
 
@@ -1036,7 +1036,7 @@ export default function LandingPageClient({ initialIsAuthed }: LandingPageClient
                           <div className="mkly-comment-avatar">AR</div>
                           <div>
                             <div style={{ fontSize: 11, color: 'var(--text2)', lineHeight: 1.5 }}>&ldquo;Review highlighted section&rdquo;</div>
-                            <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 4 }}>2 min ago · Resolved</div>
+                            <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 4 }}>2 min ago · Verified</div>
                           </div>
                         </div>
                       </div>

@@ -43,10 +43,8 @@ next-env.d.ts
 storage/
 .env.local
 
-# marketing promo assets
-marketing/markly-promo.html
-marketing/markly-promo-music.wav
-marketing/markly-promo.mp4
+# marketing assets and launch posts (local only)
+/marketing/
 
 # personal learning notes (local only)
 /docs/

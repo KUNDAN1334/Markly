@@ -30,7 +30,7 @@ const HARD_PARTS = [
   {
     n: '01',
     t: 'Login-free review that is still secure',
-    d: 'The obvious way to let anyone review a document is to loosen auth. I did the opposite and used two explicit authorization paths instead. Owners are resolved from `markly_session`, an HTTP-only Firebase session cookie verified server-side. Reviewers are resolved from a `?token=` share link that maps to a ShareLink row, checked for expiry and for a ranked access level — VIEW < COMMENT < EDIT — against whatever the route requires. Every document-scoped route goes through one of those two paths, so there is no second, weaker auth system hiding behind the convenience.',
+    d: 'The obvious way to let anyone review a document is to loosen auth. I did the opposite and used two explicit authorization paths instead. Owners are resolved from `markly_session`, an HTTP-only Firebase session cookie verified server-side. Reviewers are resolved from the share-link token (an `x-share-token` header, or `?token=` on the PDF and export URLs the browser opens directly), which maps to a ShareLink row and is checked for expiry and for a ranked access level — VIEW < COMMENT < EDIT — against whatever the route requires. Every document-scoped route goes through one of those two paths, so there is no second, weaker auth system hiding behind the convenience.',
   },
   {
     n: '02',
@@ -52,12 +52,12 @@ const HARD_PARTS = [
 const STACK = [
   ['Framework', 'Next.js 16 (App Router)'],
   ['UI', 'React 19 + Tailwind CSS v4'],
-  ['Canvas', 'pdf.js + HTML Canvas + Rough.js'],
+  ['Canvas', 'pdf.js + HTML Canvas 2D'],
   ['Export', 'pdf-lib + @pdf-lib/fontkit'],
   ['Auth', 'Firebase Auth + session cookies'],
   ['Data', 'PostgreSQL 16 + Prisma 7'],
   ['Storage', 'Cloudflare R2 (S3-compatible)'],
-  ['State', 'Zustand + TanStack Query'],
+  ['State', 'Zustand + React state'],
 ];
 
 export default function BlogPageClient() {
@@ -238,8 +238,8 @@ export default function BlogPageClient() {
             <h2 className="blog-h2">How it&rsquo;s put together</h2>
             <p>
               One Next.js deployable holds the server components, the API routes and the editor. State splits cleanly:
-              Zustand for the synchronous editor store (tools, history, viewport), TanStack Query for anything that
-              touches the server. Storage is pluggable — <code>lib/storage.ts</code> picks local disk or Cloudflare R2
+              Zustand for the synchronous editor store (tools, history, viewport), and plain page-level React state for
+              anything that comes from the server, kept fresh by debounced saves and a short poll. Storage is pluggable — <code>lib/storage.ts</code> picks local disk or Cloudflare R2
               from environment variables alone, so <code>npm run dev</code> works with zero cloud credentials.
             </p>
             <figure className="blog-fig lp-reveal">

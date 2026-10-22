@@ -91,7 +91,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     const { history, historyIndex } = get();
     const newHistory = history.slice(0, historyIndex + 1);
     newHistory.push([...annotations]);
-    set({ history: newHistory.slice(-50), historyIndex: newHistory.length - 1 });
+    // Index from the trimmed array, or the first undo past the cap lands on the current state.
+    const capped = newHistory.slice(-50);
+    set({ history: capped, historyIndex: capped.length - 1 });
   },
   undo: () => {
     const { history, historyIndex } = get();
